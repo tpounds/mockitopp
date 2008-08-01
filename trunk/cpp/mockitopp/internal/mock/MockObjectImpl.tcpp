@@ -1,0 +1,25 @@
+#include <mockitopp/internal/stubbing/Stub.hpp>
+#include <mockitopp/internal/stubbing/StubImplData.hpp>
+#include <mockitopp/internal/utility/FunctionAddress.hpp>
+
+namespace mockitopp
+{
+   namespace detail
+   {
+      template <typename M>
+      void MockObjectImpl::stubImpl(M ptr2member)
+      {
+         size_t vtable_offset = FunctionAddress::offset(ptr2member);
+         __vptr->__vtable[vtable_offset] = Stub::getInstance<M>(vtable_offset);
+         __stubImpl[vtable_offset] = new StubImplData<M>();
+      }
+
+      template <typename M>
+      ArgumentMatcher<M>& MockObjectImpl::getMatcher(M ptr2member)
+         { return reinterpret_cast<StubImplData<M>*>(__stubImpl[FunctionAddress::offset(ptr2member)])->getMatcher(); }
+
+      template <typename M>
+      uint32_t MockObjectImpl::getCalls(M ptr2member)
+         { return reinterpret_cast<StubImplData<M>*>(__stubImpl[FunctionAddress::offset(ptr2member)])->getCalls(); }
+   } // namespace detail
+} // namespace mockitopp

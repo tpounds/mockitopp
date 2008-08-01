@@ -1,0 +1,6 @@
+Import('env')
+SRC = [
+   'src/utility/FunctionAddress.cpp',
+]
+env.SharedLibrary('mockitopp', SRC)
+# vim:ft=python:
