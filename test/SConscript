@@ -1,0 +1,11 @@
+Import('env')
+SRC = [
+   'src/__TestRunner.cpp',
+   'src/TestBasicStubbing.cpp',
+   'src/TestDefaultAction.cpp',
+   'src/TestSimpleComposite.cpp',
+   'src/TestVerify.cpp'
+]
+env.Program('TestRunner', SRC, LIBS=['UnitTest++', 'mockitopp'])
+#env.Command("test.passed", 'TestRunner', './$SOURCE')
+# vim:ft=python:
