@@ -1,0 +1,22 @@
+#labels Featured
+== Stubbing ==
+This example is trivial but shows the basics for constructing a simple mock of an interface and stubbing its only virtual function.
+{{{
+#include <UnitTest++.h>
+#include <mockitopp/MockObject.hpp>
+
+// This is a really simple and dumb interface
+struct Foo
+{
+   virtual void bar() = 0;
+};
+
+using mockitopp::MockObject;
+TEST(MyTestCase)
+{
+   MockObject<Foo> mock;
+   mock.stub(&Foo::bar);
+   SimpleInterface& foo = mock.getMock();
+   foo.bar();
+}
+}}}
