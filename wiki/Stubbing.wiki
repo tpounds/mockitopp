@@ -1,22 +1,57 @@
 #labels Featured
-== Stubbing ==
+== Trivial Example ==
 This example is trivial but shows the basics for constructing a simple mock of an interface and stubbing its only virtual function.
 {{{
 #include <UnitTest++.h>
 #include <mockitopp/MockObject.hpp>
 
-// This is a really simple and dumb interface
+// This is a really trivial interface
 struct Foo
 {
    virtual void bar() = 0;
 };
 
+// This is a trivial test case
 using mockitopp::MockObject;
 TEST(MyTestCase)
 {
    MockObject<Foo> mock;
    mock.stub(&Foo::bar);
-   SimpleInterface& foo = mock.getMock();
-   foo.bar();
+   Foo& fooImpl = mock.getMock();
+   fooImpl.bar();
 }
 }}}
+
+== Defining Stub Returnable Behavior ==
+This example shows how you can define simple returnable behavior for an object.  You will notice that we chained a bnch of arguments and their return values together in a nice readable format. We then have our associated UnitTest++ {{{CHECK}}} macros verify the expected behavior. As you can see we make a call to {{{adderImpl.add(4, 5)}}}, but we didn't define any behavior for it. What happens in this case is the stub implementation will try to return the default behavior for function's signature.  This means for POD (i.e. {{{int}}}, {{{bool}}}, etc.) it will return 0, false, 0.0, etc.  For objects it will try to return the object using the default constructor (i.e. {{{std::string()}}}, {{{std::vector()}}}, etc).  For pointers it will return {{{NULL}}}. For reference types it will do a very dangerous cast from a pointer to a primitive to a reference of the return type (which may or may not be desired, SO BE CAREFUL).
+{{{
+#include <UnitTest++.h>
+#include <mockitopp/MockObject.hpp>
+
+// new interface
+struct Adder
+{
+   virtual int add(int a, int b) = 0;
+};
+
+// test case
+using mockitopp::MockObject;
+TEST(MyTestCase)
+{
+   MockObject<Adder> mock;
+   mock.stub(&Adder::add).arguments(0, 0).returns(0)
+                         .arguments(1, 1).returns(2)
+                         .arguments(2, 2).returns(5); // most certainly 2 + 2 = 5!
+   Adder& adderImpl = mock.getMock();
+
+   CHECK(adderImpl.add(0, 0) == 0);
+   CHECK(adderImpl.add(1, 1) == 2);
+   CHECK(adderImpl.add(2, 2) == 5);
+   // What does 4 + 5 return?
+   // We didn't define any behavior!!!
+   CHECK(adderImpl.add(4, 5) == 0);
+}
+}}}
+
+== Defining Stub Throwable Behavior ==
+TODO
