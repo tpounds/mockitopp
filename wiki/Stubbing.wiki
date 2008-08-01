@@ -54,4 +54,32 @@ TEST(MyTestCase)
 }}}
 
 == Defining Stub Throwable Behavior ==
-TODO
+This example shows how you can define simple throwable behavior for an object.  Similarly to the returnable action behavior you can instead decide to use {{{throws(...)}}} to define a throwable action. AS you may ahve noticed you can chain together multiple throwable and returnable actions.  This is useful for cases where your mock object is only expected to handle certain argument types.
+{{{
+#include <UnitTest++.h>
+#include <mockitopp/MockObject.hpp>
+
+// new interface
+struct Adder
+{
+   virtual int add(int a, int b) = 0;
+};
+
+// test case
+using mockitopp::MockObject;
+TEST(MyTestCase)
+{
+   MockObject<Adder> mock;
+   mock.stub(&Adder::add).arguments(0, 0).returns(0)
+                         .arguments(1, 1).returns(2)
+                         .arguments(2, 2).throws(std::string("I don't support this!")); // Don't believe me? I dare you to try it!
+   Adder& adderImpl = mock.getMock();
+
+   CHECK(adderImpl.add(0, 0) == 0);
+   CHECK(adderImpl.add(1, 1) == 2);
+   try
+      { int result = adderImpl.add(2, 2); }
+   catch(std::string& s)
+      { std::cout << s << std::endl; }
+}
+}}}
