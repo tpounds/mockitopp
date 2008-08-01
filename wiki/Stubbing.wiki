@@ -22,7 +22,7 @@ TEST(MyTestCase)
 }
 }}}
 
-== Defining Stub Returnable Behavior ==
+== Stub Returnable Behavior ==
 This example shows how you can define simple returnable behavior for an object.  You will notice that we chained a bunch of arguments and their return values together in a nice readable format. We then have our associated UnitTest++ {{{CHECK}}} macros verify the expected behavior. As you can see we make a call to {{{adderImpl.add(4, 5)}}}, but we didn't define any behavior for it. What happens in this case is the stub implementation will try to return the default behavior for function's signature.  This means for POD (i.e. {{{int}}}, {{{bool}}}, etc.) it will return 0, false, 0.0, etc.  For objects it will try to return the object using the default constructor (i.e. {{{std::string()}}}, {{{std::vector()}}}, etc).  For pointers it will return {{{NULL}}}. For reference types it will do a very dangerous cast from a pointer to a primitive to a reference of the return type (which may or may not be desired, SO BE CAREFUL).
 {{{
 #include <UnitTest++.h>
@@ -53,7 +53,7 @@ TEST(MyTestCase)
 }
 }}}
 
-== Defining Stub Throwable Behavior ==
+== Stub Throwable Behavior ==
 This example shows how you can define simple throwable behavior for an object.  Similarly to the returnable action behavior you can instead decide to use {{{throws(...)}}} to define a throwable action. AS you may ahve noticed you can chain together multiple throwable and returnable actions.  This is useful for cases where your mock object is only expected to handle certain argument types.
 {{{
 #include <UnitTest++.h>
