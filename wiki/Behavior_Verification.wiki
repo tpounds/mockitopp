@@ -11,15 +11,6 @@ struct Foo
 
 === Verify Exactly ===
 {{{
-#include <UnitTest++.h>
-#include <mockitopp/MockObject.hpp>
-
-struct Foo
-{
-   virtual void bar() = 0;
-};
-
-using mockitopp::MockObject;
 TEST(TestVerifyExactly)
 {
    MockObject<Foo> mock;
@@ -36,10 +27,6 @@ TEST(TestVerifyExactly)
 
 === Verify At Least ===
 {{{
-#include <UnitTest++.h>
-#include <mockitopp/MockObject.hpp>
-
-using mockitopp::MockObject;
 TEST(TestVerifyAtLeast)
 {
    MockObject<Foo> mock;
@@ -59,10 +46,6 @@ TEST(TestVerifyAtLeast)
 
 === Verify At Most ===
 {{{
-#include <UnitTest++.h>
-#include <mockitopp/MockObject.hpp>
-
-using mockitopp::MockObject;
 TEST(TestVerifyAtMost)
 {
    MockObject<Foo> mock;
@@ -82,11 +65,7 @@ TEST(TestVerifyAtMost)
 
 === Verify Never ===
 {{{
-#include <UnitTest++.h>
-#include <mockitopp/MockObject.hpp>
-
-using mockitopp::MockObject;
-TEST(TestVerifyAtMost)
+TEST(TestVerifyNever)
 {
    MockObject<Foo> mock;
    mock.stub(&Foo::bar);
@@ -100,11 +79,7 @@ TEST(TestVerifyAtMost)
 
 === Verify Range ===
 {{{
-#include <UnitTest++.h>
-#include <mockitopp/MockObject.hpp>
-
-using mockitopp::MockObject;
-TEST(TestVerifyAtMost)
+TEST(TestVerifyRange)
 {
    MockObject<Foo> mock;
    mock.stub(&Foo::bar);
