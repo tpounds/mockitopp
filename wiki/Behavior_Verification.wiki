@@ -1,9 +1,6 @@
 #labels Featured
-== About ==
-Behavior verification is implemented as the xUnit pattern, *Test Spy*, as defined by [http://xunitpatterns.com Gerard Meszaros].  The mock object has several introspection methods which provide an observation into the use of the mock object during the xUnit test run.
-
 == Verifying Invocations ==
-The {{{verifyXXX}}} methods allow xUnit test cases to assert if a given stubbed function has been invoke a certain number of times.  This is useful to ensure that no unexpected method invocations were encountered during the test run.  All of these examples will be mocking the simple interface below.
+There are several introspection methods which provide an observation into the use of the mock object during the xUnit test run. The mock object's {{{verifyXXX}}} methods allow test cases to assert if a given stubbed function has been invoke a certain number of times.  This is useful to ensure that no unexpected method invocations were encountered during the test run.  All of these examples will be mocking the simple interface below.
 
 {{{
 struct Foo
