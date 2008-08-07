@@ -105,7 +105,7 @@ TEST(MyTestCase)
    MockObject<Foo> mock;
    mock.stub(&Foo::bar).arguments(0).returns()
                        .arguments(1).returns()
-                       .arguments(2).throws(std::string("Inavlid argument!"));
+                       .arguments(2).throws(std::string("Invalid argument!"));
    Foo& foo = mock.getMock();
 
    try
@@ -117,5 +117,41 @@ TEST(MyTestCase)
    }
    catch(std::string& s)
       { std::cout << s << std::endl; }
+}
+}}}
+
+== Iterator-Style ==
+You can stub arguments to return different values on consecutive calls.  This is useful for modeling iterator like behavior for a given argument list.  It even works with a fucntion that takes no arguments.  The configuration is similar to the previous uses except you chain together consecutive calls to the {{{returns}}} and {{{throws}}} methods from a single use of the {{{arguments}}} method.  The last stubbed return or throws becomes the default behavior when the last element is hit.
+{{{
+#include <UnitTest++.h>
+#include <mockitopp/MockObject.hpp>
+
+// some interface
+struct Enumeration
+{
+   virtual int next() = 0;
+};
+
+// test case
+using mockitopp::MockObject;
+TEST(MyTestCase)
+{
+   MockObject<Enumeration> mock;
+   mock.stub(&Enumeration::next).arguments().returns(0)
+                                            .returns(1)
+                                            .throws(std::string("Invalid argument!"))
+                                            .returns(2)
+                                            .returns(3);
+   Enumeration& e = mock.getMock();
+
+   CHECK(0 == e.next()); // should return 0
+   CHECK(1 == e.next()); // should return 1
+   try
+      { CHECK(1 == e.next()); /*should throw an exception*/ }
+   catch(...)
+      { /*ignore*/ }
+   CHECK(2 == e.next()); // should return 2
+   CHECK(3 == e.next()); // should return 3
+   CHECK(3 == e.next()); // remaining consecutive calls return the last stubbed value
 }
 }}}
