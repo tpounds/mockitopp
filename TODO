@@ -1,0 +1,3 @@
+* fix-up possible memory leaks (i.e. check new/delete)
+* more test cases
+* mockito style argument matchers (i.e. anyString() anyInt(), etc)

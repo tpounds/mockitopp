@@ -2,6 +2,7 @@
 #define __MOCKITOPP_ARGUMENT_MATCHER_HPP__
 
 #include <map>
+#include <queue>
 
 #include <boost/preprocessor/punctuation/comma_if.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
@@ -36,7 +37,7 @@ namespace mockitopp
          \
             ArgumentMatcher& returns() \
             { \
-               actionMap[ongoingMatch] = new ReturnableAction<R>(); \
+               actionMap[ongoingMatch].push(new ReturnableAction<R>()); \
                return *this; \
             } \
          };
@@ -49,7 +50,7 @@ namespace mockitopp
          \
             ArgumentMatcher& returns(R value) \
             { \
-               actionMap[ongoingMatch] = new ReturnableAction<R>(value); \
+               actionMap[ongoingMatch].push(new ReturnableAction<R>(value)); \
                return *this; \
             } \
          };
@@ -57,7 +58,8 @@ namespace mockitopp
       #define DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT) \
             typedef boost::tuple<BOOST_PP_ENUM_PARAMS(NNN, A)> args_type; \
             typedef Action<R>*                                 action_type; \
-            typedef std::map<args_type, action_type>           map_type; \
+            typedef std::queue<action_type>                    queue_type; \
+            typedef std::map<args_type, queue_type>            map_type; \
          \
             map_type    actionMap; \
             action_type defaultAction; \
@@ -78,16 +80,20 @@ namespace mockitopp
             template <typename T> \
             ArgumentMatcher& throws(T throwable) \
             { \
-               actionMap[ongoingMatch] = new ThrowableAction<R, T>(throwable); \
+               actionMap[ongoingMatch].push(new ThrowableAction<R, T>(throwable)); \
                return *this; \
             } \
          \
             R invoke(BOOST_PP_ENUM_BINARY_PARAMS(NNN, A, a)) \
             { \
-               args_type   args   = args_type(BOOST_PP_ENUM_PARAMS(NNN, a)); \
-               action_type action = actionMap[args]; \
-               if(action == NULL) \
-                  { action = defaultAction; } \
+               args_type   args     = args_type(BOOST_PP_ENUM_PARAMS(NNN, a)); \
+               queue_type& action_q = actionMap[args]; \
+               if(action_q.empty()) \
+                  { return defaultAction->execute(); } \
+               else if(action_q.size() == 1) \
+                  { return action_q.front()->execute(); } \
+               action_type action = action_q.front(); \
+               action_q.pop(); \
                return action->execute(); \
             }
 
