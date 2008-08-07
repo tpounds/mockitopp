@@ -85,7 +85,7 @@ TEST(MyTestCase)
 }}}
 
 == Void Functions ==
-You can stub functions that return {{{void}}} similarly to the way it is done for functions with return values. The different is that the {{{returns}}} method takes no arguments, while the {{{throws}} method still operates as expected.
+You can stub functions that return {{{void}}} similarly to the way it is done for functions with return values. The different is that the {{{returns}}} method takes no arguments, while the {{{throws}}} method still operates as expected.
 
 What happens when you don't stub behavior for a given input? In this case it operates as if you stubbed the argument using the {{{returns}}} method.
 {{{
