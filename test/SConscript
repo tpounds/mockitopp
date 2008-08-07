@@ -3,6 +3,7 @@ SRC = [
    'src/__TestRunner.cpp',
    'src/TestBasicStubbing.cpp',
    'src/TestDefaultAction.cpp',
+   'src/TestIterator.cpp',
    'src/TestSimpleComposite.cpp',
    'src/TestVerify.cpp'
 ]
