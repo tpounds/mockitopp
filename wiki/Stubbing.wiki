@@ -121,7 +121,7 @@ TEST(MyTestCase)
 }}}
 
 == Iterator-Style ==
-You can stub arguments to return different values on consecutive calls.  This is useful for modeling iterator like behavior for a given argument list.  It even works with a fucntion that takes no arguments.  The configuration is similar to the previous uses except you chain together consecutive calls to the {{{returns}}} and {{{throws}}} methods from a single use of the {{{arguments}}} method.  The last stubbed return or throws becomes the default behavior when the last element is hit.
+You can stub arguments to return different values on consecutive calls.  This is useful for modeling iterator like behavior for a given argument list.  It even works with a fucntion that takes no arguments.  The configuration is similar to the previous uses except you chain together consecutive calls to the {{{returns}}} and {{{throws}}} methods from a single call to the {{{arguments}}} method.  Also, the last stubbed {{{returns}}} or {{{throws}}} becomes the default behavior on consecutive calls after the the last element is hit.
 {{{
 #include <UnitTest++.h>
 #include <mockitopp/MockObject.hpp>
