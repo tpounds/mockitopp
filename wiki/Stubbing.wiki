@@ -83,3 +83,37 @@ TEST(MyTestCase)
       { std::cout << s << std::endl; }
 }
 }}}
+
+== Stub Void Functions ==
+You can stub functions that return {{{void}}} similarly to the way it is done for functions with return values. The different is that the {{{returns}}} method takes no arguments.  The {{{throws}} method still operates as in the above examples. What happens when you don't stub behavior for a given input? In this case it operates as if you did define void returnable behavior using the {{{returns}}} method.
+{{{
+#include <UnitTest++.h>
+#include <mockitopp/MockObject.hpp>
+
+// new interface
+struct Foo
+{
+   virtual void bar(int x) = 0;
+};
+
+// test case
+using mockitopp::MockObject;
+TEST(MyTestCase)
+{
+   MockObject<Foo> mock;
+   mock.stub(&Foo::bar).arguments(0).returns()
+                       .arguments(1).returns()
+                       .arguments(2).throws(std::string("Inavlid argument!"));
+   Foo& foo = mock.getMock();
+
+   try
+   {
+      foo.bar(0); // returns because we stubbed it
+      foo.bar(1); // returns because we stubbed it
+      foo.bar(3); // also returns, even though we didn't stub it for this argument though
+      foo.bar(2); // throws stubbed exception
+   }
+   catch(std::string& s)
+      { std::cout << s << std::endl; }
+}
+}}}
