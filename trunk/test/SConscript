@@ -7,6 +7,17 @@ SRC = [
    'src/TestSimpleComposite.cpp',
    'src/TestVerify.cpp'
 ]
-env.Program('TestRunner', SRC, LIBS=['UnitTest++', 'mockitopp'])
-#env.Command("test.passed", 'TestRunner', './$SOURCE')
+test = env.Program('test', SRC, LIBS=['UnitTest++', 'mockitopp'])
+
+# Unit Test Builder
+def runTests(target, source, env):
+   from subprocess import Popen
+   proc = Popen(source[0].abspath, env={'LD_LIBRARY_PATH':'3rdparty/build:cpp/build'})
+   proc.wait()
+   if proc.returncode:
+      print "Unit Test FAILURE!"
+      return 1
+   return 0
+
+env.Command('test.passed', 'test', runTests)
 # vim:ft=python:
