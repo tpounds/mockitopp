@@ -1,3 +1,5 @@
 * fix-up possible memory leaks (i.e. check new/delete)
 * more test cases
 * mockito style argument matchers (i.e. anyString() anyInt(), etc)
+* improve boost headers externals (really don't need them all)
+* fixup LD_LIBRARY_PATH usage in unit tests.  This isn't portable across multiple environments
