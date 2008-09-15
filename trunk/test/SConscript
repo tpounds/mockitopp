@@ -7,12 +7,12 @@ SRC = [
    'src/TestSimpleComposite.cpp',
    'src/TestVerify.cpp'
 ]
-test = env.Program('test', SRC, LIBS=['UnitTest++', 'mockitopp'])
+test = env.Program('test', SRC, LIBS=['UnitTest++'])
 
 # Unit Test Builder
 def runTests(target, source, env):
    from subprocess import Popen
-   proc = Popen(source[0].abspath, env={'LD_LIBRARY_PATH':'3rdparty/build:cpp/build'})
+   proc = Popen(source[0].abspath, env={'LD_LIBRARY_PATH':'3rdparty/build'})
    proc.wait()
    if proc.returncode:
       print "Unit Test FAILURE!"

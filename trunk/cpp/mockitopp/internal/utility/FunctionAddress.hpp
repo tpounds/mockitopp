@@ -15,24 +15,9 @@ namespace mockitopp
       /**
        * @author Trevor Pounds
        */
-      struct OffsetHelper
-      {
-         #define DEFINE_OFFSET_HELPER_VIRTUAL_FUNCTION(ZZZ, NNN, TTT) \
-            virtual size_t offset##NNN() { return NNN; }
-
-         BOOST_PP_REPEAT(MAX_VIRTUAL_FUNCTIONS, DEFINE_OFFSET_HELPER_VIRTUAL_FUNCTION, ~)
-
-         #undef DEFINE_OFFSET_HELPER_VIRTUAL_FUNCTION
-      };
-
-      /**
-       * @author Trevor Pounds
-       */
       class FunctionAddress
       {
          private:
-
-            static OffsetHelper offsetHelper;
 
             union UnsafeUnion
             {
@@ -60,7 +45,17 @@ namespace mockitopp
 
             template <typename T>
             static size_t offset(T ptr2member)
-               { return (offsetHelper.*reinterpret_cast<size_t (OffsetHelper::*)()>(ptr2member))(); }
+            {
+               FunctionAddress fa;
+               return (fa.*reinterpret_cast<size_t (FunctionAddress::*)()>(ptr2member))();
+            }
+
+            #define DEFINE_OFFSET_HELPER_VIRTUAL_FUNCTION(ZZZ, NNN, TTT) \
+               virtual size_t offset##NNN() { return NNN; }
+
+            BOOST_PP_REPEAT(MAX_VIRTUAL_FUNCTIONS, DEFINE_OFFSET_HELPER_VIRTUAL_FUNCTION, ~)
+
+            #undef DEFINE_OFFSET_HELPER_VIRTUAL_FUNCTION
       };
 
    } // namespace detail
