@@ -1,4 +1,6 @@
-env = Environment(CPPPATH=['#cpp', '#3rdparty/boost_headers_1_35_0','#3rdparty/UnitTest++/src'],
+import os
+env = Environment(CXX=os.getenv('CXX', Environment()['CXX']),
+                  CPPPATH=['#cpp', '#3rdparty/boost_headers_1_35_0','#3rdparty/UnitTest++/src'],
                   LIBPATH=['#3rdparty/build'])
 Export('env')
 
