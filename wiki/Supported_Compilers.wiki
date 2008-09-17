@@ -1,0 +1,21 @@
+#labels Featured
+This library was primarily developed against GCC but should be portable across newer C++ compilers. That said it may not work on all toolchains due to dependencies on the compiler's virtual table ABI implementation and support for fairly old meta-template programming techniques.  This page will serve as a cross-reference of known supported compilers.  If you do not see your compiler listed, forward me the working status (yes/no & version) so I can update this page accordingly.
+
+== [http://gcc.gnu.org/ GCC] ==
+|| *version* || *compatible* || *notes* ||
+||2.9.5||???||Not Tested (Most Likely Not)||
+||3.3.x||Yes||Tested against 4.1.2||
+||3.4.x||Yes||Tested against 3.4.6||
+||4.0.x||???||Not Tested||
+||4.1.x||Yes||Tested against 3.3.6||
+||4.2.x||???||Not Tested||
+||4.3.x||???||Not Tested||
+
+== [http://msdn.microsoft.com/en-us/visualc Microsoft Visual C++] ==
+|| *version* || *compatible* || *notes* ||
+||5.0||???||Not Tested (Most Likely Not)||
+||6.0||???||Not Tested (Most Likely Not)||
+||7.0 (.Net 2002)||???||Not Tested||
+||7.1 (.Net 2003)||???||Not Tested||
+||8.0 (2005)||???||Not Tested||
+||9.0 (2008)||???||Not Tested||
