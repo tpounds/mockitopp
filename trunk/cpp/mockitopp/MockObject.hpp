@@ -38,19 +38,19 @@ namespace mockitopp
 
       template <typename M>
       bool verifyAtLeast(M ptr2member, uint32_t times)
-         { verify(ptr2member, times, 0xFFFFFFFF); }
+         { return verify(ptr2member, times, 0xFFFFFFFF); }
 
       template <typename M>
       bool verifyAtMost(M ptr2member, uint32_t times)
-         { verify(ptr2member, 0, times); }
+         { return verify(ptr2member, 0, times); }
 
       template <typename M>
       bool verifyExactly(M ptr2member, uint32_t times)
-         { verify(ptr2member, times, times); }
+         { return verify(ptr2member, times, times); }
 
       template <typename M>
       bool verifyNever(M ptr2member)
-         { verify(ptr2member, 0, 0); }
+         { return verify(ptr2member, 0, 0); }
    };
 
 } // namespace mockitopp
