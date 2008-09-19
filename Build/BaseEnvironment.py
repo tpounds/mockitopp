@@ -1,9 +1,9 @@
 from SCons.Script.SConscript import SConsEnvironment
+import os
+import subprocess
 
 def Test(target, source, env):
-   import os
-   from subprocess import Popen
-   proc = Popen(source[0].abspath)
+   proc = subprocess.Popen(source[0].abspath)
    proc.wait()
    print "\n============================="
    if proc.returncode:
@@ -22,6 +22,7 @@ def TestString(target, source, env):
 class Environment(SConsEnvironment):
    def __init__(self, **kw):
       apply(SConsEnvironment.__init__, (self,), kw)
+      self['CXX'] = os.getenv('CXX', self['CXX'])
       self['BUILDERS']['Test'] = self.Builder(action = self.Action(Test, TestString),
                                               suffix = '.dummy',
                                               src_suffix = self['PROGSUFFIX'])
