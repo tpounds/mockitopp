@@ -7,17 +7,10 @@ SRC = [
    'src/TestSimpleComposite.cpp',
    'src/TestVerify.cpp'
 ]
-test = env.Program('test', SRC, LIBS=['UnitTest++'])
+env.AppendUnique(CPPPATH = ['#cpp', '#3rdparty/boost_headers_1_35_0','#3rdparty/UnitTest++/src'])
+env.AppendUnique(LIBPATH = '#3rdparty/build')
+env.AppendUnique(LIBS = 'UnitTest++')
+test = env.Program('test', SRC)
+unitTest = env.Test('test')
 
-# Unit Test Builder
-def runTests(target, source, env):
-   from subprocess import Popen
-   proc = Popen(source[0].abspath, env={'LD_LIBRARY_PATH':'3rdparty/build'})
-   proc.wait()
-   if proc.returncode:
-      print "Unit Test FAILURE!"
-      return 1
-   return 0
-
-env.Command('test.passed', 'test', runTests)
 # vim:ft=python:
