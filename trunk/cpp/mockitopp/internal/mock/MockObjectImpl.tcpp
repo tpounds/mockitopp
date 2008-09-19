@@ -19,7 +19,7 @@ namespace mockitopp
          { return reinterpret_cast<StubImplData<M>*>(__stubImpl[FunctionAddress::offset(ptr2member)])->getMatcher(); }
 
       template <typename M>
-      uint32_t MockObjectImpl::getCalls(M ptr2member)
+      int MockObjectImpl::getCalls(M ptr2member)
          { return reinterpret_cast<StubImplData<M>*>(__stubImpl[FunctionAddress::offset(ptr2member)])->getCalls(); }
    } // namespace detail
 } // namespace mockitopp
