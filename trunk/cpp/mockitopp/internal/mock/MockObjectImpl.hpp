@@ -1,8 +1,6 @@
 #ifndef __MOCKITOPP_MOCK_OBJECT_IMPL_HPP__
 #define __MOCKITOPP_MOCK_OBJECT_IMPL_HPP__
 
-#include <stdint.h>
-
 #include <mockitopp/Configuration.hpp>
 #include <mockitopp/internal/matcher/ArgumentMatcher.hpp>
 #include <mockitopp/internal/mock/VirtualTable.hpp>
@@ -33,7 +31,7 @@ namespace mockitopp
 
          template <typename M> ArgumentMatcher<M>& getMatcher(M ptr2member);
 
-         template <typename M> uint32_t getCalls(M ptr2member);
+         template <typename M> int getCalls(M ptr2member);
       };
    } // namespace detail
 }

@@ -1,8 +1,6 @@
 #ifndef __MOCKITOPP_STUB_IMPL_DATA_HPP__
 #define __MOCKITOPP_STUB_IMPL_DATA_HPP__
 
-#include <stdint.h>
-
 #include <mockitopp/internal/matcher/ArgumentMatcher.hpp>
 
 namespace mockitopp
@@ -18,7 +16,7 @@ namespace mockitopp
 
          private:
 
-            uint32_t     __calls;
+            int          __calls;
             matcher_type __matcher;
 
          public:
@@ -28,7 +26,7 @@ namespace mockitopp
                , __matcher()
             {}
 
-            uint32_t& getCalls()
+            int& getCalls()
                { return __calls; }
 
             matcher_type& getMatcher()
