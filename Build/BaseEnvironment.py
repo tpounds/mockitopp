@@ -3,8 +3,7 @@ from SCons.Script.SConscript import SConsEnvironment
 def Test(target, source, env):
    import os
    from subprocess import Popen
-   # TODO: fix LD_LIBRARY_PATH construction
-   proc = Popen(source[0].abspath, env={'LD_LIBRARY_PATH': '3rdparty/build'})
+   proc = Popen(source[0].abspath)
    proc.wait()
    print "\n============================="
    if proc.returncode:

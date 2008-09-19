@@ -24,5 +24,5 @@ else:
    SRC.append('UnitTest++/src/Posix/SignalTranslator.cpp')
    SRC.append('UnitTest++/src/Posix/TimeHelpers.cpp')
 
-env.SharedLibrary('UnitTest++', SRC)
+env.Library('UnitTest++', SRC)
 # vim:ft=python:
