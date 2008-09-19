@@ -1,8 +1,6 @@
 #ifndef __MOCKITOPP_MOCK_OBJECT_HPP__
 #define __MOCKITOPP_MOCK_OBJECT_HPP__
 
-#include <stdint.h>
-
 #include <mockitopp/internal/matcher/ArgumentMatcher.hpp>
 #include <mockitopp/internal/mock/MockObjectImpl.hpp>
 
@@ -28,24 +26,24 @@ namespace mockitopp
       }
 
       template <typename M>
-      bool verify(M ptr2member, uint32_t minTimes, uint32_t maxTimes)
+      bool verify(M ptr2member, int minTimes, int maxTimes)
       {
-         uint32_t calls = getCalls(ptr2member);
+         int calls = getCalls(ptr2member);
          if(calls >= minTimes && calls <= maxTimes)
             { return true; }
          return false;
       }
 
       template <typename M>
-      bool verifyAtLeast(M ptr2member, uint32_t times)
-         { return verify(ptr2member, times, 0xFFFFFFFF); }
+      bool verifyAtLeast(M ptr2member, int times)
+         { return verify(ptr2member, times, 0x7FFF); }
 
       template <typename M>
-      bool verifyAtMost(M ptr2member, uint32_t times)
+      bool verifyAtMost(M ptr2member, int times)
          { return verify(ptr2member, 0, times); }
 
       template <typename M>
-      bool verifyExactly(M ptr2member, uint32_t times)
+      bool verifyExactly(M ptr2member, int times)
          { return verify(ptr2member, times, times); }
 
       template <typename M>
