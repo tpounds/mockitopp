@@ -11,7 +11,7 @@ struct Foo
 
 === Verify Exactly ===
 {{{
-TEST(TestVerifyExactly)
+TEST(TestVerify, Exactly)
 {
    MockObject<Foo> mock;
    mock.stub(&Foo::bar);
@@ -21,13 +21,13 @@ TEST(TestVerifyExactly)
    fooImpl.bar();
    fooImpl.bar();
 
-   CHECK(mock.verifyExactly(&Foo::bar, 3)); // pass
+   ASSERT_TRUE(mock.verifyExactly(&Foo::bar, 3)); // pass
 }
 }}}
 
 === Verify At Least ===
 {{{
-TEST(TestVerifyAtLeast)
+TEST(TestVerify, AtLeast)
 {
    MockObject<Foo> mock;
    mock.stub(&Foo::bar);
@@ -37,16 +37,16 @@ TEST(TestVerifyAtLeast)
    fooImpl.bar();
    fooImpl.bar();
 
-   CHECK(mock.verifyAtLeast(&Foo::bar, 1)); // pass
-   CHECK(mock.verifyAtLeast(&Foo::bar, 2)); // pass
-   CHECK(mock.verifyAtLeast(&Foo::bar, 3)); // pass
-   CHECK(mock.verifyAtLeast(&Foo::bar, 4)); // fail
+   ASSERT_TRUE(mock.verifyAtLeast(&Foo::bar, 1)); // pass
+   ASSERT_TRUE(mock.verifyAtLeast(&Foo::bar, 2)); // pass
+   ASSERT_TRUE(mock.verifyAtLeast(&Foo::bar, 3)); // pass
+   ASSERT_TRUE(mock.verifyAtLeast(&Foo::bar, 4)); // fail
 }
 }}}
 
 === Verify At Most ===
 {{{
-TEST(TestVerifyAtMost)
+TEST(TestVerify, AtMost)
 {
    MockObject<Foo> mock;
    mock.stub(&Foo::bar);
@@ -56,30 +56,30 @@ TEST(TestVerifyAtMost)
    fooImpl.bar();
    fooImpl.bar();
 
-   CHECK(mock.verifyAtMost(&Foo::bar, 4)); // pass
-   CHECK(mock.verifyAtMost(&Foo::bar, 3)); // pass
-   CHECK(mock.verifyAtMost(&Foo::bar, 2)); // fail
-   CHECK(mock.verifyAtLeast(&Foo::bar, 3));
+   ASSERT_TRUE(mock.verifyAtMost(&Foo::bar, 4)); // pass
+   ASSERT_TRUE(mock.verifyAtMost(&Foo::bar, 3)); // pass
+   ASSERT_TRUE(mock.verifyAtMost(&Foo::bar, 2)); // fail
+   ASSERT_TRUE(mock.verifyAtLeast(&Foo::bar, 3));
 }
 }}}
 
 === Verify Never ===
 {{{
-TEST(TestVerifyNever)
+TEST(TestVerify, Never)
 {
    MockObject<Foo> mock;
    mock.stub(&Foo::bar);
    Foo& fooImpl = mock.getMock();
 
-   CHECK(mock.verifyNever(&Foo::bar)); // pass
+   ASSERT_TRUE(mock.verifyNever(&Foo::bar)); // pass
    fooImpl.bar();
-   CHECK(mock.verifyNever(&Foo::bar)); // fail
+   ASSERT_TRUE(mock.verifyNever(&Foo::bar)); // fail
 }
 }}}
 
 === Verify Range ===
 {{{
-TEST(TestVerifyRange)
+TEST(TestVerify, Range)
 {
    MockObject<Foo> mock;
    mock.stub(&Foo::bar);
@@ -87,10 +87,10 @@ TEST(TestVerifyRange)
 
    fooImpl.bar();
    fooImpl.bar();
-   CHECK(mock.verifyNever(&Foo::bar, 1, 3)); // pass
+   ASSERT_TRUE(mock.verifyNever(&Foo::bar, 1, 3)); // pass
    fooImpl.bar();
-   CHECK(mock.verifyNever(&Foo::bar, 1, 3)); // pass
+   ASSERT_TRUE(mock.verifyNever(&Foo::bar, 1, 3)); // pass
    fooImpl.bar();
-   CHECK(mock.verifyNever(&Foo::bar, 1, 3)); // fail
+   ASSERT_TRUE(mock.verifyNever(&Foo::bar, 1, 3)); // fail
 }
 }}}
