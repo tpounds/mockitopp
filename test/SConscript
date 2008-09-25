@@ -1,16 +1,18 @@
 Import('env')
+testenv = env.Clone()
 SRC = [
-   'src/__TestRunner.cpp',
    'src/TestBasicStubbing.cpp',
    'src/TestDefaultAction.cpp',
    'src/TestIterator.cpp',
    'src/TestSimpleComposite.cpp',
    'src/TestVerify.cpp'
 ]
-env.AppendUnique(CPPPATH = ['#cpp', '#3rdparty/boost_headers_1_35_0','#3rdparty/UnitTest++/src'])
-env.AppendUnique(LIBPATH = '#3rdparty/build')
-env.AppendUnique(LIBS = 'UnitTest++')
-test = env.Program('test', SRC)
-unitTest = env.Test('test')
+testenv.AppendUnique(CPPPATH = ['#cpp'])
+testenv.AppendUnique(CPPPATH = ['#3rdparty/boost_headers_1_36_0'])
+testenv.AppendUnique(CPPPATH = ['#3rdparty/googletest-1.1.0/include'])
+testenv.AppendUnique(LIBPATH = '#3rdparty/build')
+testenv.AppendUnique(LIBS = 'googletest')
+test = testenv.Program('test', SRC)
+unitTest = testenv.Test('test')
 
 # vim:ft=python:

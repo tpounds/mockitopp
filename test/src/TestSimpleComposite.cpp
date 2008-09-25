@@ -1,5 +1,4 @@
-#include <UnitTest++.h>
-
+#include <gtest/gtest.h>
 #include <mockitopp/MockObject.hpp>
 
 using mockitopp::MockObject;
@@ -35,7 +34,7 @@ struct SimpleComposite
    }
 };
 
-TEST(TestSimpleCompositeAdd)
+TEST(TestSimpleComposite, Add)
 {
    MockObject<Interface1> mock1;
    mock1.stub(&Interface1::foo).arguments().returns(2);
@@ -47,12 +46,12 @@ TEST(TestSimpleCompositeAdd)
 
    SimpleComposite c = SimpleComposite(i1, i2);
 
-   CHECK(12 == c.simpleAdd());
-   CHECK(mock1.verifyExactly(&Interface1::foo, 1));
-   CHECK(mock2.verifyExactly(&Interface2::bar, 1));
+   ASSERT_EQ(12, c.simpleAdd());
+   ASSERT_TRUE(mock1.verifyExactly(&Interface1::foo, 1));
+   ASSERT_TRUE(mock2.verifyExactly(&Interface2::bar, 1));
 }
 
-TEST(TestSimpleCompositeMultiply)
+TEST(TestSimpleComposite, Multiply)
 {
    MockObject<Interface1> mock1;
    mock1.stub(&Interface1::foo).arguments().returns(10);
@@ -64,12 +63,12 @@ TEST(TestSimpleCompositeMultiply)
 
    SimpleComposite c = SimpleComposite(i1, i2);
 
-   CHECK(100 == c.simpleMultiply());
-   CHECK(mock1.verifyExactly(&Interface1::foo, 1));
-   CHECK(mock2.verifyExactly(&Interface2::bar, 1));
+   ASSERT_EQ(100, c.simpleMultiply());
+   ASSERT_TRUE(mock1.verifyExactly(&Interface1::foo, 1));
+   ASSERT_TRUE(mock2.verifyExactly(&Interface2::bar, 1));
 }
 
-TEST(TestSimpleCompositeAddandMultiply)
+TEST(TestSimpleComposite, Add_and_Multiply)
 {
    MockObject<Interface1> mock1;
    mock1.stub(&Interface1::foo).arguments().returns(10);
@@ -81,8 +80,8 @@ TEST(TestSimpleCompositeAddandMultiply)
 
    SimpleComposite c = SimpleComposite(i1, i2);
 
-   CHECK(20  == c.simpleAdd());
-   CHECK(100 == c.simpleMultiply());
-   CHECK(mock1.verifyExactly(&Interface1::foo, 2));
-   CHECK(mock2.verifyExactly(&Interface2::bar, 2));
+   ASSERT_EQ(20,  c.simpleAdd());
+   ASSERT_EQ(100, c.simpleMultiply());
+   ASSERT_TRUE(mock1.verifyExactly(&Interface1::foo, 2));
+   ASSERT_TRUE(mock2.verifyExactly(&Interface2::bar, 2));
 }

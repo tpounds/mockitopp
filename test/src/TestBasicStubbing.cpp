@@ -1,5 +1,5 @@
+#include <gtest/gtest.h>
 #include <mockitopp/MockObject.hpp>
-#include <UnitTest++.h>
 
 using mockitopp::MockObject;
 
@@ -7,7 +7,7 @@ struct VoidVoidInterface
 {
    virtual void foo() = 0;
 };
-TEST(TestBasicStubbingVoidVoid)
+TEST(TestBasicStubbing, VoidVoid)
 {
    MockObject<VoidVoidInterface> mock;
    VoidVoidInterface& i = mock.getMock();
@@ -15,41 +15,28 @@ TEST(TestBasicStubbingVoidVoid)
    // returnable call
    mock.stub(&VoidVoidInterface::foo).arguments().returns();
    i.foo();
-   CHECK(mock.verifyExactly(&VoidVoidInterface::foo, 1));
+   ASSERT_TRUE(mock.verifyExactly(&VoidVoidInterface::foo, 1));
 
    // throwable call
    mock.stub(&VoidVoidInterface::foo).arguments().throws(std::string("Hypothetical Error!"));
-   try
-   {
-      i.foo();
-      CHECK(false);
-   }
-   catch(...)
-      { CHECK(true); }
+   ASSERT_THROW(i.foo(), std::string);
 }
-
 
 struct CharVoidInterface
 {
    virtual char foo() = 0;
 };
-TEST(TestBasicStubbingCharVoid)
+TEST(TestBasicStubbing, CharVoid)
 {
    MockObject<CharVoidInterface> mock;
    CharVoidInterface& i = mock.getMock();
 
    // returnable call
    mock.stub(&CharVoidInterface::foo).arguments().returns('A');
-   CHECK('A' == i.foo());
-   CHECK(mock.verifyExactly(&CharVoidInterface::foo, 1));
+   ASSERT_EQ('A', i.foo());
+   ASSERT_TRUE(mock.verifyExactly(&CharVoidInterface::foo, 1));
 
    // throwable call
    mock.stub(&CharVoidInterface::foo).arguments().throws(std::string("Hypothetical Error!"));
-   try
-   {
-      i.foo();
-      CHECK(false);
-   }
-   catch(...)
-      { CHECK(true); }
+   ASSERT_THROW(i.foo(), std::string);
 }
