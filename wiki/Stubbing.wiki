@@ -2,7 +2,7 @@
 == Simple Example ==
 This example is trivial but shows the basics for constructing a simple mock of an interface and stubbing its only virtual function.
 {{{
-#include <UnitTest++.h>
+#include <gtest/gtest.h>
 #include <mockitopp/MockObject.hpp>
 
 // some interface
@@ -13,19 +13,20 @@ struct Foo
 
 // a simple test case
 using mockitopp::MockObject;
-TEST(MyTestCase)
+TEST(MyTestCase, Foo)
 {
    MockObject<Foo> mock;
    mock.stub(&Foo::bar);
    Foo& fooImpl = mock.getMock();
-   fooImpl.bar();
+
+   ASSERT_NO_THROW(fooImpl.bar());
 }
 }}}
 
 == Returnable Behavior ==
-This example shows how you can define simple returnable behavior for an object.  You will notice that we chained a bunch of arguments and their return values together in a nice readable format. We then have our associated UnitTest++ {{{CHECK}}} macros verify the expected behavior. As you can see we make a call to {{{adderImpl.add(4, 5)}}}, but we didn't define any behavior for it. What happens in this case is the stub implementation will try to return the default behavior for function's signature.  This means for POD (i.e. {{{int}}}, {{{bool}}}, etc.) it will return 0, false, 0.0, etc.  For objects it will try to return the object using the default constructor (i.e. {{{std::string()}}}, {{{std::vector()}}}, etc).  For pointers it will return {{{NULL}}}. For reference types it will do a very dangerous cast from a pointer to a primitive to a reference of the return type (which may or may not be desired, SO BE CAREFUL).
+This example shows how you can define simple returnable behavior for an object.  You will notice that we chained a bunch of arguments and their return values together in a nice readable format. We then have our associated gtest {{{ASSERT_?}}} macros verify the expected behavior. As you can see we make a call to {{{adderImpl.add(4, 5)}}}, but we didn't define any behavior for it. What happens in this case is the stub implementation will try to return the default behavior for function's signature.  This means for POD (i.e. {{{int}}}, {{{bool}}}, etc.) it will return 0, false, 0.0, etc.  For objects it will try to return the object using the default constructor (i.e. {{{std::string()}}}, {{{std::vector()}}}, etc).  For pointers it will return {{{NULL}}}. For reference types it will do a very dangerous cast from a pointer to a primitive to a reference of the return type (which may or may not be desired, SO BE CAREFUL).
 {{{
-#include <UnitTest++.h>
+#include <gtest/gtest.h>
 #include <mockitopp/MockObject.hpp>
 
 // some interface
@@ -36,7 +37,7 @@ struct Adder
 
 // test case
 using mockitopp::MockObject;
-TEST(MyTestCase)
+TEST(MyTestCase, Adder)
 {
    MockObject<Adder> mock;
    mock.stub(&Adder::add).arguments(0, 0).returns(0)
@@ -44,19 +45,19 @@ TEST(MyTestCase)
                          .arguments(2, 2).returns(5); // most certainly 2 + 2 = 5!
    Adder& adderImpl = mock.getMock();
 
-   CHECK(adderImpl.add(0, 0) == 0);
-   CHECK(adderImpl.add(1, 1) == 2);
-   CHECK(adderImpl.add(2, 2) == 5);
+   ASSERT_EQ(adderImpl.add(0, 0), 0);
+   ASSERT_EQ(adderImpl.add(1, 1), 2);
+   ASSERT_EQ(adderImpl.add(2, 2), 5);
    // What does 4 + 5 return?
    // We didn't define any behavior!!!
-   CHECK(adderImpl.add(4, 5) == 0);
+   ASSERT_EQ(adderImpl.add(4, 5), 0);
 }
 }}}
 
 == Throwable Behavior ==
 This example shows how you can define simple throwable behavior for an object.  Similarly to the returnable action behavior you can instead decide to use {{{throws(...)}}} to define a throwable action. AS you may ahve noticed you can chain together multiple throwable and returnable actions.  This is useful for cases where your mock object is only expected to handle certain argument types.
 {{{
-#include <UnitTest++.h>
+#include <gtest/gtest.h>
 #include <mockitopp/MockObject.hpp>
 
 // some interface
@@ -75,12 +76,9 @@ TEST(MyTestCase)
                          .arguments(2, 2).throws(std::string("I don't support this!")); // Don't believe me? I dare you to try it!
    Adder& adderImpl = mock.getMock();
 
-   CHECK(adderImpl.add(0, 0) == 0);
-   CHECK(adderImpl.add(1, 1) == 2);
-   try
-      { int result = adderImpl.add(2, 2); }
-   catch(std::string& s)
-      { std::cout << s << std::endl; }
+   ASSERT_EQ(adderImpl.add(0, 0), 0);
+   ASSERT_EQ(adderImpl.add(1, 1), 2);
+   ASSERT_THROW(int result = adderImpl.add(2, 2), std::string);
 }
 }}}
 
@@ -89,7 +87,7 @@ You can stub functions that return {{{void}}} similarly to the way it is done fo
 
 What happens when you don't stub behavior for a given input? In this case it operates as if you stubbed the argument using the {{{returns}}} method.
 {{{
-#include <UnitTest++.h>
+#include <gtest/gtest.h>
 #include <mockitopp/MockObject.hpp>
 
 // some interface
@@ -108,22 +106,17 @@ TEST(MyTestCase)
                        .arguments(2).throws(std::string("Invalid argument!"));
    Foo& foo = mock.getMock();
 
-   try
-   {
-      foo.bar(0); // returns cause we stubbed it
-      foo.bar(1); // returns cause we stubbed it
-      foo.bar(3); // returns even though we didn't stub it for this argument
-      foo.bar(2); // throws stubbed exception
-   }
-   catch(std::string& s)
-      { std::cout << s << std::endl; }
+   ASSERT_NO_THROW(foo.bar(0)); // returns cause we stubbed it
+   ASSERT_NO_THROW(foo.bar(1)); // returns cause we stubbed it
+   ASSERT_NO_THROW(foo.bar(3)); // returns even though we didn't stub it for this argument
+   ASSERT_THROW(foo.bar(2), std::string); // throws stubbed exception
 }
 }}}
 
 == Iterator-Style ==
 You can stub arguments to return different values on consecutive calls.  This is useful for modeling iterator like behavior for a given argument list.  It even works with a fucntion that takes no arguments.  The configuration is similar to the previous uses except you chain together consecutive calls to the {{{returns}}} and {{{throws}}} methods from a single call to the {{{arguments}}} method.  Also, the last stubbed {{{returns}}} or {{{throws}}} becomes the default behavior on consecutive calls after the the last element is hit.
 {{{
-#include <UnitTest++.h>
+#include <gtest/gtest.h>
 #include <mockitopp/MockObject.hpp>
 
 // some interface
@@ -134,7 +127,7 @@ struct Enumeration
 
 // test case
 using mockitopp::MockObject;
-TEST(MyTestCase)
+TEST(MyTestCase, Enumeration)
 {
    MockObject<Enumeration> mock;
    mock.stub(&Enumeration::next).arguments().returns(0)
@@ -144,14 +137,11 @@ TEST(MyTestCase)
                                             .returns(3);
    Enumeration& e = mock.getMock();
 
-   CHECK(0 == e.next()); // should return 0
-   CHECK(1 == e.next()); // should return 1
-   try
-      { CHECK(1 == e.next()); /*should throw an exception*/ }
-   catch(...)
-      { /*ignore*/ }
-   CHECK(2 == e.next()); // should return 2
-   CHECK(3 == e.next()); // should return 3
-   CHECK(3 == e.next()); // remaining consecutive calls return the last stubbed value
+   ASSERT_EQ(0, e.next()); // should return 0
+   ASSERT_EQ(1, e.next()); // should return 1
+   ASSERT_THROW(1 == e.next(), std::string); // should throw an exception
+   ASSERT_EQ(2, e.next()); // should return 2
+   ASSERT_EQ(3, e.next()); // should return 3
+   ASSERT_EQ(3, e.next()); // remaining consecutive calls return the last stubbed value
 }
 }}}
