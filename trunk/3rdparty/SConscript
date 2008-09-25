@@ -1,28 +1,14 @@
 Import('env')
+env3rd = env.Clone()
 SRC = [
-   'UnitTest++/src/TimeConstraint.cpp',
-   'UnitTest++/src/TestRunner.cpp',
-   'UnitTest++/src/MemoryOutStream.cpp',
-   'UnitTest++/src/DeferredTestResult.cpp',
-   'UnitTest++/src/AssertException.cpp',
-   'UnitTest++/src/ReportAssert.cpp',
-   'UnitTest++/src/Checks.cpp',
-   'UnitTest++/src/TestResults.cpp',
-   'UnitTest++/src/TestReporter.cpp',
-   'UnitTest++/src/DeferredTestReporter.cpp',
-   'UnitTest++/src/TestReporterStdout.cpp',
-   'UnitTest++/src/TestList.cpp',
-   'UnitTest++/src/Test.cpp',
-   'UnitTest++/src/XmlTestReporter.cpp',
-   'UnitTest++/src/TestDetails.cpp'
+   'googletest-1.1.0/src/gtest.cc',
+   'googletest-1.1.0/src/gtest-death-test.cc',
+   'googletest-1.1.0/src/gtest-filepath.cc',
+   'googletest-1.1.0/src/gtest_main.cc',
+   'googletest-1.1.0/src/gtest-port.cc',
+   'googletest-1.1.0/src/gtest-typed-test.cc',
 ]
-
-import os
-if os.name == 'nt':
-   SRC.append('UnitTest++/src/Win32/TimeHelpers.cpp')
-else:
-   SRC.append('UnitTest++/src/Posix/SignalTranslator.cpp')
-   SRC.append('UnitTest++/src/Posix/TimeHelpers.cpp')
-
-env.Library('UnitTest++', SRC)
+env3rd.AppendUnique(CPPPATH = ['googletest-1.1.0'])
+env3rd.AppendUnique(CPPPATH = ['googletest-1.1.0/include'])
+env3rd.Library('googletest', SRC)
 # vim:ft=python:

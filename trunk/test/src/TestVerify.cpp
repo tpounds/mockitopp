@@ -1,5 +1,4 @@
-#include <UnitTest++.h>
-
+#include <gtest/gtest.h>
 #include <mockitopp/MockObject.hpp>
 
 using mockitopp::MockObject;
@@ -9,7 +8,7 @@ class SimpleInterface
    public: virtual void foo() = 0;
 };
 
-TEST(TestVerifyAtLeast)
+TEST(TestVerify, AtLeast)
 {
    MockObject<SimpleInterface> mock;
    mock.stub(&SimpleInterface::foo).arguments().returns();
@@ -19,13 +18,13 @@ TEST(TestVerifyAtLeast)
    si.foo();
    si.foo();
 
-   CHECK(mock.verifyAtLeast(&SimpleInterface::foo, 1));
-   CHECK(mock.verifyAtLeast(&SimpleInterface::foo, 2));
-   CHECK(mock.verifyAtLeast(&SimpleInterface::foo, 3));
-   CHECK(!mock.verifyAtLeast(&SimpleInterface::foo, 4));
+   ASSERT_TRUE(mock.verifyAtLeast(&SimpleInterface::foo, 1));
+   ASSERT_TRUE(mock.verifyAtLeast(&SimpleInterface::foo, 2));
+   ASSERT_TRUE(mock.verifyAtLeast(&SimpleInterface::foo, 3));
+   ASSERT_FALSE(mock.verifyAtLeast(&SimpleInterface::foo, 4));
 }
 
-TEST(TestVerifyAtMost)
+TEST(TestVerify, AtMost)
 {
    MockObject<SimpleInterface> mock;
    mock.stub(&SimpleInterface::foo).arguments().returns();
@@ -36,14 +35,14 @@ TEST(TestVerifyAtMost)
    si.foo();
    si.foo();
 
-   CHECK(!mock.verifyAtMost(&SimpleInterface::foo, 1));
-   CHECK(!mock.verifyAtMost(&SimpleInterface::foo, 2));
-   CHECK(!mock.verifyAtMost(&SimpleInterface::foo, 3));
-   CHECK(mock.verifyAtMost(&SimpleInterface::foo, 4));
-   CHECK(mock.verifyAtMost(&SimpleInterface::foo, 5));
+   ASSERT_FALSE(mock.verifyAtMost(&SimpleInterface::foo, 1));
+   ASSERT_FALSE(mock.verifyAtMost(&SimpleInterface::foo, 2));
+   ASSERT_FALSE(mock.verifyAtMost(&SimpleInterface::foo, 3));
+   ASSERT_TRUE(mock.verifyAtMost(&SimpleInterface::foo, 4));
+   ASSERT_TRUE(mock.verifyAtMost(&SimpleInterface::foo, 5));
 }
 
-TEST(TestVerifyExactly)
+TEST(TestVerify, Exactly)
 {
    MockObject<SimpleInterface> mock;
    mock.stub(&SimpleInterface::foo).arguments().returns();
@@ -52,20 +51,20 @@ TEST(TestVerifyExactly)
    si.foo();
    si.foo();
 
-   CHECK(!mock.verifyExactly(&SimpleInterface::foo, 0));
-   CHECK(!mock.verifyExactly(&SimpleInterface::foo, 1));
-   CHECK(mock.verifyExactly(&SimpleInterface::foo, 2));
-   CHECK(!mock.verifyExactly(&SimpleInterface::foo, 3));
-   CHECK(!mock.verifyExactly(&SimpleInterface::foo, 4));
+   ASSERT_FALSE(mock.verifyExactly(&SimpleInterface::foo, 0));
+   ASSERT_FALSE(mock.verifyExactly(&SimpleInterface::foo, 1));
+   ASSERT_TRUE(mock.verifyExactly(&SimpleInterface::foo, 2));
+   ASSERT_FALSE(mock.verifyExactly(&SimpleInterface::foo, 3));
+   ASSERT_FALSE(mock.verifyExactly(&SimpleInterface::foo, 4));
 }
 
-TEST(TestVerifyNever)
+TEST(TestVerify, Never)
 {
    MockObject<SimpleInterface> mock;
    mock.stub(&SimpleInterface::foo).arguments().returns();
    SimpleInterface& si = mock.getMock();
 
-   CHECK(mock.verifyNever(&SimpleInterface::foo));
+   ASSERT_TRUE(mock.verifyNever(&SimpleInterface::foo));
    si.foo();
-   CHECK(!mock.verifyNever(&SimpleInterface::foo));
+   ASSERT_FALSE(mock.verifyNever(&SimpleInterface::foo));
 }
