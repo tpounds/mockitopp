@@ -4,10 +4,10 @@ This library was primarily developed against GCC but should be portable across n
 == [http://gcc.gnu.org/ GCC] ==
 || *version* || *compatible* || *notes* ||
 ||2.9.5||???||Not Tested (Most Likely Not)||
-||3.3.x||Yes||Tested against 4.1.2||
+||3.3.x||Yes||Tested against 3.3.6||
 ||3.4.x||Yes||Tested against 3.4.6||
 ||4.0.x||???||Not Tested||
-||4.1.x||Yes||Tested against 3.3.6||
+||4.1.x||Yes||Tested against 4.1.2||
 ||4.2.x||???||Not Tested||
 ||4.3.x||???||Not Tested||
 
