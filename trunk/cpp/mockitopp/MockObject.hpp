@@ -1,56 +1,85 @@
 #ifndef __MOCKITOPP_MOCK_OBJECT_HPP__
 #define __MOCKITOPP_MOCK_OBJECT_HPP__
 
-#include <mockitopp/internal/matcher/ArgumentMatcher.hpp>
 #include <mockitopp/internal/mock/MockObjectImpl.hpp>
 
-// TODO: add documentation
 namespace mockitopp
 {
    /**
+    * provides a base implementation of a mock object
+    *
     * @author Trevor Pounds
     */
    template <typename T>
    struct MockObject : protected detail::MockObjectImpl
    {
-      typedef T interface_type;
+      /**
+       * returns a mock object of the given abstract base class/interface
+       *
+       * @return mock object
+       */
+      T& getMock()
+        { return reinterpret_cast<T&>(*this); }
 
-      interface_type& getMock()
-        { return reinterpret_cast<interface_type&>(*this); }
-
+      /**
+       * add stubbed functionality
+       *
+       * @param ptr2member method to be stubbed
+       */
       template <typename M>
-      detail::ArgumentMatcher<M>& stub(M ptr2member)
-      {
-         stubImpl(ptr2member);
-         return getMatcher(ptr2member);
-      }
+      typename OngoingStubbing<M>::base_type& stub(M ptr2member)
+         { return doStub(ptr2member); }
 
+      /**
+       * verify method invocation occurs in a certain range
+       *
+       * @param ptr2member method to be verify
+       * @param minTimes minimum number of times method can be called
+       * @param maxTimes maximum number of times method can be called
+       */
       template <typename M>
       bool verify(M ptr2member, int minTimes, int maxTimes)
-      {
-         int calls = getCalls(ptr2member);
-         if(calls >= minTimes && calls <= maxTimes)
-            { return true; }
-         return false;
-      }
+         { return doVerify(ptr2member, minTimes, maxTimes); }
 
+      /**
+       * verify method invocation occurs at least (n) times
+       *
+       * @param ptr2member method to be verify
+       * @param times minimum number of times method should be called
+       */
       template <typename M>
       bool verifyAtLeast(M ptr2member, int times)
          { return verify(ptr2member, times, 0x7FFF); }
 
+      /**
+       * verify method invocation occurs at most (n) times
+       *
+       * @param ptr2member method to be verify
+       * @param times maximum number of times method should be called
+       */
       template <typename M>
       bool verifyAtMost(M ptr2member, int times)
          { return verify(ptr2member, 0, times); }
 
+      /**
+       * verify method invocation exactly (n) times
+       *
+       * @param ptr2member method to be verify
+       * @param times exact number of times method should be called
+       */
       template <typename M>
       bool verifyExactly(M ptr2member, int times)
          { return verify(ptr2member, times, times); }
 
+      /**
+       * verify method invocation is never called
+       *
+       * @param ptr2member method to be verify
+       */
       template <typename M>
       bool verifyNever(M ptr2member)
          { return verify(ptr2member, 0, 0); }
    };
-
 } // namespace mockitopp
 
 #endif //__MOCKITOPP_MOCK_OBJECT_HPP__
