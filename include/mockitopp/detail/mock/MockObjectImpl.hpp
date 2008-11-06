@@ -4,6 +4,9 @@
 #include <mockitopp/Configuration.hpp>
 #include <mockitopp/detail/matcher/ArgumentMatcher.hpp>
 #include <mockitopp/detail/mock/VirtualTable.hpp>
+#include <mockitopp/detail/stubbing/Stub.hpp>
+#include <mockitopp/detail/stubbing/StubImplData.hpp>
+#include <mockitopp/detail/utility/FunctionAddress.hpp>
 
 // TODO: add documentation
 namespace mockitopp
@@ -33,13 +36,18 @@ namespace mockitopp
 //               { delete __stubImpl[i]; }
          }
 
-         template <typename M> ArgumentMatcher<M>& doStubImpl(M ptr2member);
-
-         template <typename M> int getCalls(M ptr2member);
+         template <typename M>
+         int getCalls(M ptr2member)
+            { return reinterpret_cast<StubImplData<M>*>(__stubImpl[FunctionAddress::offset(ptr2member)])->getCalls(); }
 
          template <typename M>
          ArgumentMatcher<M>& doStub(M ptr2member)
-            { return doStubImpl(ptr2member); }
+         {
+            size_t vtable_offset = FunctionAddress::offset(ptr2member);
+            __vptr->__vtable[vtable_offset] = Stub::getInstance<M>(vtable_offset);
+            __stubImpl[vtable_offset] = new StubImplData<M>();
+            return reinterpret_cast<StubImplData<M>*>(__stubImpl[FunctionAddress::offset(ptr2member)])->getMatcher();
+         }
 
          template <typename M>
          bool doVerify(M ptr2member, int minTimes, int maxTimes)
@@ -50,29 +58,6 @@ namespace mockitopp
             return false;
          }
       };
-   } // namespace detail
-} // namespace mockitopp
-
-#include <mockitopp/detail/stubbing/Stub.hpp>
-#include <mockitopp/detail/stubbing/StubImplData.hpp>
-#include <mockitopp/detail/utility/FunctionAddress.hpp>
-
-namespace mockitopp
-{
-   namespace detail
-   {
-      template <typename M>
-      ArgumentMatcher<M>& MockObjectImpl::doStubImpl(M ptr2member)
-      {
-         size_t vtable_offset = FunctionAddress::offset(ptr2member);
-         __vptr->__vtable[vtable_offset] = Stub::getInstance<M>(vtable_offset);
-         __stubImpl[vtable_offset] = new StubImplData<M>();
-         return reinterpret_cast<StubImplData<M>*>(__stubImpl[FunctionAddress::offset(ptr2member)])->getMatcher();
-      }
-
-      template <typename M>
-      int MockObjectImpl::getCalls(M ptr2member)
-         { return reinterpret_cast<StubImplData<M>*>(__stubImpl[FunctionAddress::offset(ptr2member)])->getCalls(); }
    } // namespace detail
 } // namespace mockitopp
 
