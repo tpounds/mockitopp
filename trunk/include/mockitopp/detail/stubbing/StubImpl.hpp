@@ -7,7 +7,6 @@
 #include <boost/preprocessor/repetition/repeat.hpp>
 
 #include <mockitopp/Configuration.hpp>
-#include <mockitopp/detail/mock/MockObjectImpl.hpp>
 #include <mockitopp/detail/stubbing/StubImplData.hpp>
 
 namespace mockitopp
@@ -23,10 +22,12 @@ namespace mockitopp
             typedef R (C::*sig_type)(BOOST_PP_ENUM_PARAMS(NNN, A)); \
             typedef StubImplData<sig_type> stub_data_type; \
          \
+            void*           __PAD_FOR_MOCK_vptr; \
+            stub_data_type* __PAD_FOR_MOCK_stubs[MAX_VIRTUAL_FUNCTIONS]; \
+         \
             R invoke(BOOST_PP_ENUM_BINARY_PARAMS(NNN, A, a)) \
             { \
-               MockObjectImpl* mock = reinterpret_cast<MockObjectImpl*>(this); \
-               stub_data_type* stub = reinterpret_cast<stub_data_type*>(mock->__stubImpl[OFFSET]); \
+               stub_data_type* stub = __PAD_FOR_MOCK_stubs[OFFSET]; \
                stub->getCalls()++; \
                return stub->getMatcher().invoke(BOOST_PP_ENUM_PARAMS(NNN, a)); \
             } \
