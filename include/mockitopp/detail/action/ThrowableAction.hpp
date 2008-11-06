@@ -1,7 +1,7 @@
 #ifndef __MOCKITOPP_THROWABLE_ACTION_HPP__
 #define __MOCKITOPP_THROWABLE_ACTION_HPP__
 
-#include <mockitopp/internal/action/Action.hpp>
+#include <mockitopp/detail/action/Action.hpp>
 
 namespace mockitopp
 {

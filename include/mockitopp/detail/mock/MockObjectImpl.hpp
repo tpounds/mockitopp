@@ -2,8 +2,8 @@
 #define __MOCKITOPP_MOCK_OBJECT_IMPL_HPP__
 
 #include <mockitopp/Configuration.hpp>
-#include <mockitopp/internal/matcher/ArgumentMatcher.hpp>
-#include <mockitopp/internal/mock/VirtualTable.hpp>
+#include <mockitopp/detail/matcher/ArgumentMatcher.hpp>
+#include <mockitopp/detail/mock/VirtualTable.hpp>
 
 // TODO: add documentation
 namespace mockitopp
@@ -53,9 +53,9 @@ namespace mockitopp
    } // namespace detail
 } // namespace mockitopp
 
-#include <mockitopp/internal/stubbing/Stub.hpp>
-#include <mockitopp/internal/stubbing/StubImplData.hpp>
-#include <mockitopp/internal/utility/FunctionAddress.hpp>
+#include <mockitopp/detail/stubbing/Stub.hpp>
+#include <mockitopp/detail/stubbing/StubImplData.hpp>
+#include <mockitopp/detail/utility/FunctionAddress.hpp>
 
 namespace mockitopp
 {

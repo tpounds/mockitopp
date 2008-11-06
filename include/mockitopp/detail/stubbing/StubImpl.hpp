@@ -7,8 +7,8 @@
 #include <boost/preprocessor/repetition/repeat.hpp>
 
 #include <mockitopp/Configuration.hpp>
-#include <mockitopp/internal/mock/MockObjectImpl.hpp>
-#include <mockitopp/internal/stubbing/StubImplData.hpp>
+#include <mockitopp/detail/mock/MockObjectImpl.hpp>
+#include <mockitopp/detail/stubbing/StubImplData.hpp>
 
 namespace mockitopp
 {

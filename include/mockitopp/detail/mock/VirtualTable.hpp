@@ -4,7 +4,7 @@
 #include <exception>
 
 #include <mockitopp/Configuration.hpp>
-#include <mockitopp/internal/utility/FunctionAddress.hpp>
+#include <mockitopp/detail/utility/FunctionAddress.hpp>
 
 // TODO: add documentation
 namespace mockitopp
