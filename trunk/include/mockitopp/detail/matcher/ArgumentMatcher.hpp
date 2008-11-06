@@ -14,10 +14,10 @@
 #include <boost/utility/enable_if.hpp>
 
 #include <mockitopp/Configuration.hpp>
-#include <mockitopp/internal/action/Action.hpp>
-#include <mockitopp/internal/action/DefaultAction.hpp>
-#include <mockitopp/internal/action/ReturnableAction.hpp>
-#include <mockitopp/internal/action/ThrowableAction.hpp>
+#include <mockitopp/detail/action/Action.hpp>
+#include <mockitopp/detail/action/DefaultAction.hpp>
+#include <mockitopp/detail/action/ReturnableAction.hpp>
+#include <mockitopp/detail/action/ThrowableAction.hpp>
 
 // TODO: add documentation
 namespace mockitopp

@@ -4,7 +4,7 @@
 #include  <boost/type_traits/is_reference.hpp>
 #include  <boost/utility/enable_if.hpp>
 
-#include <mockitopp/internal/action/Action.hpp>
+#include <mockitopp/detail/action/Action.hpp>
 
 namespace mockitopp
 {

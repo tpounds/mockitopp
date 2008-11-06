@@ -4,8 +4,8 @@
 #include <boost/preprocessor/repetition/repeat.hpp>
 
 #include <mockitopp/Configuration.hpp>
-#include <mockitopp/internal/stubbing/StubImpl.hpp>
-#include <mockitopp/internal/utility/FunctionAddress.hpp>
+#include <mockitopp/detail/stubbing/StubImpl.hpp>
+#include <mockitopp/detail/utility/FunctionAddress.hpp>
 
 // TODO: add documentation
 namespace mockitopp

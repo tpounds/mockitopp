@@ -1,7 +1,7 @@
 #ifndef __MOCKITOPP_STUB_IMPL_DATA_HPP__
 #define __MOCKITOPP_STUB_IMPL_DATA_HPP__
 
-#include <mockitopp/internal/matcher/ArgumentMatcher.hpp>
+#include <mockitopp/detail/matcher/ArgumentMatcher.hpp>
 
 namespace mockitopp
 {

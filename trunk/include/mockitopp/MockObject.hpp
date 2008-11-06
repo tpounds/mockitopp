@@ -1,7 +1,7 @@
 #ifndef __MOCKITOPP_MOCK_OBJECT_HPP__
 #define __MOCKITOPP_MOCK_OBJECT_HPP__
 
-#include <mockitopp/internal/mock/MockObjectImpl.hpp>
+#include <mockitopp/detail/mock/MockObjectImpl.hpp>
 
 namespace mockitopp
 {
