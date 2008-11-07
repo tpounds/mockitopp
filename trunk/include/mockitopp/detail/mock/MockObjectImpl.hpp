@@ -4,7 +4,7 @@
 #include <mockitopp/Configuration.hpp>
 #include <mockitopp/detail/matcher/ArgumentMatcher.hpp>
 #include <mockitopp/detail/mock/VirtualTable.hpp>
-#include <mockitopp/detail/stubbing/Stub.hpp>
+#include <mockitopp/detail/stubbing/StubFactory.hpp>
 #include <mockitopp/detail/stubbing/StubImplData.hpp>
 #include <mockitopp/detail/utility/FunctionAddress.hpp>
 
@@ -22,31 +22,31 @@ namespace mockitopp
          };
 
          VirtualTable* __vptr;
-         void*         __stubImpl[MAX_VIRTUAL_FUNCTIONS];
+         void*         __spys[MAX_VIRTUAL_FUNCTIONS];
 
          MockObjectImpl()
             : __vptr(new VirtualTable())
-            , __stubImpl()
+            , __spys()
          {}
 
          ~MockObjectImpl()
          {
             delete __vptr;
 //            for(int i = 0; i < MAX_VIRTUAL_FUNCTIONS; i++)
-//               { delete __stubImpl[i]; }
+//               { delete __spys[i]; }
          }
 
          template <typename M>
          int getCalls(M ptr2member)
-            { return reinterpret_cast<StubImplData<M>*>(__stubImpl[FunctionAddress::offset(ptr2member)])->getCalls(); }
+            { return reinterpret_cast<StubImplData<M>*>(__spys[FunctionAddress::offset(ptr2member)])->getCalls(); }
 
          template <typename M>
          ArgumentMatcher<M>& doStub(M ptr2member)
          {
             size_t vtable_offset = FunctionAddress::offset(ptr2member);
-            __vptr->__vtable[vtable_offset] = Stub::getInstance(ptr2member);
-            __stubImpl[vtable_offset] = new StubImplData<M>();
-            return reinterpret_cast<StubImplData<M>*>(__stubImpl[vtable_offset])->getMatcher();
+            __vptr->__vtable[vtable_offset] = StubFactory::createDelegate(ptr2member);
+            __spys[vtable_offset] = StubFactory::createSpy(ptr2member);
+            return reinterpret_cast<StubImplData<M>*>(__spys[vtable_offset])->getMatcher();
          }
 
          template <typename M>
