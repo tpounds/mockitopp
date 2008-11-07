@@ -23,11 +23,11 @@ namespace mockitopp
             typedef StubImplData<sig_type> stub_data_type; \
          \
             void*           __PAD_FOR_MOCK_vptr; \
-            stub_data_type* __PAD_FOR_MOCK_stubs[MAX_VIRTUAL_FUNCTIONS]; \
+            stub_data_type* __PAD_FOR_MOCK_spys[MAX_VIRTUAL_FUNCTIONS]; \
          \
             R invoke(BOOST_PP_ENUM_BINARY_PARAMS(NNN, A, a)) \
             { \
-               stub_data_type* stub = __PAD_FOR_MOCK_stubs[OFFSET]; \
+               stub_data_type* stub = __PAD_FOR_MOCK_spys[OFFSET]; \
                stub->getCalls()++; \
                return stub->getMatcher().invoke(BOOST_PP_ENUM_PARAMS(NNN, a)); \
             } \

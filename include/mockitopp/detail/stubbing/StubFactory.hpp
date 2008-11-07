@@ -15,10 +15,10 @@ namespace mockitopp
       /**
        * @author Trevor Pounds
        */
-      struct Stub
+      struct StubFactory
       {
          template <typename M>
-         static void* getInstance(M ptr2member)
+         static void* createDelegate(M ptr2member)
          {
             void* stubImplTable[MAX_VIRTUAL_FUNCTIONS];
 
@@ -31,6 +31,10 @@ namespace mockitopp
 
             return stubImplTable[FunctionAddress::offset(ptr2member)];
          }
+
+         template <typename M>
+         static void* createSpy(M ptr2member)
+            { return new StubImplData<M>(); }
       };
    } // namespace detail
 } // namespace mockitopp
