@@ -44,9 +44,9 @@ namespace mockitopp
          ArgumentMatcher<M>& doStub(M ptr2member)
          {
             size_t vtable_offset = FunctionAddress::offset(ptr2member);
-            __vptr->__vtable[vtable_offset] = Stub::getInstance<M>(vtable_offset);
+            __vptr->__vtable[vtable_offset] = Stub::getInstance(ptr2member);
             __stubImpl[vtable_offset] = new StubImplData<M>();
-            return reinterpret_cast<StubImplData<M>*>(__stubImpl[FunctionAddress::offset(ptr2member)])->getMatcher();
+            return reinterpret_cast<StubImplData<M>*>(__stubImpl[vtable_offset])->getMatcher();
          }
 
          template <typename M>

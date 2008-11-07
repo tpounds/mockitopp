@@ -17,19 +17,19 @@ namespace mockitopp
        */
       struct Stub
       {
-         template <typename T>
-         static void* getInstance(size_t offset)
+         template <typename M>
+         static void* getInstance(M ptr2member)
          {
             void* stubImplTable[MAX_VIRTUAL_FUNCTIONS];
 
             #define ASSIGN_STUB_IMPL_TO_TABLE(ZZZ, NNN, TTT) \
-               stubImplTable[NNN] = FunctionAddress::unsafe_cast(&StubImpl<NNN, T>::invoke);
+               stubImplTable[NNN] = FunctionAddress::unsafe_cast(&StubImpl<NNN, M>::invoke);
 
             BOOST_PP_REPEAT(MAX_VIRTUAL_FUNCTIONS, ASSIGN_STUB_IMPL_TO_TABLE, ~)
 
             #undef ASSIGN_STUB_IMPL_TO_TABLE
 
-            return stubImplTable[offset];
+            return stubImplTable[FunctionAddress::offset(ptr2member)];
          }
       };
    } // namespace detail
