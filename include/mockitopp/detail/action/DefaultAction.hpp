@@ -1,9 +1,6 @@
 #ifndef __MOCKITOPP_DEFAULT_ACTION_HPP__
 #define __MOCKITOPP_DEFAULT_ACTION_HPP__
 
-#include  <boost/type_traits/is_reference.hpp>
-#include  <boost/utility/enable_if.hpp>
-
 #include <mockitopp/detail/action/Action.hpp>
 
 namespace mockitopp
@@ -13,7 +10,7 @@ namespace mockitopp
       template <typename R, typename ENABLE = void> struct DefaultAction;
 
       template <typename R>
-      struct DefaultAction<R, typename boost::disable_if<boost::is_reference<R> >::type> : public Action<R>
+      struct DefaultAction<R> : public Action<R>
       {
          R _returnable;
 
@@ -29,19 +26,19 @@ namespace mockitopp
       };
 
       template <typename R>
-      struct DefaultAction<R, typename boost::enable_if<boost::is_reference<R> >::type> : public Action<R>
+      struct DefaultAction<R&> : public Action<R&>
       {
-         R _returnable;
+         R& _returnable;
 
          DefaultAction()
             // XXX: this is kind of hacky but works as needed
-            : _returnable(reinterpret_cast<R>(*(new char())))
+            : _returnable(reinterpret_cast<R&>(*(new char())))
             {}
 
          ~DefaultAction()
             { delete &_returnable; }
 
-         R execute()
+         R& execute()
             { return _returnable; }
       };
 

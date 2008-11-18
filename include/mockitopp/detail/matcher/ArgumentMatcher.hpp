@@ -10,8 +10,6 @@
 #include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/tuple/tuple_comparison.hpp>
-#include <boost/type_traits/is_void.hpp>
-#include <boost/utility/enable_if.hpp>
 
 #include <mockitopp/detail/action/Action.hpp>
 #include <mockitopp/detail/action/DefaultAction.hpp>
@@ -29,23 +27,23 @@ namespace mockitopp
       // TODO: add sequence matcher
 
       #define DEFINE_ARGUMENT_MATCHER_IMPL_VOID(ZZZ, NNN, TTT) \
-         template <typename R, typename C BOOST_PP_COMMA_IF(NNN) BOOST_PP_ENUM_PARAMS(NNN, typename A)> \
-         struct ArgumentMatcher<R (C::*)(BOOST_PP_ENUM_PARAMS(NNN, A)), typename boost::enable_if<boost::is_void<R> >::type> \
+         template <typename C BOOST_PP_COMMA_IF(NNN) BOOST_PP_ENUM_PARAMS(NNN, typename A)> \
+         struct ArgumentMatcher<void (C::*)(BOOST_PP_ENUM_PARAMS(NNN, A))> \
          { \
-            DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT) \
+            DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT, void) \
          \
             ArgumentMatcher& returns() \
             { \
-               actionMap[ongoingMatch].push(new ReturnableAction<R>()); \
+               actionMap[ongoingMatch].push(new ReturnableAction<void>()); \
                return *this; \
             } \
          };
 
       #define DEFINE_ARGUMENT_MATCHER_IMPL_NON_VOID(ZZZ, NNN, TTT) \
          template <typename R, typename C BOOST_PP_COMMA_IF(NNN) BOOST_PP_ENUM_PARAMS(NNN, typename A)> \
-         struct ArgumentMatcher<R (C::*)(BOOST_PP_ENUM_PARAMS(NNN, A)), typename boost::disable_if<boost::is_void<R> >::type> \
+         struct ArgumentMatcher<R (C::*)(BOOST_PP_ENUM_PARAMS(NNN, A))> \
          { \
-            DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT) \
+            DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT, R) \
          \
             ArgumentMatcher& returns(R value) \
             { \
@@ -54,9 +52,9 @@ namespace mockitopp
             } \
          };
 
-      #define DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT) \
+      #define DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT, RRR) \
             typedef boost::tuple<BOOST_PP_ENUM_PARAMS(NNN, A)> args_type; \
-            typedef Action<R>*                                 action_type; \
+            typedef Action<RRR>*                               action_type; \
             typedef std::queue<action_type>                    queue_type; \
             typedef std::map<args_type, queue_type>            map_type; \
          \
@@ -66,7 +64,7 @@ namespace mockitopp
          \
             ArgumentMatcher() \
                : actionMap() \
-               , defaultAction(new DefaultAction<R>()) \
+               , defaultAction(new DefaultAction<RRR>()) \
                , ongoingMatch() \
                {} \
          \
@@ -79,11 +77,11 @@ namespace mockitopp
             template <typename T> \
             ArgumentMatcher& throws(T throwable) \
             { \
-               actionMap[ongoingMatch].push(new ThrowableAction<R, T>(throwable)); \
+               actionMap[ongoingMatch].push(new ThrowableAction<RRR, T>(throwable)); \
                return *this; \
             } \
          \
-            R invoke(BOOST_PP_ENUM_BINARY_PARAMS(NNN, A, a)) \
+            RRR invoke(BOOST_PP_ENUM_BINARY_PARAMS(NNN, A, a)) \
             { \
                args_type   args     = args_type(BOOST_PP_ENUM_PARAMS(NNN, a)); \
                queue_type& action_q = actionMap[args]; \
