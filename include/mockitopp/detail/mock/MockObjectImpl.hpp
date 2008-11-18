@@ -1,7 +1,6 @@
 #ifndef __MOCKITOPP_MOCK_OBJECT_IMPL_HPP__
 #define __MOCKITOPP_MOCK_OBJECT_IMPL_HPP__
 
-#include <mockitopp/Configuration.hpp>
 #include <mockitopp/detail/matcher/ArgumentMatcher.hpp>
 #include <mockitopp/detail/mock/VirtualTable.hpp>
 #include <mockitopp/detail/stubbing/StubFactory.hpp>

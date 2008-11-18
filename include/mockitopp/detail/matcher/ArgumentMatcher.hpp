@@ -13,7 +13,6 @@
 #include <boost/type_traits/is_void.hpp>
 #include <boost/utility/enable_if.hpp>
 
-#include <mockitopp/Configuration.hpp>
 #include <mockitopp/detail/action/Action.hpp>
 #include <mockitopp/detail/action/DefaultAction.hpp>
 #include <mockitopp/detail/action/ReturnableAction.hpp>
