@@ -1,6 +1,12 @@
 #ifndef __MOCKITOPP_MOCK_OBJECT_HPP__
 #define __MOCKITOPP_MOCK_OBJECT_HPP__
 
+// increase to support more virtual functions
+#define MAX_VIRTUAL_FUNCTIONS 50
+// boost::tuple supports 0-10 elements, so don't
+// support arity > 11 with this implementation.
+#define MAX_VIRTUAL_FUNCTION_ARITY 11
+
 #include <mockitopp/detail/mock/MockObjectImpl.hpp>
 
 namespace mockitopp

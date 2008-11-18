@@ -3,7 +3,6 @@
 
 #include <boost/preprocessor/repetition/repeat.hpp>
 
-#include <mockitopp/Configuration.hpp>
 #include <mockitopp/detail/stubbing/StubImpl.hpp>
 #include <mockitopp/detail/utility/FunctionAddress.hpp>
 

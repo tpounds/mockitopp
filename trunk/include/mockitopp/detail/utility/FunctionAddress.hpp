@@ -5,8 +5,6 @@
 
 #include <boost/preprocessor/repetition/repeat.hpp>
 
-#include <mockitopp/Configuration.hpp>
-
 // TODO: add documentation
 namespace mockitopp
 {
