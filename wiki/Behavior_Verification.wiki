@@ -14,7 +14,7 @@ struct Foo
 TEST(TestVerify, Exactly)
 {
    MockObject<Foo> mock;
-   mock.stub(&Foo::bar);
+   mock.when(&Foo::bar);
    Foo& fooImpl = mock.getMock();
 
    fooImpl.bar();
@@ -25,12 +25,12 @@ TEST(TestVerify, Exactly)
 }
 }}}
 
-=== Verify At Least ===
+=== Verify at Least ===
 {{{
 TEST(TestVerify, AtLeast)
 {
    MockObject<Foo> mock;
-   mock.stub(&Foo::bar);
+   mock.when(&Foo::bar);
    Foo& fooImpl = mock.getMock();
 
    fooImpl.bar();
@@ -44,12 +44,12 @@ TEST(TestVerify, AtLeast)
 }
 }}}
 
-=== Verify At Most ===
+=== Verify at Most ===
 {{{
 TEST(TestVerify, AtMost)
 {
    MockObject<Foo> mock;
-   mock.stub(&Foo::bar);
+   mock.when(&Foo::bar);
    Foo& fooImpl = mock.getMock();
 
    fooImpl.bar();
@@ -68,7 +68,7 @@ TEST(TestVerify, AtMost)
 TEST(TestVerify, Never)
 {
    MockObject<Foo> mock;
-   mock.stub(&Foo::bar);
+   mock.when(&Foo::bar);
    Foo& fooImpl = mock.getMock();
 
    ASSERT_TRUE(mock.verifyNever(&Foo::bar)); // pass
@@ -82,15 +82,15 @@ TEST(TestVerify, Never)
 TEST(TestVerify, Range)
 {
    MockObject<Foo> mock;
-   mock.stub(&Foo::bar);
+   mock.when(&Foo::bar);
    Foo& fooImpl = mock.getMock();
 
    fooImpl.bar();
    fooImpl.bar();
-   ASSERT_TRUE(mock.verifyNever(&Foo::bar, 1, 3)); // pass
+   ASSERT_TRUE(mock.verify(&Foo::bar, 1, 3)); // pass
    fooImpl.bar();
-   ASSERT_TRUE(mock.verifyNever(&Foo::bar, 1, 3)); // pass
+   ASSERT_TRUE(mock.verify(&Foo::bar, 1, 3)); // pass
    fooImpl.bar();
-   ASSERT_TRUE(mock.verifyNever(&Foo::bar, 1, 3)); // fail
+   ASSERT_TRUE(mock.verify(&Foo::bar, 1, 3)); // fail
 }
 }}}
