@@ -32,7 +32,7 @@ namespace mockitopp
          { \
             DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT, void) \
          \
-            ArgumentMatcher& toReturn() \
+            ArgumentMatcher& thenReturn() \
             { \
                actionMap[ongoingMatch].push(new ReturnableAction<void>()); \
                return *this; \
@@ -45,7 +45,7 @@ namespace mockitopp
          { \
             DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT, R) \
          \
-            ArgumentMatcher& toReturn(R value) \
+            ArgumentMatcher& thenReturn(R value) \
             { \
                actionMap[ongoingMatch].push(new ReturnableAction<R>(value)); \
                return *this; \
@@ -75,7 +75,7 @@ namespace mockitopp
             } \
          \
             template <typename T> \
-            ArgumentMatcher& toThrow(T throwable) \
+            ArgumentMatcher& thenThrow(T throwable) \
             { \
                actionMap[ongoingMatch].push(new ThrowableAction<RRR, T>(throwable)); \
                return *this; \
