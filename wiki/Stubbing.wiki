@@ -16,7 +16,7 @@ using mockitopp::MockObject;
 TEST(MyTestCase, Foo)
 {
    MockObject<Foo> mock;
-   mock.stub(&Foo::bar);
+   mock.when(&Foo::bar);
    Foo& fooImpl = mock.getMock();
 
    ASSERT_NO_THROW(fooImpl.bar());
@@ -40,9 +40,9 @@ using mockitopp::MockObject;
 TEST(MyTestCase, Adder)
 {
    MockObject<Adder> mock;
-   mock.stub(&Adder::add).arguments(0, 0).returns(0)
-                         .arguments(1, 1).returns(2)
-                         .arguments(2, 2).returns(5); // most certainly 2 + 2 = 5!
+   mock.when(&Adder::add)(0, 0).toReturn(0);
+   mock.when(&Adder::add)(1, 1).toReturn(2)
+   mock.when(&Adder::add)(2, 2).toReturn(5); // most certainly 2 + 2 = 5!
    Adder& adderImpl = mock.getMock();
 
    ASSERT_EQ(adderImpl.add(0, 0), 0);
@@ -71,9 +71,9 @@ using mockitopp::MockObject;
 TEST(MyTestCase)
 {
    MockObject<Adder> mock;
-   mock.stub(&Adder::add).arguments(0, 0).returns(0)
-                         .arguments(1, 1).returns(2)
-                         .arguments(2, 2).throws(std::string("I don't support this!")); // Don't believe me? I dare you to try it!
+   mock.stub(&Adder::add)(0, 0).toReturn(0)
+   mock.stub(&Adder::add)(1, 1).toReturn(2)
+   mock.stub(&Adder::add)(2, 2).toThrow(std::string("I don't support this!")); // Don't believe me? I dare you to try it!
    Adder& adderImpl = mock.getMock();
 
    ASSERT_EQ(adderImpl.add(0, 0), 0);
@@ -101,9 +101,9 @@ using mockitopp::MockObject;
 TEST(MyTestCase)
 {
    MockObject<Foo> mock;
-   mock.stub(&Foo::bar).arguments(0).returns()
-                       .arguments(1).returns()
-                       .arguments(2).throws(std::string("Invalid argument!"));
+   mock.stub(&Foo::bar)(0).toReturn();
+   mock.stub(&Foo::bar)(1).toReturn();
+   mock.stub(&Foo::bar)(2).toThrow(std::string("Invalid argument!"));
    Foo& foo = mock.getMock();
 
    ASSERT_NO_THROW(foo.bar(0)); // returns cause we stubbed it
@@ -130,11 +130,11 @@ using mockitopp::MockObject;
 TEST(MyTestCase, Enumeration)
 {
    MockObject<Enumeration> mock;
-   mock.stub(&Enumeration::next).arguments().returns(0)
-                                            .returns(1)
-                                            .throws(std::string("Invalid argument!"))
-                                            .returns(2)
-                                            .returns(3);
+   mock.stub(&Enumeration::next)().toReturn(0)
+                                  .toReturn(1)
+                                  .toThrow(std::string("Invalid argument!"))
+                                  .toReturn(2)
+                                  .toReturn(3);
    Enumeration& e = mock.getMock();
 
    ASSERT_EQ(0, e.next()); // should return 0
