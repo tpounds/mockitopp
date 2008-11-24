@@ -40,9 +40,9 @@ using mockitopp::MockObject;
 TEST(MyTestCase, Adder)
 {
    MockObject<Adder> mock;
-   mock.when(&Adder::add)(0, 0).toReturn(0);
-   mock.when(&Adder::add)(1, 1).toReturn(2)
-   mock.when(&Adder::add)(2, 2).toReturn(5); // most certainly 2 + 2 = 5!
+   mock.when(&Adder::add)(0, 0).thenReturn(0);
+   mock.when(&Adder::add)(1, 1).thenReturn(2)
+   mock.when(&Adder::add)(2, 2).thenReturn(5); // most certainly 2 + 2 = 5!
    Adder& adderImpl = mock.getMock();
 
    ASSERT_EQ(adderImpl.add(0, 0), 0);
@@ -55,7 +55,7 @@ TEST(MyTestCase, Adder)
 }}}
 
 == Throwable Behavior ==
-This example shows how you can define simple throwable behavior for an object.  Similarly to the returnable action behavior you can instead decide to use {{{throws(...)}}} to define a throwable action. AS you may ahve noticed you can chain together multiple throwable and returnable actions.  This is useful for cases where your mock object is only expected to handle certain argument types.
+This example shows how you can define simple throwable behavior for an object.  Similarly to the returnable action behavior you can instead decide to use {{{thenThrow(...)}}} to define a throwable action. AS you may have noticed you can chain together multiple throwable and returnable actions.  This is useful for cases where your mock object is only expected to handle certain argument types.
 {{{
 #include <gtest/gtest.h>
 #include <mockitopp/MockObject.hpp>
@@ -71,9 +71,9 @@ using mockitopp::MockObject;
 TEST(MyTestCase)
 {
    MockObject<Adder> mock;
-   mock.stub(&Adder::add)(0, 0).toReturn(0)
-   mock.stub(&Adder::add)(1, 1).toReturn(2)
-   mock.stub(&Adder::add)(2, 2).toThrow(std::string("I don't support this!")); // Don't believe me? I dare you to try it!
+   mock.stub(&Adder::add)(0, 0).thenReturn(0)
+   mock.stub(&Adder::add)(1, 1).thenReturn(2)
+   mock.stub(&Adder::add)(2, 2).thenThrow(std::string("I don't support this!")); // Don't believe me? I dare you to try it!
    Adder& adderImpl = mock.getMock();
 
    ASSERT_EQ(adderImpl.add(0, 0), 0);
@@ -83,9 +83,9 @@ TEST(MyTestCase)
 }}}
 
 == Void Functions ==
-You can stub functions that return {{{void}}} similarly to the way it is done for functions with return values. The different is that the {{{returns}}} method takes no arguments, while the {{{throws}}} method still operates as expected.
+You can stub functions that return {{{void}}} similarly to the way it is done for functions with return values. The different is that the {{{thenReturn}}} method takes no arguments, while the {{{thenThrow}}} method still operates as expected.
 
-What happens when you don't stub behavior for a given input? In this case it operates as if you stubbed the argument using the {{{returns}}} method.
+What happens when you don't stub behavior for a given input? In this case it operates as if you stubbed the argument using the {{{thenReturn}}} method.
 {{{
 #include <gtest/gtest.h>
 #include <mockitopp/MockObject.hpp>
@@ -101,9 +101,9 @@ using mockitopp::MockObject;
 TEST(MyTestCase)
 {
    MockObject<Foo> mock;
-   mock.stub(&Foo::bar)(0).toReturn();
-   mock.stub(&Foo::bar)(1).toReturn();
-   mock.stub(&Foo::bar)(2).toThrow(std::string("Invalid argument!"));
+   mock.when(&Foo::bar)(0).thenReturn();
+   mock.when(&Foo::bar)(1).thenReturn();
+   mock.when(&Foo::bar)(2).thenThrow(std::string("Invalid argument!"));
    Foo& foo = mock.getMock();
 
    ASSERT_NO_THROW(foo.bar(0)); // returns cause we stubbed it
@@ -114,7 +114,7 @@ TEST(MyTestCase)
 }}}
 
 == Iterator-Style ==
-You can stub arguments to return different values on consecutive calls.  This is useful for modeling iterator like behavior for a given argument list.  It even works with a fucntion that takes no arguments.  The configuration is similar to the previous uses except you chain together consecutive calls to the {{{returns}}} and {{{throws}}} methods from a single call to the {{{arguments}}} method.  Also, the last stubbed {{{returns}}} or {{{throws}}} becomes the default behavior on consecutive calls after the the last element is hit.
+You can stub arguments to return different values on consecutive calls.  This is useful for modeling iterator like behavior for a given argument list.  It even works with a function that takes no arguments.  The configuration is similar to the previous uses except you chain together consecutive calls to the {{{thenReturn}}} and {{{thenThrow}}} methods from a single call to the {{{when}}} method.  Also, the last stubbed {{{thenReturn}}} or {{{thenThrow}}} becomes the default behavior on consecutive calls after the the last element is hit.
 {{{
 #include <gtest/gtest.h>
 #include <mockitopp/MockObject.hpp>
@@ -130,11 +130,11 @@ using mockitopp::MockObject;
 TEST(MyTestCase, Enumeration)
 {
    MockObject<Enumeration> mock;
-   mock.stub(&Enumeration::next)().toReturn(0)
-                                  .toReturn(1)
-                                  .toThrow(std::string("Invalid argument!"))
-                                  .toReturn(2)
-                                  .toReturn(3);
+   mock.when(&Enumeration::next)().thenReturn(0)
+                                  .thenReturn(1)
+                                  .thenThrow(std::string("Invalid argument!"))
+                                  .thenReturn(2)
+                                  .thenReturn(3);
    Enumeration& e = mock.getMock();
 
    ASSERT_EQ(0, e.next()); // should return 0
