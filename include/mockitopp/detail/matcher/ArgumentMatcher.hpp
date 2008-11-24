@@ -32,7 +32,7 @@ namespace mockitopp
          { \
             DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT, void) \
          \
-            ArgumentMatcher& returns() \
+            ArgumentMatcher& toReturn() \
             { \
                actionMap[ongoingMatch].push(new ReturnableAction<void>()); \
                return *this; \
@@ -45,7 +45,7 @@ namespace mockitopp
          { \
             DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT, R) \
          \
-            ArgumentMatcher& returns(R value) \
+            ArgumentMatcher& toReturn(R value) \
             { \
                actionMap[ongoingMatch].push(new ReturnableAction<R>(value)); \
                return *this; \
@@ -68,14 +68,14 @@ namespace mockitopp
                , ongoingMatch() \
                {} \
          \
-            ArgumentMatcher& arguments(BOOST_PP_ENUM_BINARY_PARAMS(NNN, A, a)) \
+            ArgumentMatcher& operator() (BOOST_PP_ENUM_BINARY_PARAMS(NNN, A, a)) \
             { \
                ongoingMatch = args_type(BOOST_PP_ENUM_PARAMS(NNN, a)); \
                return *this; \
             } \
          \
             template <typename T> \
-            ArgumentMatcher& throws(T throwable) \
+            ArgumentMatcher& toThrow(T throwable) \
             { \
                actionMap[ongoingMatch].push(new ThrowableAction<RRR, T>(throwable)); \
                return *this; \

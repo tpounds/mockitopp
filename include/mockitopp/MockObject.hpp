@@ -28,12 +28,12 @@ namespace mockitopp
         { return reinterpret_cast<T&>(*this); }
 
       /**
-       * add stubbed functionality
+       * stub functionality for a given method
        *
        * @param ptr2member method to be stubbed
        */
       template <typename M>
-      typename OngoingStubbing<M>::base_type& stub(M ptr2member)
+      typename OngoingStubbing<M>::base_type& when(M ptr2member)
          { return doStub(ptr2member); }
 
       /**
