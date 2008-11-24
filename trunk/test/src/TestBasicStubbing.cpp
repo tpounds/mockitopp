@@ -13,12 +13,12 @@ TEST(TestBasicStubbing, VoidVoid)
    VoidVoidInterface& i = mock.getMock();
 
    // returnable call
-   mock.stub(&VoidVoidInterface::foo).arguments().returns();
+   mock.when(&VoidVoidInterface::foo)().toReturn();
    i.foo();
    ASSERT_TRUE(mock.verifyExactly(&VoidVoidInterface::foo, 1));
 
    // throwable call
-   mock.stub(&VoidVoidInterface::foo).arguments().throws(std::string("Hypothetical Error!"));
+   mock.when(&VoidVoidInterface::foo)().toThrow(std::string("Hypothetical Error!"));
    ASSERT_THROW(i.foo(), std::string);
 }
 
@@ -32,11 +32,11 @@ TEST(TestBasicStubbing, CharVoid)
    CharVoidInterface& i = mock.getMock();
 
    // returnable call
-   mock.stub(&CharVoidInterface::foo).arguments().returns('A');
+   mock.when(&CharVoidInterface::foo)().toReturn('A');
    ASSERT_EQ('A', i.foo());
    ASSERT_TRUE(mock.verifyExactly(&CharVoidInterface::foo, 1));
 
    // throwable call
-   mock.stub(&CharVoidInterface::foo).arguments().throws(std::string("Hypothetical Error!"));
+   mock.when(&CharVoidInterface::foo)().toThrow(std::string("Hypothetical Error!"));
    ASSERT_THROW(i.foo(), std::string);
 }
