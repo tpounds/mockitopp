@@ -12,11 +12,11 @@ TEST(TestIterator, IteratorInterface)
 {
    typedef IteratorInterface<int> it_type;
    MockObject<it_type> mock;
-   mock.when(&it_type::next)().toReturn(0)
-                              .toReturn(1)
-                              .toReturn(2)
-                              .toReturn(3)
-                              .toReturn(4);
+   mock.when(&it_type::next)().thenReturn(0)
+                              .thenReturn(1)
+                              .thenReturn(2)
+                              .thenReturn(3)
+                              .thenReturn(4);
    it_type& i = mock.getMock();
 
    ASSERT_EQ(0, i.next());
