@@ -11,10 +11,10 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/tuple/tuple_comparison.hpp>
 
-#include <mockitopp/detail/action/Action.hpp>
-#include <mockitopp/detail/action/DefaultAction.hpp>
-#include <mockitopp/detail/action/ReturnableAction.hpp>
-#include <mockitopp/detail/action/ThrowableAction.hpp>
+#include <mockitopp/detail/exception/IncompleteImplementationException.hpp>
+#include <mockitopp/detail/stubbing/Answer.hpp>
+#include <mockitopp/detail/stubbing/Returns.hpp>
+#include <mockitopp/detail/stubbing/Throws.hpp>
 
 // TODO: add documentation
 namespace mockitopp
@@ -34,7 +34,7 @@ namespace mockitopp
          \
             OngoingStubbing& thenReturn() \
             { \
-               actionMap[ongoingMatch].push(new ReturnableAction<void>()); \
+               answerMap[ongoingMatch].push(new Returns<void>()); \
                return *this; \
             } \
          };
@@ -47,25 +47,25 @@ namespace mockitopp
          \
             OngoingStubbing& thenReturn(R value) \
             { \
-               actionMap[ongoingMatch].push(new ReturnableAction<R>(value)); \
+               answerMap[ongoingMatch].push(new Returns<R>(value)); \
                return *this; \
             } \
          };
 
       #define DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT, RRR) \
             typedef boost::tuple<BOOST_PP_ENUM_PARAMS(NNN, A)> args_type; \
-            typedef Action<RRR>*                               action_type; \
-            typedef std::queue<action_type>                    queue_type; \
+            typedef Answer<RRR>*                               answer_type; \
+            typedef std::queue<answer_type>                    queue_type; \
             typedef std::map<args_type, queue_type>            map_type; \
          \
-            map_type    actionMap; \
-            action_type lastAction; \
+            map_type    answerMap; \
+            answer_type lastAnswer; \
             args_type   ongoingMatch; \
             int         calls; \
          \
             OngoingStubbing() \
-               : actionMap() \
-               , lastAction(new DefaultAction<RRR>()) \
+               : answerMap() \
+               , lastAnswer(NULL) \
                , ongoingMatch() \
                , calls(0) \
                {} \
@@ -79,7 +79,7 @@ namespace mockitopp
             template <typename T> \
             OngoingStubbing& thenThrow(T throwable) \
             { \
-               actionMap[ongoingMatch].push(new ThrowableAction<RRR, T>(throwable)); \
+               answerMap[ongoingMatch].push(new Throws<RRR, T>(throwable)); \
                return *this; \
             } \
          \
@@ -87,13 +87,15 @@ namespace mockitopp
             { \
                calls++; \
                args_type   args     = args_type(BOOST_PP_ENUM_PARAMS(NNN, a)); \
-               queue_type& action_q = actionMap[args]; \
-               if(!action_q.empty()) \
+               queue_type& answer_q = answerMap[args]; \
+               if(!answer_q.empty()) \
                { \
-                  lastAction = action_q.front(); \
-                  action_q.pop(); \
+                  lastAnswer = answer_q.front(); \
+                  answer_q.pop(); \
                } \
-               return lastAction->execute(); \
+               if(lastAnswer != NULL) \
+                  { return lastAnswer->execute(); } \
+               throw IncompleteImplementationException(); \
             } \
          \
             int getCalls() const \

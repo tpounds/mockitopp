@@ -1,6 +1,7 @@
 #ifndef __MOCKITOPP_MOCK_OBJECT_IMPL_HPP__
 #define __MOCKITOPP_MOCK_OBJECT_IMPL_HPP__
 
+#include <mockitopp/detail/exception/NotImplementedException.hpp>
 #include <mockitopp/detail/mock/VirtualTable.hpp>
 #include <mockitopp/detail/stubbing/OngoingStubbing.hpp>
 #include <mockitopp/detail/stubbing/Stub.hpp>
@@ -19,7 +20,7 @@ namespace mockitopp
          Verifier      __verifier;
 
          MockObjectImpl()
-            : __vptr(new VirtualTable())
+            : __vptr(new VirtualTable(&MockObjectImpl::NotImplemented))
             , __spys()
          {}
 
@@ -48,6 +49,9 @@ namespace mockitopp
             __verifier.calls = reinterpret_cast<OngoingStubbing<M>*>(__spys[Function::getOffset(ptr2member)])->getCalls();
             return __verifier;
          }
+
+         void NotImplemented()
+            { throw NotImplementedException(); }
       };
    } // namespace detail
 } // namespace mockitopp
