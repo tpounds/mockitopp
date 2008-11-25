@@ -1,16 +1,16 @@
-#ifndef __MOCKITOPP_ACTION_HPP__
-#define __MOCKITOPP_ACTION_HPP__
+#ifndef __MOCKITOPP_ANSWER_HPP__
+#define __MOCKITOPP_ANSWER_HPP__
 
 namespace mockitopp
 {
    namespace detail
    {
       template <typename R>
-      struct Action
+      struct Answer
       {
          virtual R execute() = 0;
       };
    } // namespace detail
 } // namespace mockitopp
 
-#endif //__MOCKITOPP_ACTION_HPP__
+#endif //__MOCKITOPP_ANSWER_HPP__

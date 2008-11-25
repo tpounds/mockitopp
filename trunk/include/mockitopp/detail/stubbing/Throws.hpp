@@ -1,18 +1,18 @@
-#ifndef __MOCKITOPP_THROWABLE_ACTION_HPP__
-#define __MOCKITOPP_THROWABLE_ACTION_HPP__
+#ifndef __MOCKITOPP_THROWS_HPP__
+#define __MOCKITOPP_THROWS_HPP__
 
-#include <mockitopp/detail/action/Action.hpp>
+#include <mockitopp/detail/stubbing/Answer.hpp>
 
 namespace mockitopp
 {
    namespace detail
    {
       template <typename R, typename T>
-      struct ThrowableAction : public Action<R>
+      struct Throws : public Answer<R>
       {
          T _throwable;
 
-         ThrowableAction(const T& throwable)
+         Throws(const T& throwable)
             : _throwable(throwable)
             {}
 
@@ -22,4 +22,4 @@ namespace mockitopp
    } // namespace detail
 } // namespace mockitopp
 
-#endif //__MOCKITOPP_THROWABLE_ACTION_HPP__
+#endif //__MOCKITOPP_THROWS_HPP__

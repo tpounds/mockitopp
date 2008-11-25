@@ -1,18 +1,18 @@
-#ifndef __MOCKITOPP_RETURNABLE_ACTION_HPP__
-#define __MOCKITOPP_RETURNABLE_ACTION_HPP__
+#ifndef __MOCKITOPP_RETURNS_HPP__
+#define __MOCKITOPP_RETURNS_HPP__
 
-#include <mockitopp/detail/action/Action.hpp>
+#include <mockitopp/detail/stubbing/Answer.hpp>
 
 namespace mockitopp
 {
    namespace detail
    {
       template <typename R>
-      struct ReturnableAction : public Action<R>
+      struct Returns : public Answer<R>
       {
          R _returnable;
 
-         ReturnableAction(const R& returnable)
+         Returns(const R& returnable)
             : _returnable(returnable)
             {}
 
@@ -21,7 +21,7 @@ namespace mockitopp
       };
 
       template <>
-      struct ReturnableAction<void> : public Action<void>
+      struct Returns<void> : public Answer<void>
       {
          void execute()
             {}
@@ -29,4 +29,4 @@ namespace mockitopp
    } // namespace detail
 } // namespace mockitopp
 
-#endif //__MOCKITOPP_RETURNABLE_ACTION_HPP__
+#endif //__MOCKITOPP_RETURNS_HPP__
