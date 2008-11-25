@@ -6,6 +6,7 @@
 #include <mockitopp/detail/mock/VirtualTable.hpp>
 #include <mockitopp/detail/stubbing/OngoingStubbing.hpp>
 #include <mockitopp/detail/stubbing/StubImpl.hpp>
+#include <mockitopp/detail/stubbing/Verifier.hpp>
 #include <mockitopp/detail/utility/FunctionAddress.hpp>
 
 // TODO: add documentation
@@ -17,6 +18,7 @@ namespace mockitopp
       {
          VirtualTable* __vptr;
          void*         __spys[MAX_VIRTUAL_FUNCTIONS];
+         Verifier      __verifier;
 
          MockObjectImpl()
             : __vptr(new VirtualTable())
@@ -58,12 +60,10 @@ namespace mockitopp
          }
 
          template <typename M>
-         bool doVerify(M ptr2member, int minTimes, int maxTimes)
+         const Verifier& doVerify(M ptr2member)
          {
-            int calls = reinterpret_cast<OngoingStubbing<M>*>(__spys[FunctionAddress::offset(ptr2member)])->getCalls();
-            if(calls >= minTimes && calls <= maxTimes)
-               { return true; }
-            return false;
+            __verifier.calls = reinterpret_cast<OngoingStubbing<M>*>(__spys[FunctionAddress::offset(ptr2member)])->getCalls();
+            return __verifier;
          }
       };
    } // namespace detail

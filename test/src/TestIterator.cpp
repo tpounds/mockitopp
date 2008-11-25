@@ -17,7 +17,7 @@ TEST(TestIterator, IteratorInterface)
                               .thenReturn(2)
                               .thenReturn(3)
                               .thenReturn(4);
-   it_type& i = mock.getMock();
+   it_type& i = mock.getInstance();
 
    ASSERT_EQ(0, i.next());
    ASSERT_EQ(1, i.next());
@@ -25,5 +25,5 @@ TEST(TestIterator, IteratorInterface)
    ASSERT_EQ(3, i.next());
    ASSERT_EQ(4, i.next());
    ASSERT_EQ(4, i.next());
-   ASSERT_TRUE(mock.verifyExactly(&it_type::next, 6));
+   ASSERT_TRUE(mock.verify(&it_type::next).exactly(6));
 }
