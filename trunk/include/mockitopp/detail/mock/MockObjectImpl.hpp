@@ -1,10 +1,11 @@
 #ifndef __MOCKITOPP_MOCK_OBJECT_IMPL_HPP__
 #define __MOCKITOPP_MOCK_OBJECT_IMPL_HPP__
 
-#include <mockitopp/detail/matcher/ArgumentMatcher.hpp>
+#include <boost/preprocessor/repetition/repeat.hpp>
+
 #include <mockitopp/detail/mock/VirtualTable.hpp>
-#include <mockitopp/detail/stubbing/StubFactory.hpp>
-#include <mockitopp/detail/stubbing/StubImplData.hpp>
+#include <mockitopp/detail/stubbing/OngoingStubbing.hpp>
+#include <mockitopp/detail/stubbing/StubImpl.hpp>
 #include <mockitopp/detail/utility/FunctionAddress.hpp>
 
 // TODO: add documentation
@@ -14,12 +15,6 @@ namespace mockitopp
    {
       struct MockObjectImpl
       {
-         template <typename T>
-         struct OngoingStubbing
-         {
-            typedef ArgumentMatcher<T> base_type;
-         };
-
          VirtualTable* __vptr;
          void*         __spys[MAX_VIRTUAL_FUNCTIONS];
 
@@ -36,22 +31,36 @@ namespace mockitopp
          }
 
          template <typename M>
-         int getCalls(M ptr2member)
-            { return reinterpret_cast<StubImplData<M>*>(__spys[FunctionAddress::offset(ptr2member)])->getCalls(); }
+         static void* createStub(M ptr2member)
+         {
+            void* stubs[MAX_VIRTUAL_FUNCTIONS];
+
+            #define ASSIGN_STUB_TO_TABLE(ZZZ, NNN, TTT) \
+               stubs[NNN] = FunctionAddress::unsafe_cast(&StubImpl<NNN, M>::invoke);
+
+            BOOST_PP_REPEAT(MAX_VIRTUAL_FUNCTIONS, ASSIGN_STUB_TO_TABLE, ~)
+
+            #undef ASSIGN_STUB_TO_TABLE
+
+            return stubs[FunctionAddress::offset(ptr2member)];
+         }
 
          template <typename M>
-         ArgumentMatcher<M>& doStub(M ptr2member)
+         OngoingStubbing<M>& doWhen(M ptr2member)
          {
             size_t vtable_offset = FunctionAddress::offset(ptr2member);
-            __vptr->__vtable[vtable_offset] = StubFactory::createDelegate(ptr2member);
-            __spys[vtable_offset] = StubFactory::createSpy(ptr2member);
-            return reinterpret_cast<StubImplData<M>*>(__spys[vtable_offset])->getMatcher();
+            if(__spys[vtable_offset] == NULL)
+            {
+               __vptr->__vtable[vtable_offset] = createStub(ptr2member);
+               __spys[vtable_offset] = new OngoingStubbing<M>();
+            }
+            return *reinterpret_cast<OngoingStubbing<M>*>(__spys[vtable_offset]);
          }
 
          template <typename M>
          bool doVerify(M ptr2member, int minTimes, int maxTimes)
          {
-            int calls = getCalls(ptr2member);
+            int calls = reinterpret_cast<OngoingStubbing<M>*>(__spys[FunctionAddress::offset(ptr2member)])->getCalls();
             if(calls >= minTimes && calls <= maxTimes)
                { return true; }
             return false;

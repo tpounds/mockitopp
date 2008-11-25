@@ -1,5 +1,5 @@
-#ifndef __MOCKITOPP_ARGUMENT_MATCHER_HPP__
-#define __MOCKITOPP_ARGUMENT_MATCHER_HPP__
+#ifndef __MOCKITOPP_ONGOING_STUBBING_HPP__
+#define __MOCKITOPP_ONGOING_STUBBING_HPP__
 
 #include <map>
 #include <queue>
@@ -21,18 +21,18 @@ namespace mockitopp
 {
    namespace detail
    {
-      template <typename T, typename ENABLE = void> struct ArgumentMatcher;
+      template <typename T> struct OngoingStubbing;
 
       // TODO: clean up impl
       // TODO: add sequence matcher
 
       #define DEFINE_ARGUMENT_MATCHER_IMPL_VOID(ZZZ, NNN, TTT) \
          template <typename C BOOST_PP_COMMA_IF(NNN) BOOST_PP_ENUM_PARAMS(NNN, typename A)> \
-         struct ArgumentMatcher<void (C::*)(BOOST_PP_ENUM_PARAMS(NNN, A))> \
+         struct OngoingStubbing<void (C::*)(BOOST_PP_ENUM_PARAMS(NNN, A))> \
          { \
             DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT, void) \
          \
-            ArgumentMatcher& thenReturn() \
+            OngoingStubbing& thenReturn() \
             { \
                actionMap[ongoingMatch].push(new ReturnableAction<void>()); \
                return *this; \
@@ -41,11 +41,11 @@ namespace mockitopp
 
       #define DEFINE_ARGUMENT_MATCHER_IMPL_NON_VOID(ZZZ, NNN, TTT) \
          template <typename R, typename C BOOST_PP_COMMA_IF(NNN) BOOST_PP_ENUM_PARAMS(NNN, typename A)> \
-         struct ArgumentMatcher<R (C::*)(BOOST_PP_ENUM_PARAMS(NNN, A))> \
+         struct OngoingStubbing<R (C::*)(BOOST_PP_ENUM_PARAMS(NNN, A))> \
          { \
             DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT, R) \
          \
-            ArgumentMatcher& thenReturn(R value) \
+            OngoingStubbing& thenReturn(R value) \
             { \
                actionMap[ongoingMatch].push(new ReturnableAction<R>(value)); \
                return *this; \
@@ -59,23 +59,25 @@ namespace mockitopp
             typedef std::map<args_type, queue_type>            map_type; \
          \
             map_type    actionMap; \
-            action_type defaultAction; \
+            action_type lastAction; \
             args_type   ongoingMatch; \
+            int         calls; \
          \
-            ArgumentMatcher() \
+            OngoingStubbing() \
                : actionMap() \
-               , defaultAction(new DefaultAction<RRR>()) \
+               , lastAction(new DefaultAction<RRR>()) \
                , ongoingMatch() \
+               , calls(0) \
                {} \
          \
-            ArgumentMatcher& operator() (BOOST_PP_ENUM_BINARY_PARAMS(NNN, A, a)) \
+            OngoingStubbing& operator() (BOOST_PP_ENUM_BINARY_PARAMS(NNN, A, a)) \
             { \
                ongoingMatch = args_type(BOOST_PP_ENUM_PARAMS(NNN, a)); \
                return *this; \
             } \
          \
             template <typename T> \
-            ArgumentMatcher& thenThrow(T throwable) \
+            OngoingStubbing& thenThrow(T throwable) \
             { \
                actionMap[ongoingMatch].push(new ThrowableAction<RRR, T>(throwable)); \
                return *this; \
@@ -83,16 +85,19 @@ namespace mockitopp
          \
             RRR invoke(BOOST_PP_ENUM_BINARY_PARAMS(NNN, A, a)) \
             { \
+               calls++; \
                args_type   args     = args_type(BOOST_PP_ENUM_PARAMS(NNN, a)); \
                queue_type& action_q = actionMap[args]; \
-               if(action_q.empty()) \
-                  { return defaultAction->execute(); } \
-               else if(action_q.size() == 1) \
-                  { return action_q.front()->execute(); } \
-               action_type action = action_q.front(); \
-               action_q.pop(); \
-               return action->execute(); \
-            }
+               if(!action_q.empty()) \
+               { \
+                  lastAction = action_q.front(); \
+                  action_q.pop(); \
+               } \
+               return lastAction->execute(); \
+            } \
+         \
+            int getCalls() const \
+               { return calls; }
 
       BOOST_PP_REPEAT(MAX_VIRTUAL_FUNCTION_ARITY, DEFINE_ARGUMENT_MATCHER_IMPL_VOID, ~)
       BOOST_PP_REPEAT(MAX_VIRTUAL_FUNCTION_ARITY, DEFINE_ARGUMENT_MATCHER_IMPL_NON_VOID, ~)
@@ -102,4 +107,4 @@ namespace mockitopp
    } // namespace detail
 } // namespace mockitopp
 
-#endif //__MOCKITOPP_ARGUMENT_MATCHER_HPP__
+#endif //__MOCKITOPP_ONGOING_STUBBING_HPP__
