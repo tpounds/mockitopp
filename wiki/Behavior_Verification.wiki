@@ -1,6 +1,6 @@
 #labels Featured
 == Verifying Invocations ==
-There are several introspection methods which provide an observation into the use of the mock object during the xUnit test run. The mock object's {{{verifyXXX}}} methods allow test cases to assert if a given stubbed function has been invoke a certain number of times.  This is useful to ensure that no unexpected method invocations were encountered during the test run.  All of these examples will be mocking the simple interface below.
+There are several introspection methods which provide an observation into the use of the mock object during the xUnit test run. The mock object's {{{verify}}} methods allow test cases to assert if a given stubbed function has been invoke a certain number of times.  This is useful to ensure that no unexpected method invocations were encountered during the test run.  All of these examples will be mocking the simple interface below.
 
 {{{
 struct Foo
@@ -15,13 +15,13 @@ TEST(TestVerify, Exactly)
 {
    MockObject<Foo> mock;
    mock.when(&Foo::bar);
-   Foo& fooImpl = mock.getMock();
+   Foo& fooImpl = mock.getInstance();
 
    fooImpl.bar();
    fooImpl.bar();
    fooImpl.bar();
 
-   ASSERT_TRUE(mock.verifyExactly(&Foo::bar, 3)); // pass
+   ASSERT_TRUE(mock.verify(&Foo::bar).exactly(3)); // pass
 }
 }}}
 
@@ -31,16 +31,16 @@ TEST(TestVerify, AtLeast)
 {
    MockObject<Foo> mock;
    mock.when(&Foo::bar);
-   Foo& fooImpl = mock.getMock();
+   Foo& fooImpl = mock.getInstance();
 
    fooImpl.bar();
    fooImpl.bar();
    fooImpl.bar();
 
-   ASSERT_TRUE(mock.verifyAtLeast(&Foo::bar, 1)); // pass
-   ASSERT_TRUE(mock.verifyAtLeast(&Foo::bar, 2)); // pass
-   ASSERT_TRUE(mock.verifyAtLeast(&Foo::bar, 3)); // pass
-   ASSERT_TRUE(mock.verifyAtLeast(&Foo::bar, 4)); // fail
+   ASSERT_TRUE(mock.verify(&Foo::bar).atLeast(1)); // pass
+   ASSERT_TRUE(mock.verify(&Foo::bar).atLeast(2)); // pass
+   ASSERT_TRUE(mock.verify(&Foo::bar).atLeast(3)); // pass
+   ASSERT_TRUE(mock.verify(&Foo::bar).atLeast(4)); // fail
 }
 }}}
 
@@ -50,16 +50,15 @@ TEST(TestVerify, AtMost)
 {
    MockObject<Foo> mock;
    mock.when(&Foo::bar);
-   Foo& fooImpl = mock.getMock();
+   Foo& fooImpl = mock.getInstance();
 
    fooImpl.bar();
    fooImpl.bar();
    fooImpl.bar();
 
-   ASSERT_TRUE(mock.verifyAtMost(&Foo::bar, 4)); // pass
-   ASSERT_TRUE(mock.verifyAtMost(&Foo::bar, 3)); // pass
-   ASSERT_TRUE(mock.verifyAtMost(&Foo::bar, 2)); // fail
-   ASSERT_TRUE(mock.verifyAtLeast(&Foo::bar, 3));
+   ASSERT_TRUE(mock.verify(&Foo::bar).aMost(4)); // pass
+   ASSERT_TRUE(mock.verify(&Foo::bar).atMost(3)); // pass
+   ASSERT_TRUE(mock.verify(&Foo::bar).atMost(2)); // fail
 }
 }}}
 
@@ -69,11 +68,11 @@ TEST(TestVerify, Never)
 {
    MockObject<Foo> mock;
    mock.when(&Foo::bar);
-   Foo& fooImpl = mock.getMock();
+   Foo& fooImpl = mock.getInstance();
 
-   ASSERT_TRUE(mock.verifyNever(&Foo::bar)); // pass
+   ASSERT_TRUE(mock.verify(&Foo::bar).never()); // pass
    fooImpl.bar();
-   ASSERT_TRUE(mock.verifyNever(&Foo::bar)); // fail
+   ASSERT_TRUE(mock.verify(&Foo::bar).never()); // fail
 }
 }}}
 
@@ -83,14 +82,14 @@ TEST(TestVerify, Range)
 {
    MockObject<Foo> mock;
    mock.when(&Foo::bar);
-   Foo& fooImpl = mock.getMock();
+   Foo& fooImpl = mock.getInstance();
 
    fooImpl.bar();
    fooImpl.bar();
-   ASSERT_TRUE(mock.verify(&Foo::bar, 1, 3)); // pass
+   ASSERT_TRUE(mock.verify(&Foo::bar).between(1, 3)); // pass
    fooImpl.bar();
-   ASSERT_TRUE(mock.verify(&Foo::bar, 1, 3)); // pass
+   ASSERT_TRUE(mock.verify(&Foo::bar).between(1, 3)); // pass
    fooImpl.bar();
-   ASSERT_TRUE(mock.verify(&Foo::bar, 1, 3)); // fail
+   ASSERT_TRUE(mock.verify(&Foo::bar).between(1, 3)); // fail
 }
 }}}
