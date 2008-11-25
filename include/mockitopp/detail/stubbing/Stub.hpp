@@ -1,5 +1,5 @@
-#ifndef __MOCKITOPP_STUB_IMPL_HPP__
-#define __MOCKITOPP_STUB_IMPL_HPP__
+#ifndef __MOCKITOPP_STUB_HPP__
+#define __MOCKITOPP_STUB_HPP__
 
 #include <boost/preprocessor/punctuation/comma_if.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
@@ -7,6 +7,7 @@
 #include <boost/preprocessor/repetition/repeat.hpp>
 
 #include <mockitopp/detail/stubbing/OngoingStubbing.hpp>
+#include <mockitopp/detail/utility/HorribleCast.hpp>
 
 namespace mockitopp
 {
@@ -14,7 +15,7 @@ namespace mockitopp
    {
       template <int OFFSET, typename T> struct StubImpl;
 
-      #define DEFINE_STUB_IMPL(ZZZ, NNN, TTT) \
+      #define DEFINE_STUB_IMPL_FUNCTION(ZZZ, NNN, TTT) \
          template <int OFFSET, typename R, typename C BOOST_PP_COMMA_IF(NNN) BOOST_PP_ENUM_PARAMS(NNN, typename A)> \
          struct StubImpl<OFFSET, R (C::*)(BOOST_PP_ENUM_PARAMS(NNN, A))> \
          { \
@@ -26,11 +27,27 @@ namespace mockitopp
                { return __PAD_FOR_MOCK_spys[OFFSET]->invoke(BOOST_PP_ENUM_PARAMS(NNN, a)); } \
          };
 
-      BOOST_PP_REPEAT(MAX_VIRTUAL_FUNCTION_ARITY, DEFINE_STUB_IMPL, ~)
+      BOOST_PP_REPEAT(MAX_VIRTUAL_FUNCTION_ARITY, DEFINE_STUB_IMPL_FUNCTION, ~)
 
-      #undef DEFINE_STUB_IMPL
+      #undef DEFINE_STUB_IMPL_FUNCTION
 
+      template <typename M>
+      struct Stub
+      {
+         static void* getInstance(M ptr2member)
+         {
+            Stub s;
+            return (s.*reinterpret_cast<void* (Stub::*)()>(ptr2member))();
+         }
+
+         #define DEFINE_STUB_LOOKUP_FUNCTION(ZZZ, NNN, TTT) \
+            virtual void* stub##NNN() { return horrible_cast<void*>(&StubImpl<NNN, M>::invoke); }
+
+         BOOST_PP_REPEAT(MAX_VIRTUAL_FUNCTIONS, DEFINE_STUB_LOOKUP_FUNCTION, ~)
+
+         #undef DEFINE_STUB_LOOKUP_FUNCTION
+      };
    } // namespace detail
 } // namespace mockitopp
 
-#endif //__MOCKITOPP_STUB_IMPL_HPP__
+#endif //__MOCKITOPP_STUB_HPP__

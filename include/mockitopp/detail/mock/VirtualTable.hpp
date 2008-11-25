@@ -3,7 +3,7 @@
 
 #include <exception>
 
-#include <mockitopp/detail/utility/FunctionAddress.hpp>
+#include <mockitopp/detail/utility/HorribleCast.hpp>
 
 // TODO: add documentation
 namespace mockitopp
@@ -16,12 +16,11 @@ namespace mockitopp
       struct VirtualTable
       {
          void* __vtable[MAX_VIRTUAL_FUNCTIONS];
-         void* __vptr;
 
          VirtualTable()
          {
             for(int i = 0; i < MAX_VIRTUAL_FUNCTIONS; i++)
-               { __vtable[i] = FunctionAddress::unsafe_cast(&VirtualTable::virtualFunctionNotImplemented); }
+               { __vtable[i] = horrible_cast<void*>(&VirtualTable::virtualFunctionNotImplemented); }
          }
 
          struct NotImplementedException : public std::exception {};
