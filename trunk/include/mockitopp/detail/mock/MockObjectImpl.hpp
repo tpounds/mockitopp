@@ -1,13 +1,11 @@
 #ifndef __MOCKITOPP_MOCK_OBJECT_IMPL_HPP__
 #define __MOCKITOPP_MOCK_OBJECT_IMPL_HPP__
 
-#include <boost/preprocessor/repetition/repeat.hpp>
-
 #include <mockitopp/detail/mock/VirtualTable.hpp>
 #include <mockitopp/detail/stubbing/OngoingStubbing.hpp>
-#include <mockitopp/detail/stubbing/StubImpl.hpp>
+#include <mockitopp/detail/stubbing/Stub.hpp>
 #include <mockitopp/detail/stubbing/Verifier.hpp>
-#include <mockitopp/detail/utility/FunctionAddress.hpp>
+#include <mockitopp/detail/utility/Function.hpp>
 
 // TODO: add documentation
 namespace mockitopp
@@ -33,36 +31,21 @@ namespace mockitopp
          }
 
          template <typename M>
-         static void* createStub(M ptr2member)
-         {
-            void* stubs[MAX_VIRTUAL_FUNCTIONS];
-
-            #define ASSIGN_STUB_TO_TABLE(ZZZ, NNN, TTT) \
-               stubs[NNN] = FunctionAddress::unsafe_cast(&StubImpl<NNN, M>::invoke);
-
-            BOOST_PP_REPEAT(MAX_VIRTUAL_FUNCTIONS, ASSIGN_STUB_TO_TABLE, ~)
-
-            #undef ASSIGN_STUB_TO_TABLE
-
-            return stubs[FunctionAddress::offset(ptr2member)];
-         }
-
-         template <typename M>
          OngoingStubbing<M>& doWhen(M ptr2member)
          {
-            size_t vtable_offset = FunctionAddress::offset(ptr2member);
-            if(__spys[vtable_offset] == NULL)
+            int offset = Function::getOffset(ptr2member);
+            if(__spys[offset] == NULL)
             {
-               __vptr->__vtable[vtable_offset] = createStub(ptr2member);
-               __spys[vtable_offset] = new OngoingStubbing<M>();
+               __vptr->__vtable[offset] = Stub<M>::getInstance(ptr2member);
+               __spys[offset] = new OngoingStubbing<M>();
             }
-            return *reinterpret_cast<OngoingStubbing<M>*>(__spys[vtable_offset]);
+            return *reinterpret_cast<OngoingStubbing<M>*>(__spys[offset]);
          }
 
          template <typename M>
          const Verifier& doVerify(M ptr2member)
          {
-            __verifier.calls = reinterpret_cast<OngoingStubbing<M>*>(__spys[FunctionAddress::offset(ptr2member)])->getCalls();
+            __verifier.calls = reinterpret_cast<OngoingStubbing<M>*>(__spys[Function::getOffset(ptr2member)])->getCalls();
             return __verifier;
          }
       };
