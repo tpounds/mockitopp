@@ -10,9 +10,10 @@ namespace mockitopp
          int calls;
 
          /**
-          * verify method invocation is never called
+          * verify method is called within a specified range
           *
-          * @param ptr2member method to be verify
+          * @param min minimum times method should be called
+          * @param max maximum times method should be called
           */
          bool between(int min, int max) const
          {
@@ -22,33 +23,31 @@ namespace mockitopp
          }
 
          /**
-          * verify method invocation occurs at least (n) times
+          * verify method is called at least (n) times
           *
-          * @param ptr2member method to be verify
           * @param times minimum number of times method should be called
           */
          bool atLeast(int times) const
             { return between(times, 0x7FFF); }
 
          /**
-          * verify method invocation occurs at most (n) times
+          * verify method is called at most (n) times
           *
-          * @param ptr2member method to be verify
           * @param times maximum number of times method should be called
           */
          bool atMost(int times) const
             { return between(0, times); }
 
          /**
-          * verify method invocation exactly (n) times
+          * verify method is called exactly (n) times
           *
           * @param times exact number of times method should be called
           */
-         const bool exactly(int times) const
+         bool exactly(int times) const
             { return between(times, times); }
 
          /**
-          * verify method invocation is never called
+          * verify method is never called
           */
          bool never() const
             { return between(0, 0); }
