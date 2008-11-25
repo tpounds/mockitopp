@@ -33,8 +33,8 @@ namespace mockitopp
        * @param ptr2member method to be stubbed
        */
       template <typename M>
-      typename OngoingStubbing<M>::base_type& when(M ptr2member)
-         { return doStub(ptr2member); }
+      detail::OngoingStubbing<M>& when(M ptr2member)
+         { return doWhen(ptr2member); }
 
       /**
        * verify method invocation occurs in a certain range
