@@ -17,7 +17,7 @@ TEST(MyTestCase, Foo)
 {
    MockObject<Foo> mock;
    mock.when(&Foo::bar);
-   Foo& fooImpl = mock.getMock();
+   Foo& fooImpl = mock.getInstance();
 
    ASSERT_NO_THROW(fooImpl.bar());
 }
@@ -43,7 +43,7 @@ TEST(MyTestCase, Adder)
    mock.when(&Adder::add)(0, 0).thenReturn(0);
    mock.when(&Adder::add)(1, 1).thenReturn(2)
    mock.when(&Adder::add)(2, 2).thenReturn(5); // most certainly 2 + 2 = 5!
-   Adder& adderImpl = mock.getMock();
+   Adder& adderImpl = mock.getInstance();
 
    ASSERT_EQ(adderImpl.add(0, 0), 0);
    ASSERT_EQ(adderImpl.add(1, 1), 2);
@@ -74,7 +74,7 @@ TEST(MyTestCase)
    mock.stub(&Adder::add)(0, 0).thenReturn(0)
    mock.stub(&Adder::add)(1, 1).thenReturn(2)
    mock.stub(&Adder::add)(2, 2).thenThrow(std::string("I don't support this!")); // Don't believe me? I dare you to try it!
-   Adder& adderImpl = mock.getMock();
+   Adder& adderImpl = mock.getInstance();
 
    ASSERT_EQ(adderImpl.add(0, 0), 0);
    ASSERT_EQ(adderImpl.add(1, 1), 2);
@@ -104,7 +104,7 @@ TEST(MyTestCase)
    mock.when(&Foo::bar)(0).thenReturn();
    mock.when(&Foo::bar)(1).thenReturn();
    mock.when(&Foo::bar)(2).thenThrow(std::string("Invalid argument!"));
-   Foo& foo = mock.getMock();
+   Foo& foo = mock.getInstance();
 
    ASSERT_NO_THROW(foo.bar(0)); // returns cause we stubbed it
    ASSERT_NO_THROW(foo.bar(1)); // returns cause we stubbed it
@@ -135,7 +135,7 @@ TEST(MyTestCase, Enumeration)
                                   .thenThrow(std::string("Invalid argument!"))
                                   .thenReturn(2)
                                   .thenReturn(3);
-   Enumeration& e = mock.getMock();
+   Enumeration& e = mock.getInstance();
 
    ASSERT_EQ(0, e.next()); // should return 0
    ASSERT_EQ(1, e.next()); // should return 1
