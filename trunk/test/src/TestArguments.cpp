@@ -19,9 +19,9 @@ TEST(TestArguments, PlainOleDataTypes)
    m.when(&PlainOleDataTypes::__bool)(false).thenReturn(true);
    m.when(&PlainOleDataTypes::__char)('A').thenReturn('Z');
    m.when(&PlainOleDataTypes::__bool)('Z').thenReturn('0');
-   PlainOleDataTypes& i = m.getMock();
+   PlainOleDataTypes& i = m.getInstance();
 
    ASSERT_EQ(2, i.__int(0));
    ASSERT_EQ(8, i.__int(100));
-   ASSERT_TRUE(m.verifyExactly(&PlainOleDataTypes::__int, 2));
+   ASSERT_TRUE(m.verify(&PlainOleDataTypes::__int).exactly(2));
 }

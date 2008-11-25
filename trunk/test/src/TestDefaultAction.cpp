@@ -13,10 +13,10 @@ TEST(TestDefaultAction, ReferenceInterface)
 {
    MockObject<ReferenceInterface> mock;
    mock.when(&ReferenceInterface::get);
-   ReferenceInterface& i = mock.getMock();
+   ReferenceInterface& i = mock.getInstance();
 
    ReferenceInterface& ret = i.get();
-   ASSERT_TRUE(mock.verifyExactly(&ReferenceInterface::get, 1));
+   ASSERT_TRUE(mock.verify(&ReferenceInterface::get).exactly(1));
 }
 
 struct PointerInterface
@@ -27,10 +27,10 @@ TEST(TestDefaultAction, PointerInterface)
 {
    MockObject<PointerInterface> mock;
    mock.when(&PointerInterface::get);
-   PointerInterface& i = mock.getMock();
+   PointerInterface& i = mock.getInstance();
 
    ASSERT_TRUE(NULL == i.get());
-   ASSERT_TRUE(mock.verifyExactly(&PointerInterface::get, 1));
+   ASSERT_TRUE(mock.verify(&PointerInterface::get).exactly(1));
 }
 
 struct VoidInterface
@@ -41,10 +41,10 @@ TEST(TestDefaultAction, VoidInterface)
 {
    MockObject<VoidInterface> mock;
    mock.when(&VoidInterface::get);
-   VoidInterface& i = mock.getMock();
+   VoidInterface& i = mock.getInstance();
 
    i.get();
-   ASSERT_TRUE(mock.verifyExactly(&VoidInterface::get, 1));
+   ASSERT_TRUE(mock.verify(&VoidInterface::get).exactly(1));
 }
 
 #include <string>
@@ -56,10 +56,10 @@ TEST(TestDefaultAction, StringInterface)
 {
    MockObject<StringInterface> mock;
    mock.when(&StringInterface::get);
-   StringInterface& i = mock.getMock();
+   StringInterface& i = mock.getInstance();
 
    ASSERT_EQ("", i.get());
-   ASSERT_TRUE(mock.verifyExactly(&StringInterface::get, 1));
+   ASSERT_TRUE(mock.verify(&StringInterface::get).exactly(1));
 }
 
 struct PODInterface
@@ -80,25 +80,25 @@ TEST(TestDefaultAction, PODInterface)
    mock.when(&PODInterface::getLong);
    mock.when(&PODInterface::getFloat);
    mock.when(&PODInterface::getDouble);
-   PODInterface& i = mock.getMock();
+   PODInterface& i = mock.getInstance();
 
    ASSERT_EQ(0, i.getChar());
-   ASSERT_TRUE(mock.verifyExactly(&PODInterface::getChar, 1));
+   ASSERT_TRUE(mock.verify(&PODInterface::getChar).exactly(1));
 
    ASSERT_EQ(false, i.getBool());
-   ASSERT_TRUE(mock.verifyExactly(&PODInterface::getBool, 1));
+   ASSERT_TRUE(mock.verify(&PODInterface::getBool).exactly(1));
 
    ASSERT_EQ(0, i.getInt());
-   ASSERT_TRUE(mock.verifyExactly(&PODInterface::getInt, 1));
+   ASSERT_TRUE(mock.verify(&PODInterface::getInt).exactly(1));
 
    ASSERT_EQ(0, i.getLong());
-   ASSERT_TRUE(mock.verifyExactly(&PODInterface::getLong, 1));
+   ASSERT_TRUE(mock.verify(&PODInterface::getLong).exactly(1));
 
    ASSERT_EQ(0.0, i.getFloat());
-   ASSERT_TRUE(mock.verifyExactly(&PODInterface::getFloat, 1));
+   ASSERT_TRUE(mock.verify(&PODInterface::getFloat).exactly(1));
 
    ASSERT_EQ(0.0, i.getDouble());
-   ASSERT_TRUE(mock.verifyExactly(&PODInterface::getDouble, 1));
+   ASSERT_TRUE(mock.verify(&PODInterface::getDouble).exactly(1));
 }
 
 struct PODPointerInterface
@@ -121,26 +121,26 @@ TEST(TestDefaultAction, PODPointerInterface)
    mock.when(&PODPointerInterface::getLongP);
    mock.when(&PODPointerInterface::getFloatP);
    mock.when(&PODPointerInterface::getDoubleP);
-   PODPointerInterface& i = mock.getMock();
+   PODPointerInterface& i = mock.getInstance();
 
    ASSERT_TRUE(NULL == i.getVoidP());
-   ASSERT_TRUE(mock.verifyExactly(&PODPointerInterface::getVoidP, 1));
+   ASSERT_TRUE(mock.verify(&PODPointerInterface::getVoidP).exactly(1));
 
    ASSERT_TRUE(NULL == i.getCharP());
-   ASSERT_TRUE(mock.verifyExactly(&PODPointerInterface::getCharP, 1));
+   ASSERT_TRUE(mock.verify(&PODPointerInterface::getCharP).exactly(1));
 
    ASSERT_TRUE(NULL == i.getBoolP());
-   ASSERT_TRUE(mock.verifyExactly(&PODPointerInterface::getBoolP, 1));
+   ASSERT_TRUE(mock.verify(&PODPointerInterface::getBoolP).exactly(1));
 
    ASSERT_TRUE(NULL == i.getIntP());
-   ASSERT_TRUE(mock.verifyExactly(&PODPointerInterface::getIntP, 1));
+   ASSERT_TRUE(mock.verify(&PODPointerInterface::getIntP).exactly(1));
 
    ASSERT_TRUE(NULL == i.getLongP());
-   ASSERT_TRUE(mock.verifyExactly(&PODPointerInterface::getLongP, 1));
+   ASSERT_TRUE(mock.verify(&PODPointerInterface::getLongP).exactly(1));
 
    ASSERT_TRUE(NULL == i.getFloatP());
-   ASSERT_TRUE(mock.verifyExactly(&PODPointerInterface::getFloatP, 1));
+   ASSERT_TRUE(mock.verify(&PODPointerInterface::getFloatP).exactly(1));
 
    ASSERT_TRUE(NULL == i.getDoubleP());
-   ASSERT_TRUE(mock.verifyExactly(&PODPointerInterface::getDoubleP, 1));
+   ASSERT_TRUE(mock.verify(&PODPointerInterface::getDoubleP).exactly(1));
 }

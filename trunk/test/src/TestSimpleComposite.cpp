@@ -38,50 +38,50 @@ TEST(TestSimpleComposite, Add)
 {
    MockObject<Interface1> mock1;
    mock1.when(&Interface1::foo)().thenReturn(2);
-   Interface1& i1 = mock1.getMock();
+   Interface1& i1 = mock1.getInstance();
 
    MockObject<Interface2> mock2;
    mock2.when(&Interface2::bar)().thenReturn(10);
-   Interface2& i2 = mock2.getMock();
+   Interface2& i2 = mock2.getInstance();
 
    SimpleComposite c = SimpleComposite(i1, i2);
 
    ASSERT_EQ(12, c.simpleAdd());
-   ASSERT_TRUE(mock1.verifyExactly(&Interface1::foo, 1));
-   ASSERT_TRUE(mock2.verifyExactly(&Interface2::bar, 1));
+   ASSERT_TRUE(mock1.verify(&Interface1::foo).exactly(1));
+   ASSERT_TRUE(mock2.verify(&Interface2::bar).exactly(1));
 }
 
 TEST(TestSimpleComposite, Multiply)
 {
    MockObject<Interface1> mock1;
    mock1.when(&Interface1::foo)().thenReturn(10);
-   Interface1& i1 = mock1.getMock();
+   Interface1& i1 = mock1.getInstance();
 
    MockObject<Interface2> mock2;
    mock2.when(&Interface2::bar)().thenReturn(10);
-   Interface2& i2 = mock2.getMock();
+   Interface2& i2 = mock2.getInstance();
 
    SimpleComposite c = SimpleComposite(i1, i2);
 
    ASSERT_EQ(100, c.simpleMultiply());
-   ASSERT_TRUE(mock1.verifyExactly(&Interface1::foo, 1));
-   ASSERT_TRUE(mock2.verifyExactly(&Interface2::bar, 1));
+   ASSERT_TRUE(mock1.verify(&Interface1::foo).exactly(1));
+   ASSERT_TRUE(mock2.verify(&Interface2::bar).exactly(1));
 }
 
 TEST(TestSimpleComposite, Add_and_Multiply)
 {
    MockObject<Interface1> mock1;
    mock1.when(&Interface1::foo)().thenReturn(10);
-   Interface1& i1 = mock1.getMock();
+   Interface1& i1 = mock1.getInstance();
 
    MockObject<Interface2> mock2;
    mock2.when(&Interface2::bar)().thenReturn(10);
-   Interface2& i2 = mock2.getMock();
+   Interface2& i2 = mock2.getInstance();
 
    SimpleComposite c = SimpleComposite(i1, i2);
 
    ASSERT_EQ(20,  c.simpleAdd());
    ASSERT_EQ(100, c.simpleMultiply());
-   ASSERT_TRUE(mock1.verifyExactly(&Interface1::foo, 2));
-   ASSERT_TRUE(mock2.verifyExactly(&Interface2::bar, 2));
+   ASSERT_TRUE(mock1.verify(&Interface1::foo).exactly(2));
+   ASSERT_TRUE(mock2.verify(&Interface2::bar).exactly(2));
 }

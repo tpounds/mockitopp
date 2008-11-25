@@ -7,10 +7,8 @@ namespace mockitopp
 {
    namespace detail
    {
-      template <typename R, typename ENABLE = void> struct DefaultAction;
-
       template <typename R>
-      struct DefaultAction<R> : public Action<R>
+      struct DefaultAction : public Action<R>
       {
          R _returnable;
 
