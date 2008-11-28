@@ -1,9 +1,9 @@
 #ifndef __MOCKITOPP_STUB_HPP__
 #define __MOCKITOPP_STUB_HPP__
 
-#include <boost/preprocessor/punctuation/comma_if.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/preprocessor/repetition/enum_trailing_params.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
 
 #include <mockitopp/detail/stubbing/OngoingStubbing.hpp>
@@ -16,7 +16,7 @@ namespace mockitopp
       template <int OFFSET, typename T> struct StubImpl;
 
       #define DEFINE_STUB_IMPL_FUNCTION(ZZZ, NNN, TTT) \
-         template <int OFFSET, typename R, typename C BOOST_PP_COMMA_IF(NNN) BOOST_PP_ENUM_PARAMS(NNN, typename A)> \
+         template <int OFFSET, typename R, typename C BOOST_PP_ENUM_TRAILING_PARAMS(NNN, typename A)> \
          struct StubImpl<OFFSET, R (C::*)(BOOST_PP_ENUM_PARAMS(NNN, A))> \
          { \
             void* __PAD_FOR_MOCK_vptr; \
