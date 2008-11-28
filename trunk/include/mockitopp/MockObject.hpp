@@ -5,7 +5,7 @@
 #define MAX_VIRTUAL_FUNCTIONS 50
 // boost::tuple supports 0-10 elements, so don't
 // support arity > 11 with this implementation.
-#define MAX_VIRTUAL_FUNCTION_ARITY 11
+#define MAX_VIRTUAL_FUNCTION_ARITY 21
 
 #include <mockitopp/detail/mock/MockObjectImpl.hpp>
 

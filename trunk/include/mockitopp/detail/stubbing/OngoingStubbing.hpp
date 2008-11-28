@@ -4,17 +4,16 @@
 #include <map>
 #include <queue>
 
-#include <boost/preprocessor/punctuation/comma_if.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/preprocessor/repetition/enum_trailing_params.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/tuple/tuple_comparison.hpp>
 
 #include <mockitopp/detail/exception/IncompleteImplementationException.hpp>
 #include <mockitopp/detail/stubbing/Answer.hpp>
 #include <mockitopp/detail/stubbing/Returns.hpp>
 #include <mockitopp/detail/stubbing/Throws.hpp>
+#include <mockitopp/detail/utility/Tuple.hpp>
 
 // TODO: add documentation
 namespace mockitopp
@@ -27,7 +26,7 @@ namespace mockitopp
       // TODO: add sequence matcher
 
       #define DEFINE_ARGUMENT_MATCHER_IMPL_VOID(ZZZ, NNN, TTT) \
-         template <typename C BOOST_PP_COMMA_IF(NNN) BOOST_PP_ENUM_PARAMS(NNN, typename A)> \
+         template <typename C BOOST_PP_ENUM_TRAILING_PARAMS(NNN, typename A)> \
          struct OngoingStubbing<void (C::*)(BOOST_PP_ENUM_PARAMS(NNN, A))> \
          { \
             DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT, void) \
@@ -40,7 +39,7 @@ namespace mockitopp
          };
 
       #define DEFINE_ARGUMENT_MATCHER_IMPL_NON_VOID(ZZZ, NNN, TTT) \
-         template <typename R, typename C BOOST_PP_COMMA_IF(NNN) BOOST_PP_ENUM_PARAMS(NNN, typename A)> \
+         template <typename R, typename C BOOST_PP_ENUM_TRAILING_PARAMS(NNN, typename A)> \
          struct OngoingStubbing<R (C::*)(BOOST_PP_ENUM_PARAMS(NNN, A))> \
          { \
             DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT, R) \
@@ -53,7 +52,7 @@ namespace mockitopp
          };
 
       #define DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT, RRR) \
-            typedef boost::tuple<BOOST_PP_ENUM_PARAMS(NNN, A)> args_type; \
+            typedef Tuple<BOOST_PP_ENUM_PARAMS(NNN, A)> args_type; \
             typedef Answer<RRR>*                               answer_type; \
             typedef std::queue<answer_type>                    queue_type; \
             typedef std::map<args_type, queue_type>            map_type; \
