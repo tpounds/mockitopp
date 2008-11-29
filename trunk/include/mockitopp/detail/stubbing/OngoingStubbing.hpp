@@ -8,6 +8,8 @@
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_trailing_params.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <boost/tuple/tuple_comparison.hpp>
 
 #include <mockitopp/detail/exception/IncompleteImplementationException.hpp>
 #include <mockitopp/detail/stubbing/Answer.hpp>
@@ -52,26 +54,24 @@ namespace mockitopp
          };
 
       #define DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT, RRR) \
-            typedef Tuple<BOOST_PP_ENUM_PARAMS(NNN, A)> args_type; \
-            typedef Answer<RRR>*                        answer_type; \
-            typedef std::queue<answer_type>             queue_type; \
-            typedef std::map<args_type, queue_type>     map_type; \
+            typedef boost::tuple<BOOST_PP_ENUM_PARAMS(NNN, A)> tuple_type; \
+            typedef Answer<RRR>*                               answer_type; \
+            typedef std::queue<answer_type>                    queue_type; \
          \
-            map_type    answerMap; \
-            answer_type lastAnswer; \
-            args_type   ongoingMatch; \
+            std::map<tuple_type, queue_type>  answerMap; \
+            std::map<tuple_type, answer_type> lastAnswerMap; \
+            tuple_type  ongoingMatch; \
             int         calls; \
          \
             OngoingStubbing() \
                : answerMap() \
-               , lastAnswer(NULL) \
                , ongoingMatch() \
                , calls(0) \
                {} \
          \
             OngoingStubbing& operator() (BOOST_PP_ENUM_BINARY_PARAMS(NNN, A, a)) \
             { \
-               ongoingMatch = args_type(BOOST_PP_ENUM_PARAMS(NNN, a)); \
+               ongoingMatch = tuple_type(BOOST_PP_ENUM_PARAMS(NNN, a)); \
                return *this; \
             } \
          \
@@ -85,16 +85,16 @@ namespace mockitopp
             RRR invoke(BOOST_PP_ENUM_BINARY_PARAMS(NNN, A, a)) \
             { \
                calls++; \
-               args_type   args     = args_type(BOOST_PP_ENUM_PARAMS(NNN, a)); \
-               queue_type& answer_q = answerMap[args]; \
-               if(!answer_q.empty()) \
+               tuple_type  args     = tuple_type(BOOST_PP_ENUM_PARAMS(NNN, a)); \
+               queue_type& answers = answerMap[args]; \
+               if(answers.empty() && lastAnswerMap.find(args) == lastAnswerMap.end()) \
+                  { throw IncompleteImplementationException(); } \
+               if(answers.size() > 0) \
                { \
-                  lastAnswer = answer_q.front(); \
-                  answer_q.pop(); \
+                  lastAnswerMap[args] = answers.front(); \
+                  answers.pop(); \
                } \
-               if(lastAnswer != NULL) \
-                  { return lastAnswer->execute(); } \
-               throw IncompleteImplementationException(); \
+               return lastAnswerMap[args]->execute(); \
             } \
          \
             int getCalls() const \
