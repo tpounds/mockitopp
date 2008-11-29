@@ -53,9 +53,9 @@ namespace mockitopp
 
       #define DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT, RRR) \
             typedef Tuple<BOOST_PP_ENUM_PARAMS(NNN, A)> args_type; \
-            typedef Answer<RRR>*                               answer_type; \
-            typedef std::queue<answer_type>                    queue_type; \
-            typedef std::map<args_type, queue_type>            map_type; \
+            typedef Answer<RRR>*                        answer_type; \
+            typedef std::queue<answer_type>             queue_type; \
+            typedef std::map<args_type, queue_type>     map_type; \
          \
             map_type    answerMap; \
             answer_type lastAnswer; \

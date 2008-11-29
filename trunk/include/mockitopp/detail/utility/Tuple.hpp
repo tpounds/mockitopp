@@ -61,19 +61,19 @@ namespace mockitopp
             , t19(t19), t20(t20)
             {}
 
-         bool operator< (const Tuple& t) const
+         bool operator< (const Tuple& rhs) const
          {
             return
-               t.t1 < t1 && t.t2 < t2 &&
-               t.t3 < t3 && t.t4 < t4 &&
-               t.t5 < t5 && t.t6 < t6 &&
-               t.t7 < t7 && t.t8 < t8 &&
-               t.t9 < t9 && t.t10 < t10 &&
-               t.t11 < t11 && t.t12 < t12 &&
-               t.t13 < t13 && t.t14 < t14 &&
-               t.t15 < t15 && t.t16 < t16 &&
-               t.t17 < t17 && t.t18 < t18 &&
-               t.t19 < t19 && t.t20 < t20;
+               t1 < rhs.t1 && t2 < rhs.t2 &&
+               t3 < rhs.t3 && t4 < rhs.t4 &&
+               t5 < rhs.t5 && t6 < rhs.t6 &&
+               t7 < rhs.t7 && t8 < rhs.t8 &&
+               t9 < rhs.t9 && t10 < rhs.t10 &&
+               t11 < rhs.t11 && t12 < rhs.t12 &&
+               t13 < rhs.t13 && t14 < rhs.t14 &&
+               t15 < rhs.t15 && t16 < rhs.t16 &&
+               t17 < rhs.t17 && t18 < rhs.t18 &&
+               t19 < rhs.t19 && t20 < rhs.t20;
          }
       };
    } // namespace detail
