@@ -10,9 +10,9 @@ class Environment(BaseEnvironment.Environment):
    def DetectEnvironment(self):
       # TODO: check Microsoft Platform SDK
 
-      proc = Popen(self['CC'], stderr=STDOUT, stdout=PIPE)
+      proc = Popen(self['CXX'], stderr=STDOUT, stdout=PIPE)
       proc.wait()
-      version = "".join(proc.stderr.readlines())
+      version = "".join(proc.stdout.readlines())
 
       # configure compiler version
       if re.compile("Version 13\.10").search(version):
