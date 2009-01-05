@@ -1,5 +1,6 @@
 import BaseEnvironment
 import re
+import os
 from subprocess import Popen, PIPE, STDOUT
 
 class Environment(BaseEnvironment.Environment):
