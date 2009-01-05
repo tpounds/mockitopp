@@ -10,6 +10,8 @@
 #include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/tuple/tuple_comparison.hpp>
+#include <boost/type_traits/is_void.hpp>
+#include <boost/utility/enable_if.hpp>
 
 #include <mockitopp/detail/exception/IncompleteImplementationException.hpp>
 #include <mockitopp/detail/stubbing/Answer.hpp>
@@ -22,7 +24,7 @@ namespace mockitopp
 {
    namespace detail
    {
-      template <typename T> struct OngoingStubbing;
+      template <typename T, typename ENABLE = void> struct OngoingStubbing;
 
       // TODO: clean up impl
       // TODO: add sequence matcher
@@ -42,7 +44,7 @@ namespace mockitopp
 
       #define DEFINE_ARGUMENT_MATCHER_IMPL_NON_VOID(ZZZ, NNN, TTT) \
          template <typename R, typename C BOOST_PP_ENUM_TRAILING_PARAMS(NNN, typename A)> \
-         struct OngoingStubbing<R (C::*)(BOOST_PP_ENUM_PARAMS(NNN, A))> \
+         struct OngoingStubbing<R (C::*)(BOOST_PP_ENUM_PARAMS(NNN, A)), typename boost::disable_if<boost::is_void<R> >::type> \
          { \
             DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT, R) \
          \
