@@ -21,8 +21,7 @@ namespace mockitopp
 
          MockObjectImpl()
             : __vptr(new VirtualTable(&MockObjectImpl::NotImplemented))
-            , __spys()
-         {}
+            { memset(__spys, 0, MAX_VIRTUAL_FUNCTIONS); }
 
          ~MockObjectImpl()
          {
