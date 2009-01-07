@@ -30,8 +30,6 @@ class Environment(BaseEnvironment.Environment):
 
    # Microsoft Visual C++ .NET 2003 (7.1)
    def Configure_MSVC_7_1(self):
-      binpath = os.path.dirname(self['CXX'])
-      self['LINK'] = binpath + "\link.exe"
       print "MSVC 7.1 Detected"
 
    # Microsoft Visual C++ 2005 (8.0)
