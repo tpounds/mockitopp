@@ -4,6 +4,7 @@
 #include <map>
 #include <queue>
 
+#include <boost/preprocessor/facilities/intercept.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_trailing_params.hpp>
@@ -11,6 +12,8 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/tuple/tuple_comparison.hpp>
 #include <boost/type_traits/is_void.hpp>
+#include <boost/type_traits/remove_const.hpp>
+#include <boost/type_traits/remove_reference.hpp>
 #include <boost/utility/enable_if.hpp>
 
 #include <mockitopp/detail/exception/IncompleteImplementationException.hpp>
@@ -56,7 +59,7 @@ namespace mockitopp
          };
 
       #define DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT, RRR) \
-            typedef boost::tuple<BOOST_PP_ENUM_PARAMS(NNN, A)> tuple_type; \
+            typedef boost::tuple<BOOST_PP_ENUM_BINARY_PARAMS(NNN, typename boost::remove_const<typename boost::remove_reference<A, >::type >::type BOOST_PP_INTERCEPT)> tuple_type; \
             typedef Answer<RRR>*                               answer_type; \
             typedef std::queue<answer_type>                    queue_type; \
          \

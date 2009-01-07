@@ -40,3 +40,19 @@ TEST(TestBasicStubbing, CharVoid)
    mock.when(&CharVoidInterface::foo)().thenThrow(std::string("Hypothetical Error!"));
    ASSERT_THROW(i.foo(), std::string);
 }
+
+struct VoidStringRefInterface
+{
+   virtual void foo(const std::string& ref) = 0;
+};
+TEST(TestBasicStubbing, VoidStringRef)
+{
+   MockObject<VoidStringRefInterface> mock;
+   VoidStringRefInterface& i = mock.getInstance();
+
+   // returnable call
+   std::string bar = "bar";
+   mock.when(&VoidStringRefInterface::foo)(bar).thenReturn();
+   i.foo(bar);
+   ASSERT_TRUE(mock.verify(&VoidStringRefInterface::foo).exactly(1));
+}
