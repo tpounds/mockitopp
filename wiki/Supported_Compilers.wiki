@@ -3,18 +3,22 @@ This library was primarily developed against GCC but should be portable across n
 
 == [http://gcc.gnu.org/ GCC] ==
 || *version* || *works* || *notes* ||
-||2.9.5||???||Not Tested (Most Likely Not)||
-||3.3.x||Yes||Tested using 3.3.6||
-||3.4.x||Yes||Tested using 3.4.6||
+||2.9.5||???||Not Tested||
+||3.3.x||Yes||g++ (3.3.6)||
+||3.4.x||Yes||g++ (3.4.6)||
 ||4.0.x||???||Not Tested||
-||4.1.x||Yes||Tested using 4.1.2||
-||4.2.x||Yes||Tested using 4.2.4||
+||4.1.x||Yes||g++ (4.1.2)||
+||4.2.x||Yes||g++ (4.2.4)||
 ||4.3.x||???||Not Tested||
 
 == [http://msdn.microsoft.com/en-us/visualc Microsoft Visual C++] ==
 || *version* || *works* || *notes* ||
 ||6.0||No?||googletest does not compile||
 ||7.0 (.Net 2002)||???||Not Tested||
-||7.1 (.Net 2003)||Yes||Tested using cl.exe (13.10.6030)/link.exe (7.10.6030)||
-||8.0 (2005)||Yes||Tested using cl.exe (14.00.50727.42)/link.exe (8.00.50727.42)||
-||9.0 (2008)||Yes||Tested using cl.exe (15.00.3072.01)/link.exe (9.00.30727.01)||
+||7.1 (.Net 2003)||Yes||cl.exe (13.10.6030), link.exe (7.10.6030)||
+||8.0 (2005)||Yes||cl.exe (14.00.50727.42), link.exe (8.00.50727.42)||
+||9.0 (2008)||Yes||cl.exe (15.00.3072.01), link.exe (9.00.30727.01)||
+
+== [http://www.mingw.org/ MinGW] ==
+|| *version* || *works* || *notes* ||
+||3.4.x||Yes||g++ (3.4.5 r3), w32api (3.13)||
