@@ -32,33 +32,7 @@ namespace mockitopp
       // TODO: clean up impl
       // TODO: add sequence matcher
 
-      #define DEFINE_ARGUMENT_MATCHER_IMPL_VOID(ZZZ, NNN, TTT) \
-         template <typename C BOOST_PP_ENUM_TRAILING_PARAMS(NNN, typename A)> \
-         struct OngoingStubbing<void (C::*)(BOOST_PP_ENUM_PARAMS(NNN, A))> \
-         { \
-            DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT, void) \
-         \
-            OngoingStubbing& thenReturn() \
-            { \
-               answerMap[ongoingMatch].push(new Returns<void>()); \
-               return *this; \
-            } \
-         };
-
-      #define DEFINE_ARGUMENT_MATCHER_IMPL_NON_VOID(ZZZ, NNN, TTT) \
-         template <typename R, typename C BOOST_PP_ENUM_TRAILING_PARAMS(NNN, typename A)> \
-         struct OngoingStubbing<R (C::*)(BOOST_PP_ENUM_PARAMS(NNN, A)), typename boost::disable_if<boost::is_void<R> >::type> \
-         { \
-            DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT, R) \
-         \
-            OngoingStubbing& thenReturn(R value) \
-            { \
-               answerMap[ongoingMatch].push(new Returns<R>(value)); \
-               return *this; \
-            } \
-         };
-
-      #define DEFINE_ARGUMENT_MATCHER_IMPL_COMMON(ZZZ, NNN, TTT, RRR) \
+      #define DEFINE_ONGOING_STUBBING_COMMON(ZZZ, NNN, TTT, RRR) \
             typedef boost::tuple<BOOST_PP_ENUM_BINARY_PARAMS(NNN, typename boost::remove_const<typename boost::remove_reference<A, >::type >::type BOOST_PP_INTERCEPT)> tuple_type; \
             typedef Answer<RRR>*                               answer_type; \
             typedef std::queue<answer_type>                    queue_type; \
@@ -105,10 +79,35 @@ namespace mockitopp
             const Verifier& getVerifier() const \
                { return verifier; }
 
-      BOOST_PP_REPEAT(MAX_VIRTUAL_FUNCTION_ARITY, DEFINE_ARGUMENT_MATCHER_IMPL_VOID, ~)
-      BOOST_PP_REPEAT(MAX_VIRTUAL_FUNCTION_ARITY, DEFINE_ARGUMENT_MATCHER_IMPL_NON_VOID, ~)
+      #define DEFINE_ONGOING_STUBBING(ZZZ, NNN, TTT) \
+         template <typename C BOOST_PP_ENUM_TRAILING_PARAMS(NNN, typename A)> \
+         struct OngoingStubbing<void (C::*)(BOOST_PP_ENUM_PARAMS(NNN, A))> \
+         { \
+            DEFINE_ONGOING_STUBBING_COMMON(ZZZ, NNN, TTT, void) \
+         \
+            OngoingStubbing& thenReturn() \
+            { \
+               answerMap[ongoingMatch].push(new Returns<void>()); \
+               return *this; \
+            } \
+         }; \
+      \
+         template <typename R, typename C BOOST_PP_ENUM_TRAILING_PARAMS(NNN, typename A)> \
+         struct OngoingStubbing<R (C::*)(BOOST_PP_ENUM_PARAMS(NNN, A)), typename boost::disable_if<boost::is_void<R> >::type> \
+         { \
+            DEFINE_ONGOING_STUBBING_COMMON(ZZZ, NNN, TTT, R) \
+         \
+            OngoingStubbing& thenReturn(R value) \
+            { \
+               answerMap[ongoingMatch].push(new Returns<R>(value)); \
+               return *this; \
+            } \
+         };
 
-      #undef DEFINE_ARGUMENT_MATCHER_IMPL
+      BOOST_PP_REPEAT(MAX_VIRTUAL_FUNCTION_ARITY, DEFINE_ONGOING_STUBBING, ~)
+
+      #undef DEFINE_ONGOING_STUBBING_COMMON
+      #undef DEFINE_ONGOING_STUBBING
 
    } // namespace detail
 } // namespace mockitopp
