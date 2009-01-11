@@ -17,7 +17,6 @@ namespace mockitopp
       {
          VirtualTable* __vptr;
          void*         __spys[MAX_VIRTUAL_FUNCTIONS];
-         Verifier      __verifier;
 
          MockObjectImpl()
             : __vptr(new VirtualTable(&MockObjectImpl::NotImplemented))
@@ -43,11 +42,8 @@ namespace mockitopp
          }
 
          template <typename M>
-         const Verifier& doVerify(M ptr2member)
-         {
-            __verifier.calls = reinterpret_cast<OngoingStubbing<M>*>(__spys[Function::getOffset(ptr2member)])->getCalls();
-            return __verifier;
-         }
+         const Verifier& doVerify(M ptr2member) const
+            { return reinterpret_cast<OngoingStubbing<M>*>(__spys[Function::getOffset(ptr2member)])->getVerifier(); }
 
          void NotImplemented()
             { throw NotImplementedException(); }

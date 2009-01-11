@@ -20,7 +20,7 @@
 #include <mockitopp/detail/stubbing/Answer.hpp>
 #include <mockitopp/detail/stubbing/Returns.hpp>
 #include <mockitopp/detail/stubbing/Throws.hpp>
-#include <mockitopp/detail/utility/Tuple.hpp>
+#include <mockitopp/detail/stubbing/Verifier.hpp>
 
 // TODO: add documentation
 namespace mockitopp
@@ -66,12 +66,12 @@ namespace mockitopp
             std::map<tuple_type, queue_type>  answerMap; \
             std::map<tuple_type, answer_type> lastAnswerMap; \
             tuple_type  ongoingMatch; \
-            int         calls; \
+            Verifier    verifier; \
          \
             OngoingStubbing() \
                : answerMap() \
                , ongoingMatch() \
-               , calls(0) \
+               , verifier() \
                {} \
          \
             OngoingStubbing& operator() (BOOST_PP_ENUM_BINARY_PARAMS(NNN, A, a)) \
@@ -89,7 +89,7 @@ namespace mockitopp
          \
             RRR invoke(BOOST_PP_ENUM_BINARY_PARAMS(NNN, A, a)) \
             { \
-               calls++; \
+               verifier.calls++; \
                tuple_type  args     = tuple_type(BOOST_PP_ENUM_PARAMS(NNN, a)); \
                queue_type& answers = answerMap[args]; \
                if(answers.empty() && lastAnswerMap.find(args) == lastAnswerMap.end()) \
@@ -102,8 +102,8 @@ namespace mockitopp
                return lastAnswerMap[args]->execute(); \
             } \
          \
-            int getCalls() const \
-               { return calls; }
+            const Verifier& getVerifier() const \
+               { return verifier; }
 
       BOOST_PP_REPEAT(MAX_VIRTUAL_FUNCTION_ARITY, DEFINE_ARGUMENT_MATCHER_IMPL_VOID, ~)
       BOOST_PP_REPEAT(MAX_VIRTUAL_FUNCTION_ARITY, DEFINE_ARGUMENT_MATCHER_IMPL_NON_VOID, ~)
