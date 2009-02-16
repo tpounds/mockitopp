@@ -16,7 +16,7 @@ using mockitopp::MockObject;
 TEST(MyTestCase, Foo)
 {
    MockObject<Foo> mock;
-   mock.when(&Foo::bar);
+   mock(&Foo::bar);
    Foo& fooImpl = mock.getInstance();
 
    ASSERT_NO_THROW(fooImpl.bar());
@@ -40,9 +40,9 @@ using mockitopp::MockObject;
 TEST(MyTestCase, Adder)
 {
    MockObject<Adder> mock;
-   mock.when(&Adder::add)(0, 0).thenReturn(0);
-   mock.when(&Adder::add)(1, 1).thenReturn(2)
-   mock.when(&Adder::add)(2, 2).thenReturn(5); // most certainly 2 + 2 = 5!
+   mock(&Adder::add).when(0, 0).thenReturn(0);
+   mock(&Adder::add).when(1, 1).thenReturn(2)
+   mock(&Adder::add).when(2, 2).thenReturn(5); // most certainly 2 + 2 = 5!
    Adder& adderImpl = mock.getInstance();
 
    ASSERT_EQ(adderImpl.add(0, 0), 0);
@@ -71,9 +71,9 @@ using mockitopp::MockObject;
 TEST(MyTestCase)
 {
    MockObject<Adder> mock;
-   mock.stub(&Adder::add)(0, 0).thenReturn(0)
-   mock.stub(&Adder::add)(1, 1).thenReturn(2)
-   mock.stub(&Adder::add)(2, 2).thenThrow(std::string("I don't support this!")); // Don't believe me? I dare you to try it!
+   mock(&Adder::add).when(0, 0).thenReturn(0)
+   mock(&Adder::add).when(1, 1).thenReturn(2)
+   mock(&Adder::add).when(2, 2).thenThrow(std::string("I don't support this!")); // Don't believe me? I dare you to try it!
    Adder& adderImpl = mock.getInstance();
 
    ASSERT_EQ(adderImpl.add(0, 0), 0);
@@ -101,9 +101,9 @@ using mockitopp::MockObject;
 TEST(MyTestCase)
 {
    MockObject<Foo> mock;
-   mock.when(&Foo::bar)(0).thenReturn();
-   mock.when(&Foo::bar)(1).thenReturn();
-   mock.when(&Foo::bar)(2).thenThrow(std::string("Invalid argument!"));
+   mock(&Foo::bar).when(0).thenReturn();
+   mock(&Foo::bar).when(1).thenReturn();
+   mock(&Foo::bar).when(2).thenThrow(std::string("Invalid argument!"));
    Foo& foo = mock.getInstance();
 
    ASSERT_NO_THROW(foo.bar(0)); // returns cause we stubbed it
@@ -130,7 +130,7 @@ using mockitopp::MockObject;
 TEST(MyTestCase, Enumeration)
 {
    MockObject<Enumeration> mock;
-   mock.when(&Enumeration::next)().thenReturn(0)
+   mock(&Enumeration::next).when().thenReturn(0)
                                   .thenReturn(1)
                                   .thenThrow(std::string("Invalid argument!"))
                                   .thenReturn(2)
