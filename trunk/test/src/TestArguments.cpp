@@ -12,12 +12,12 @@ struct PlainOleDataTypes
 TEST(TestArguments, PlainOleDataTypes)
 {
    MockObject<PlainOleDataTypes> m;
-   m.when(&PlainOleDataTypes::__int)(0).thenReturn(2);
-   m.when(&PlainOleDataTypes::__int)(100).thenReturn(8);
-   m.when(&PlainOleDataTypes::__bool)(true).thenReturn(false);
-   m.when(&PlainOleDataTypes::__bool)(false).thenReturn(true);
-   m.when(&PlainOleDataTypes::__char)('A').thenReturn('Z');
-   m.when(&PlainOleDataTypes::__char)('Z').thenReturn('0');
+   m(&PlainOleDataTypes::__int).when(0).thenReturn(2);
+   m(&PlainOleDataTypes::__int).when(100).thenReturn(8);
+   m(&PlainOleDataTypes::__bool).when(true).thenReturn(false);
+   m(&PlainOleDataTypes::__bool).when(false).thenReturn(true);
+   m(&PlainOleDataTypes::__char).when('A').thenReturn('Z');
+   m(&PlainOleDataTypes::__char).when('Z').thenReturn('0');
    PlainOleDataTypes& i = m.getInstance();
 
    ASSERT_EQ(2, i.__int(0));

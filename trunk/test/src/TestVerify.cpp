@@ -11,7 +11,7 @@ class SimpleInterface
 TEST(TestVerify, AtLeast)
 {
    MockObject<SimpleInterface> mock;
-   mock.when(&SimpleInterface::foo)().thenReturn();
+   mock(&SimpleInterface::foo).when().thenReturn();
    SimpleInterface& si = mock.getInstance();
 
    si.foo();
@@ -27,7 +27,7 @@ TEST(TestVerify, AtLeast)
 TEST(TestVerify, AtMost)
 {
    MockObject<SimpleInterface> mock;
-   mock.when(&SimpleInterface::foo)().thenReturn();
+   mock(&SimpleInterface::foo).when().thenReturn();
    SimpleInterface& si = mock.getInstance();
 
    si.foo();
@@ -45,7 +45,7 @@ TEST(TestVerify, AtMost)
 TEST(TestVerify, Exactly)
 {
    MockObject<SimpleInterface> mock;
-   mock.when(&SimpleInterface::foo)().thenReturn();
+   mock(&SimpleInterface::foo).when().thenReturn();
    SimpleInterface& si = mock.getInstance();
 
    si.foo();
@@ -61,7 +61,7 @@ TEST(TestVerify, Exactly)
 TEST(TestVerify, Never)
 {
    MockObject<SimpleInterface> mock;
-   mock.when(&SimpleInterface::foo)().thenReturn();
+   mock(&SimpleInterface::foo).when().thenReturn();
    SimpleInterface& si = mock.getInstance();
 
    ASSERT_TRUE(mock.verify(&SimpleInterface::foo).never());

@@ -2,6 +2,7 @@ Import('env')
 testenv = env.Clone()
 SRC = [
    'src/TestArguments.cpp',
+   'src/TestArgumentMatchers.cpp',
    'src/TestBasicStubbing.cpp',
 #   'src/TestDefaultAction.cpp',
    'src/TestIterator.cpp',

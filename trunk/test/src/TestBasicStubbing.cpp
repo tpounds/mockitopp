@@ -10,15 +10,13 @@ struct VoidVoidInterface
 TEST(TestBasicStubbing, VoidVoid)
 {
    MockObject<VoidVoidInterface> mock;
+   mock(&VoidVoidInterface::foo).when().thenReturn();
+   mock(&VoidVoidInterface::foo).when().thenThrow(std::string("Hypothetical Error!"));
    VoidVoidInterface& i = mock.getInstance();
 
-   // returnable call
-   mock.when(&VoidVoidInterface::foo)().thenReturn();
    i.foo();
    ASSERT_TRUE(mock.verify(&VoidVoidInterface::foo).exactly(1));
 
-   // throwable call
-   mock.when(&VoidVoidInterface::foo)().thenThrow(std::string("Hypothetical Error!"));
    ASSERT_THROW(i.foo(), std::string);
 }
 
@@ -29,15 +27,13 @@ struct CharVoidInterface
 TEST(TestBasicStubbing, CharVoid)
 {
    MockObject<CharVoidInterface> mock;
+   mock(&CharVoidInterface::foo).when().thenReturn('A');
+   mock(&CharVoidInterface::foo).when().thenThrow(std::string("Hypothetical Error!"));
    CharVoidInterface& i = mock.getInstance();
 
-   // returnable call
-   mock.when(&CharVoidInterface::foo)().thenReturn('A');
    ASSERT_EQ('A', i.foo());
    ASSERT_TRUE(mock.verify(&CharVoidInterface::foo).exactly(1));
 
-   // throwable call
-   mock.when(&CharVoidInterface::foo)().thenThrow(std::string("Hypothetical Error!"));
    ASSERT_THROW(i.foo(), std::string);
 }
 
@@ -48,11 +44,9 @@ struct VoidStringRefInterface
 TEST(TestBasicStubbing, VoidStringRef)
 {
    MockObject<VoidStringRefInterface> mock;
+   mock(&VoidStringRefInterface::foo).when("bar").thenReturn();
    VoidStringRefInterface& i = mock.getInstance();
 
-   // returnable call
-   std::string bar = "bar";
-   mock.when(&VoidStringRefInterface::foo)(bar).thenReturn();
-   i.foo(bar);
+   i.foo("bar");
    ASSERT_TRUE(mock.verify(&VoidStringRefInterface::foo).exactly(1));
 }

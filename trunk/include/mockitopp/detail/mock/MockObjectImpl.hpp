@@ -30,7 +30,7 @@ namespace mockitopp
          }
 
          template <typename M>
-         OngoingStubbing<M>& doWhen(M ptr2member)
+         OngoingStubbing<M>& beginStubbing(M ptr2member)
          {
             int offset = Function::getOffset(ptr2member);
             if(__spys[offset] == NULL)

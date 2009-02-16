@@ -12,7 +12,7 @@ struct ReferenceInterface
 TEST(TestDefaultAction, ReferenceInterface)
 {
    MockObject<ReferenceInterface> mock;
-   mock.when(&ReferenceInterface::get);
+   mock(&ReferenceInterface::get);
    ReferenceInterface& i = mock.getInstance();
 
    ReferenceInterface& ret = i.get();
@@ -26,7 +26,7 @@ struct PointerInterface
 TEST(TestDefaultAction, PointerInterface)
 {
    MockObject<PointerInterface> mock;
-   mock.when(&PointerInterface::get);
+   mock(&PointerInterface::get);
    PointerInterface& i = mock.getInstance();
 
    ASSERT_TRUE(NULL == i.get());
@@ -40,7 +40,7 @@ struct VoidInterface
 TEST(TestDefaultAction, VoidInterface)
 {
    MockObject<VoidInterface> mock;
-   mock.when(&VoidInterface::get);
+   mock(&VoidInterface::get);
    VoidInterface& i = mock.getInstance();
 
    i.get();
@@ -55,7 +55,7 @@ struct StringInterface
 TEST(TestDefaultAction, StringInterface)
 {
    MockObject<StringInterface> mock;
-   mock.when(&StringInterface::get);
+   mock(&StringInterface::get);
    StringInterface& i = mock.getInstance();
 
    ASSERT_EQ("", i.get());
@@ -74,12 +74,12 @@ struct PODInterface
 TEST(TestDefaultAction, PODInterface)
 {
    MockObject<PODInterface> mock;
-   mock.when(&PODInterface::getChar);
-   mock.when(&PODInterface::getBool);
-   mock.when(&PODInterface::getInt);
-   mock.when(&PODInterface::getLong);
-   mock.when(&PODInterface::getFloat);
-   mock.when(&PODInterface::getDouble);
+   mock(&PODInterface::getChar);
+   mock(&PODInterface::getBool);
+   mock(&PODInterface::getInt);
+   mock(&PODInterface::getLong);
+   mock(&PODInterface::getFloat);
+   mock(&PODInterface::getDouble);
    PODInterface& i = mock.getInstance();
 
    ASSERT_EQ(0, i.getChar());
@@ -114,13 +114,13 @@ struct PODPointerInterface
 TEST(TestDefaultAction, PODPointerInterface)
 {
    MockObject<PODPointerInterface> mock;
-   mock.when(&PODPointerInterface::getVoidP);
-   mock.when(&PODPointerInterface::getCharP);
-   mock.when(&PODPointerInterface::getBoolP);
-   mock.when(&PODPointerInterface::getIntP);
-   mock.when(&PODPointerInterface::getLongP);
-   mock.when(&PODPointerInterface::getFloatP);
-   mock.when(&PODPointerInterface::getDoubleP);
+   mock(&PODPointerInterface::getVoidP);
+   mock(&PODPointerInterface::getCharP);
+   mock(&PODPointerInterface::getBoolP);
+   mock(&PODPointerInterface::getIntP);
+   mock(&PODPointerInterface::getLongP);
+   mock(&PODPointerInterface::getFloatP);
+   mock(&PODPointerInterface::getDoubleP);
    PODPointerInterface& i = mock.getInstance();
 
    ASSERT_TRUE(NULL == i.getVoidP());
