@@ -14,7 +14,7 @@ struct Foo
 TEST(TestVerify, Exactly)
 {
    MockObject<Foo> mock;
-   mock.when(&Foo::bar);
+   mock(&Foo::bar);
    Foo& fooImpl = mock.getInstance();
 
    fooImpl.bar();
@@ -30,7 +30,7 @@ TEST(TestVerify, Exactly)
 TEST(TestVerify, AtLeast)
 {
    MockObject<Foo> mock;
-   mock.when(&Foo::bar);
+   mock(&Foo::bar);
    Foo& fooImpl = mock.getInstance();
 
    fooImpl.bar();
@@ -49,7 +49,7 @@ TEST(TestVerify, AtLeast)
 TEST(TestVerify, AtMost)
 {
    MockObject<Foo> mock;
-   mock.when(&Foo::bar);
+   mock(&Foo::bar);
    Foo& fooImpl = mock.getInstance();
 
    fooImpl.bar();
@@ -67,7 +67,7 @@ TEST(TestVerify, AtMost)
 TEST(TestVerify, Never)
 {
    MockObject<Foo> mock;
-   mock.when(&Foo::bar);
+   mock(&Foo::bar);
    Foo& fooImpl = mock.getInstance();
 
    ASSERT_TRUE(mock.verify(&Foo::bar).never()); // pass
@@ -81,7 +81,7 @@ TEST(TestVerify, Never)
 TEST(TestVerify, Range)
 {
    MockObject<Foo> mock;
-   mock.when(&Foo::bar);
+   mock(&Foo::bar);
    Foo& fooImpl = mock.getInstance();
 
    fooImpl.bar();
