@@ -37,11 +37,11 @@ struct SimpleComposite
 TEST(TestSimpleComposite, Add)
 {
    MockObject<Interface1> mock1;
-   mock1.when(&Interface1::foo)().thenReturn(2);
+   mock1(&Interface1::foo).when().thenReturn(2);
    Interface1& i1 = mock1.getInstance();
 
    MockObject<Interface2> mock2;
-   mock2.when(&Interface2::bar)().thenReturn(10);
+   mock2(&Interface2::bar).when().thenReturn(10);
    Interface2& i2 = mock2.getInstance();
 
    SimpleComposite c = SimpleComposite(i1, i2);
@@ -54,11 +54,11 @@ TEST(TestSimpleComposite, Add)
 TEST(TestSimpleComposite, Multiply)
 {
    MockObject<Interface1> mock1;
-   mock1.when(&Interface1::foo)().thenReturn(10);
+   mock1(&Interface1::foo).when().thenReturn(10);
    Interface1& i1 = mock1.getInstance();
 
    MockObject<Interface2> mock2;
-   mock2.when(&Interface2::bar)().thenReturn(10);
+   mock2(&Interface2::bar).when().thenReturn(10);
    Interface2& i2 = mock2.getInstance();
 
    SimpleComposite c = SimpleComposite(i1, i2);
@@ -71,11 +71,11 @@ TEST(TestSimpleComposite, Multiply)
 TEST(TestSimpleComposite, Add_and_Multiply)
 {
    MockObject<Interface1> mock1;
-   mock1.when(&Interface1::foo)().thenReturn(10);
+   mock1(&Interface1::foo).when().thenReturn(10);
    Interface1& i1 = mock1.getInstance();
 
    MockObject<Interface2> mock2;
-   mock2.when(&Interface2::bar)().thenReturn(10);
+   mock2(&Interface2::bar).when().thenReturn(10);
    Interface2& i2 = mock2.getInstance();
 
    SimpleComposite c = SimpleComposite(i1, i2);

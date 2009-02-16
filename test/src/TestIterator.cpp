@@ -12,7 +12,7 @@ TEST(TestIterator, IteratorInterface)
 {
    typedef IteratorInterface<int> it_type;
    MockObject<it_type> mock;
-   mock.when(&it_type::next)().thenReturn(0)
+   mock(&it_type::next).when().thenReturn(0)
                               .thenReturn(1)
                               .thenReturn(2)
                               .thenReturn(3)
