@@ -1,6 +1,6 @@
 Import('env')
-env3rd = env.Clone()
-SRC = [
+
+GTEST_SRC = [
    'googletest-1.1.0/src/gtest.cc',
    'googletest-1.1.0/src/gtest-death-test.cc',
    'googletest-1.1.0/src/gtest-filepath.cc',
@@ -8,7 +8,16 @@ SRC = [
    'googletest-1.1.0/src/gtest-port.cc',
    'googletest-1.1.0/src/gtest-typed-test.cc',
 ]
-env3rd.AppendUnique(CPPPATH = ['googletest-1.1.0'])
-env3rd.AppendUnique(CPPPATH = ['googletest-1.1.0/include'])
-env3rd.Library('googletest', SRC)
+gtest = env.Clone()
+gtest.AppendUnique(CPPPATH = ['googletest-1.1.0'])
+gtest.AppendUnique(CPPPATH = ['googletest-1.1.0/include'])
+gtest.Library('googletest', GTEST_SRC)
+
+HAMCREST_SRC = [
+   'hamcrest-r389/core/hc_description.cpp',
+   'hamcrest-r389/core/hc_self_describing.cpp',
+]
+hamcrest = env.Clone()
+hamcrest.AppendUnique(CPPPATH = ['hamcrest-r389/core'])
+hamcrest.Library('hamcrest', HAMCREST_SRC)
 # vim:ft=python:
