@@ -1,12 +1,14 @@
 Import('env')
 testenv = env.Clone()
 TEST_SRC = [
+   # TODO: deprecate
    'src/TestArguments.cpp',
    'src/TestBasicStubbing.cpp',
 #   'src/TestDefaultAction.cpp',
-   'src/TestIterator.cpp',
    'src/TestSimpleComposite.cpp',
    'src/TestVerify.cpp',
+
+   'src/test_iterator_style.cpp',
    'src/matchers/test_hamcrest.cpp',
    'src/matchers/test_null.cpp',
    'src/matchers/test_regex.cpp',
