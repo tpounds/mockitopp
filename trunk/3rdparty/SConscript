@@ -1,5 +1,29 @@
 Import('env')
 
+BOOST_REGEX_SRC = [
+   'boost_1_36_0/src/regex/src/cpp_regex_traits.cpp',
+   'boost_1_36_0/src/regex/src/cregex.cpp',
+   'boost_1_36_0/src/regex/src/c_regex_traits.cpp',
+   'boost_1_36_0/src/regex/src/fileiter.cpp',
+   'boost_1_36_0/src/regex/src/icu.cpp',
+   'boost_1_36_0/src/regex/src/instances.cpp',
+   'boost_1_36_0/src/regex/src/posix_api.cpp',
+   'boost_1_36_0/src/regex/src/regex.cpp',
+   'boost_1_36_0/src/regex/src/regex_debug.cpp',
+   'boost_1_36_0/src/regex/src/regex_raw_buffer.cpp',
+   'boost_1_36_0/src/regex/src/regex_traits_defaults.cpp',
+   'boost_1_36_0/src/regex/src/static_mutex.cpp',
+   'boost_1_36_0/src/regex/src/usinstances.cpp',
+   'boost_1_36_0/src/regex/src/w32_regex_traits.cpp',
+   'boost_1_36_0/src/regex/src/wc_regex_traits.cpp',
+   'boost_1_36_0/src/regex/src/wide_posix_api.cpp',
+   'boost_1_36_0/src/regex/src/winstances.cpp',
+
+]
+boost_regex = env.Clone()
+boost_regex.AppendUnique(CPPPATH = ['boost_1_36_0/include'])
+boost_regex.Library('boost-regex', BOOST_REGEX_SRC)
+
 GTEST_SRC = [
    'googletest-1.1.0/src/gtest.cc',
    'googletest-1.1.0/src/gtest-death-test.cc',

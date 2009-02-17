@@ -10,10 +10,11 @@ SRC = [
    'src/TestVerify.cpp'
 ]
 testenv.AppendUnique(CPPPATH = ['#include'])
-testenv.AppendUnique(CPPPATH = ['#3rdparty/boost_headers_1_36_0'])
+testenv.AppendUnique(CPPPATH = ['#3rdparty/boost_1_36_0/include'])
 testenv.AppendUnique(CPPPATH = ['#3rdparty/googletest-1.1.0/include'])
 testenv.AppendUnique(CPPPATH = ['#3rdparty/hamcrest-r389/core'])
 testenv.AppendUnique(LIBPATH = ['#3rdparty/build'])
+testenv.AppendUnique(LIBS = ['boost-regex'])
 testenv.AppendUnique(LIBS = ['googletest'])
 testenv.AppendUnique(LIBS = ['hamcrest'])
 test = testenv.Program('test', SRC)
