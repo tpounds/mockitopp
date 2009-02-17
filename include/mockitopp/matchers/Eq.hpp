@@ -5,27 +5,30 @@
 
 namespace mockitopp
 {
-   template <typename T>
-   struct EqT : public Matcher<T>
+   namespace matcher
    {
-      EqT(const T& element)
-         : element(element)
-         {}
+      template <typename T>
+      struct EqT : public Matcher<T>
+      {
+         EqT(const T& element)
+            : element(element)
+            {}
 
-      virtual Matcher<T>* clone() const
-         { return new EqT(element); }
+         virtual Matcher<T>* clone() const
+            { return new EqT(element); }
 
-      virtual bool operator== (const T& rhs) const
-         { return element == rhs; }
+         virtual bool operator== (const T& rhs) const
+            { return element == rhs; }
 
-      private:
+         private:
 
-         T element;
-   };
+            T element;
+      };
 
-   template <typename T>
-   EqT<T> eq(const T& element)
-      { return EqT<T>(element); }
+      template <typename T>
+      EqT<T> eq(const T& element)
+         { return EqT<T>(element); }
+   } // namespace matcher
 } // namespace mockitopp
 
 #endif //__MOCKITOPP_MATCHER_EQ_HPP__

@@ -1,13 +1,15 @@
 Import('env')
 testenv = env.Clone()
-SRC = [
+TEST_SRC = [
    'src/TestArguments.cpp',
-   'src/TestArgumentMatchers.cpp',
    'src/TestBasicStubbing.cpp',
 #   'src/TestDefaultAction.cpp',
    'src/TestIterator.cpp',
    'src/TestSimpleComposite.cpp',
-   'src/TestVerify.cpp'
+   'src/TestVerify.cpp',
+   'src/matchers/test_hamcrest.cpp',
+   'src/matchers/test_null.cpp',
+   'src/matchers/test_regex.cpp',
 ]
 testenv.AppendUnique(CPPPATH = ['#include'])
 testenv.AppendUnique(CPPPATH = ['#3rdparty/boost_1_36_0/include'])
@@ -17,7 +19,7 @@ testenv.AppendUnique(LIBPATH = ['#3rdparty/build'])
 testenv.AppendUnique(LIBS = ['boost-regex'])
 testenv.AppendUnique(LIBS = ['googletest'])
 testenv.AppendUnique(LIBS = ['hamcrest'])
-test = testenv.Program('test', SRC)
+test = testenv.Program('test', TEST_SRC)
 unitTest = testenv.Test('test')
 
 # vim:ft=python:

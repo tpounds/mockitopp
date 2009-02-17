@@ -5,22 +5,25 @@
 
 namespace mockitopp
 {
-   template <typename T>
-   struct AnyT : public Matcher<T>
+   namespace matcher
    {
-      AnyT()
-         {}
+      template <typename T>
+      struct AnyT : public Matcher<T>
+      {
+         AnyT()
+            {}
 
-      virtual Matcher<T>* clone() const
-         { return new AnyT(); }
+         virtual Matcher<T>* clone() const
+            { return new AnyT(); }
 
-      virtual bool operator== (const T& rhs) const
-         { return true; }
-   };
+         virtual bool operator== (const T& rhs) const
+            { return true; }
+      };
 
-   template <typename T>
-   AnyT<T> any()
-      { return AnyT<T>(); }
+      template <typename T>
+      AnyT<T> any()
+         { return AnyT<T>(); }
+   } // namespace matcher
 } // namespace mockitopp
 
 #endif //__MOCKITOPP_MATCHER_ANY_HPP__

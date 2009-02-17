@@ -5,31 +5,34 @@
 
 namespace mockitopp
 {
-   template <typename T>
-   struct NotT : public Matcher<T>
+   namespace matcher
    {
-      NotT(const Matcher<T>& matcher)
-         : matcher(matcher.clone())
-         {}
+      template <typename T>
+      struct NotT : public Matcher<T>
+      {
+         NotT(const Matcher<T>& matcher)
+            : matcher(matcher.clone())
+            {}
 
-      NotT(Matcher<T>* matcher)
-         : matcher(matcher)
-         {}
+         NotT(Matcher<T>* matcher)
+            : matcher(matcher)
+            {}
 
-      virtual Matcher<T>* clone() const
-         { return new NotT(matcher); }
+         virtual Matcher<T>* clone() const
+            { return new NotT(matcher); }
 
-      virtual bool operator== (const T& rhs) const
-         { return !(*matcher == rhs); }
+         virtual bool operator== (const T& rhs) const
+            { return !(*matcher == rhs); }
 
-      private:
+         private:
 
-         Matcher<T>* matcher;
-   };
+            Matcher<T>* matcher;
+      };
 
-   template <typename T>
-   NotT<T> not_(const Matcher<T>& matcher)
-      { return NotT<T>(matcher); }
+      template <typename T>
+      NotT<T> not_(const Matcher<T>& matcher)
+         { return NotT<T>(matcher); }
+   } // namespace matcher
 } // namespace mockitopp
 
 #endif //__MOCKITOPP_MATCHER_EQ_HPP__

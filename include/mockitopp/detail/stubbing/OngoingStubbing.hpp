@@ -59,7 +59,7 @@ namespace mockitopp
                , verifier() \
                {} \
          \
-            OngoingStubbing& BOOST_PP_IF(NNN, when, __DISABLED_when)(BOOST_PP_ENUM_BINARY_PARAMS(NNN, const Matcher<typename boost::remove_const<typename boost::remove_reference<A, >::type >::type>& a)) \
+            OngoingStubbing& BOOST_PP_IF(NNN, when, __DISABLED_when)(BOOST_PP_ENUM_BINARY_PARAMS(NNN, const matcher::Matcher<typename boost::remove_const<typename boost::remove_reference<A, >::type >::type>& a)) \
             { \
                matcher_tuple_type arguments = matcher_tuple_type(BOOST_PP_ENUM_PARAMS(NNN, a)); \
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it; \

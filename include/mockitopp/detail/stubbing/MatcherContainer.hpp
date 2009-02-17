@@ -10,13 +10,13 @@ namespace mockitopp
       template <typename T>
       struct MatcherContainer
       {
-         Matcher<T>* matcher;
+         matcher::Matcher<T>* matcher;
 
          MatcherContainer()
             : matcher(0)
             {}
   
-         MatcherContainer(const Matcher<T>& _matcher)
+         MatcherContainer(const matcher::Matcher<T>& _matcher)
             : matcher(_matcher.clone())
             {}
 
