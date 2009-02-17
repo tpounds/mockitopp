@@ -5,41 +5,44 @@
 
 namespace mockitopp
 {
-   #if defined(BOOST_RE_REGEX_HPP)
-      #define TR1_REGEX_NAMESPACE boost
-   #elif defined(_GLIBCXX_TR1_REGEX) || defined(_REGEX_)
-      #define TR1_REGEX_NAMESPACE std::tr1
-   #else
-      #error compatible tr1 regex header not found!
-   #endif
-
-   template <typename T>
-   struct RegexT : public Matcher<T>
+   namespace matcher
    {
-      RegexT(const T& expr)
-         : expr(expr)
-         {}
+      #if defined(BOOST_RE_REGEX_HPP)
+         #define TR1_REGEX_NAMESPACE boost
+      #elif defined(_GLIBCXX_TR1_REGEX) || defined(_REGEX_)
+         #define TR1_REGEX_NAMESPACE std::tr1
+      #else
+         #error compatible tr1 regex header not found!
+      #endif
 
-      virtual Matcher<T>* clone() const
-         { return new RegexT(expr); }
-
-      virtual bool operator== (const T& rhs) const
-         { return TR1_REGEX_NAMESPACE::regex_match(rhs, expr); }
-
-      private:
-
-         TR1_REGEX_NAMESPACE::regex expr;
-
-         RegexT(const TR1_REGEX_NAMESPACE::regex& expr)
+      template <typename T>
+      struct RegexT : public Matcher<T>
+      {
+         RegexT(const T& expr)
             : expr(expr)
             {}
-   };
 
-   inline RegexT<std::string> regex(const std::string& expr)
-      { return RegexT<std::string>(expr); }
+         virtual Matcher<T>* clone() const
+            { return new RegexT(expr); }
 
-   inline RegexT<const char*> regex(const char* expr)
-      { return RegexT<const char*>(expr); }
+         virtual bool operator== (const T& rhs) const
+            { return TR1_REGEX_NAMESPACE::regex_match(rhs, expr); }
+
+         private:
+
+            TR1_REGEX_NAMESPACE::regex expr;
+
+            RegexT(const TR1_REGEX_NAMESPACE::regex& expr)
+               : expr(expr)
+               {}
+      };
+
+      inline RegexT<std::string> regex(const std::string& expr)
+         { return RegexT<std::string>(expr); }
+
+      inline RegexT<const char*> regex(const char* expr)
+         { return RegexT<const char*>(expr); }
+   } // namespace matcher
 } // namespace mockitopp
 
 #undef TR1_REGEX_NAMESPACE

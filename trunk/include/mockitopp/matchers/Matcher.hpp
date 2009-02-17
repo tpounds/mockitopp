@@ -3,13 +3,16 @@
 
 namespace mockitopp
 {
-   template <typename T>
-   struct Matcher
+   namespace matcher
    {
-      virtual Matcher* clone() const = 0;
+      template <typename T>
+      struct Matcher
+      {
+         virtual Matcher* clone() const = 0;
 
-      virtual bool operator== (const T& rhs) const = 0;
-   };
+         virtual bool operator== (const T& rhs) const = 0;
+      };
+   } // namespace matcher
 } // namespace mockitopp
 
 #endif //__MOCKITOPP_MATCHER_HPP__
