@@ -14,7 +14,7 @@ namespace mockitopp
       template <typename T>
       struct HamcrestT : public Matcher<T>
       {
-         HamcrestT(const hamcrest::matcher<T>& hc_matcher)
+         HamcrestT(const ::hamcrest::matcher<T>& hc_matcher)
             : hc_matcher(hc_matcher.copy())
             {}
 
@@ -26,19 +26,19 @@ namespace mockitopp
 
          private:
 
-            hamcrest::matcher<T>* hc_matcher;
+            ::hamcrest::matcher<T>* hc_matcher;
 
-            HamcrestT(hamcrest::matcher<T>* hc_matcher)
+            HamcrestT(::hamcrest::matcher<T>* hc_matcher)
                : hc_matcher(hc_matcher)
             {}
       };
 
       template <typename T>
-      HamcrestT<T> hamcrest(const hamcrest::matcher<T>& hc_matcher)
+      HamcrestT<T> hamcrest(const ::hamcrest::matcher<T>& hc_matcher)
          { return HamcrestT<T>(hc_matcher); }
 
       template <typename T>
-      HamcrestT<T> hc(const hamcrest::matcher<T>& hc_matcher)
+      HamcrestT<T> hc(const ::hamcrest::matcher<T>& hc_matcher)
          { return HamcrestT<T>(hc_matcher); }
    } // namespace matcher
 } // namespace mockitopp
