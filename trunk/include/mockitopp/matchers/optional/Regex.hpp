@@ -8,9 +8,9 @@ namespace mockitopp
    namespace matcher
    {
       #if defined(BOOST_RE_REGEX_HPP)
-         #define TR1_REGEX_NAMESPACE boost
+         namespace __tr1 = ::boost;
       #elif defined(_GLIBCXX_TR1_REGEX) || defined(_REGEX_)
-         #define TR1_REGEX_NAMESPACE std::tr1
+         namespace __tr1 = ::std::tr1;
       #else
          #error compatible tr1 regex header not found!
       #endif
@@ -26,13 +26,13 @@ namespace mockitopp
             { return new RegexT(expr); }
 
          virtual bool operator== (const T& rhs) const
-            { return TR1_REGEX_NAMESPACE::regex_match(rhs, expr); }
+            { return __tr1::regex_match(rhs, expr); }
 
          private:
 
-            TR1_REGEX_NAMESPACE::regex expr;
+            __tr1::regex expr;
 
-            RegexT(const TR1_REGEX_NAMESPACE::regex& expr)
+            RegexT(const __tr1::regex& expr)
                : expr(expr)
                {}
       };
@@ -44,7 +44,5 @@ namespace mockitopp
          { return RegexT<const char*>(expr); }
    } // namespace matcher
 } // namespace mockitopp
-
-#undef TR1_REGEX_NAMESPACE
 
 #endif //__MOCKITOPP_MATCHER_TR1_REGEX_HPP__

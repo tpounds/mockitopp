@@ -16,7 +16,6 @@ namespace mockitopp
       namespace tr1
       {
          using boost::tuple;
-//         #define boost::tuple tuple
       } // namespace tr1
    } // namespace detail
 } // namespace mockitopp
