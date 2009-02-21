@@ -4,11 +4,6 @@
 #include <list>
 #include <map>
 
-#include <boost/tuple/tuple.hpp>
-#include <boost/tuple/tuple_comparison.hpp>
-#include <boost/type_traits/remove_const.hpp>
-#include <boost/type_traits/remove_reference.hpp>
-
 #include <mockitopp/detail/exception/IncompleteImplementationException.hpp>
 #include <mockitopp/detail/stubbing/Answer.hpp>
 #include <mockitopp/detail/stubbing/MatcherContainer.hpp>
@@ -16,6 +11,8 @@
 #include <mockitopp/detail/stubbing/Throws.hpp>
 #include <mockitopp/detail/stubbing/Verifier.hpp>
 #include <mockitopp/detail/utility/KeyPair.hpp>
+#include <mockitopp/detail/utility/tr1_tuple.hpp>
+#include <mockitopp/detail/utility/tr1_type_traits.hpp>
 
 include(`mockitopp/detail/m4/ENUM_BINARY_PARAMS.m4')dnl
 include(`mockitopp/detail/m4/ENUM_PARAMS.m4')dnl
@@ -81,11 +78,11 @@ define(`DEFINE_ONGOING_STUBBING', `
       template <typename R, typename C`'M4_ENUM_TRAILING_PARAMS($1, typename A)>
       struct OngoingStubbing<R (C::*)(M4_ENUM_PARAMS($1, A))> : public OngoingStubbingBase<R>
       {
-         typedef boost::tuple<M4_ENUM_BINARY_PARAMS($1,
-            typename boost::remove_const<typename boost::remove_reference<A, >::type>::type,
+         typedef tr1::tuple<M4_ENUM_BINARY_PARAMS($1,
+            typename tr1::remove_const<typename tr1::remove_reference<A, >::type>::type,
                M4_INTERCEPT)> tuple_type;
-         typedef boost::tuple<M4_ENUM_BINARY_PARAMS($1,
-            MatcherContainer<typename boost::remove_const<typename boost::remove_reference<A, >::type>::type> ,
+         typedef tr1::tuple<M4_ENUM_BINARY_PARAMS($1,
+            MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A, >::type>::type> ,
                M4_INTERCEPT)> matcher_tuple_type;
 
          typedef typename OngoingStubbingBase<R>::answer_type answer_type;
@@ -104,7 +101,7 @@ define(`DEFINE_ONGOING_STUBBING', `
             , verifier()
             {}
 
-         OngoingStubbing& M4_IF($1, when, __DISABLE_OVERLOAD__when)(M4_ENUM_BINARY_PARAMS($1, const matcher::Matcher<typename boost::remove_const<typename boost::remove_reference<A, >::type>::type>& a))
+         OngoingStubbing& M4_IF($1, when, __DISABLE_OVERLOAD__when)(M4_ENUM_BINARY_PARAMS($1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A, >::type>::type>& a))
          {
             matcher_tuple_type arguments = matcher_tuple_type(M4_ENUM_PARAMS($1, a));
             typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
