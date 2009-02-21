@@ -1,4 +1,5 @@
-* fix-up possible memory leaks (i.e. check new/delete)
-* more test cases
-* mockito style argument matchers (i.e. anyString() anyInt(), etc)
-* improve/remove boost headers externals (really don't need them all)
+* fix possible memory leaks and multiple free calls
+* clean up and add more test cases
+* clean up remaining boost dependencies (i.e. boost::tuple)
+* clean up class header/class nomenclature
+* add more documentation
