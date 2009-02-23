@@ -41,10 +41,6 @@ namespace mockitopp
             return *reinterpret_cast<OngoingStubbing<M>*>(__spys[offset]);
          }
 
-         template <typename M>
-         const Verifier& doVerify(M ptr2member) const
-            { return reinterpret_cast<OngoingStubbing<M>*>(__spys[Function::getOffset(ptr2member)])->getVerifier(); }
-
          void NotImplemented()
             { throw NotImplementedException(); }
       };

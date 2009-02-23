@@ -9,6 +9,10 @@ namespace mockitopp
       {
          int calls;
 
+         Verifier()
+            : calls(0)
+            {}
+
          /**
           * verify method is called within a specified range
           *

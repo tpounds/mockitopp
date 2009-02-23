@@ -6,9 +6,9 @@ TEST_SRC = [
    'src/TestBasicStubbing.cpp',
 #   'src/TestDefaultAction.cpp',
    'src/TestSimpleComposite.cpp',
-   'src/TestVerify.cpp',
 
    'src/test_iterator_style.cpp',
+   'src/test_verify.cpp',
    'src/matchers/test_hamcrest.cpp',
    'src/matchers/test_null.cpp',
    'src/matchers/test_regex.cpp',
