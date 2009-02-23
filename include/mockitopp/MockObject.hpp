@@ -40,15 +40,6 @@ namespace mockitopp
       template <typename M>
       detail::OngoingStubbing<M>& operator() (M ptr2member)
          { return beginStubbing(ptr2member); }
-
-      /**
-       * verify method innvocation occurances
-       *
-       * @param ptr2member method to be verify
-       */
-      template <typename M>
-      const detail::Verifier& verify(M ptr2member)
-         { return doVerify(ptr2member); }
    };
 } // namespace mockitopp
 

@@ -76,7 +76,7 @@ namespace mockitopp
       //TODO: clean up typedef nomenclature
 define(`DEFINE_ONGOING_STUBBING', `
       template <typename R, typename C`'M4_ENUM_TRAILING_PARAMS($1, typename A)>
-      struct OngoingStubbing<R (C::*)(M4_ENUM_PARAMS($1, A))> : public OngoingStubbingBase<R>
+      struct OngoingStubbing<R (C::*)(M4_ENUM_PARAMS($1, A))> : public OngoingStubbingBase<R>, public Verifier
       {
          typedef tr1::tuple<M4_ENUM_BINARY_PARAMS($1,
             typename tr1::remove_const<typename tr1::remove_reference<A, >::type>::type,
@@ -92,13 +92,11 @@ define(`DEFINE_ONGOING_STUBBING', `
          std::map<tuple_type, queue_type> answerMap;
          std::list<KeyPair<matcher_tuple_type, queue_type> > answerList;
 
-         Verifier   verifier;
-
          OngoingStubbing()
             : OngoingStubbingBase<R>()
+            , Verifier()
             , answerMap()
             , answerList()
-            , verifier()
             {}
 
          OngoingStubbing& M4_IF($1, when, __DISABLE_OVERLOAD__when)(M4_ENUM_BINARY_PARAMS($1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A, >::type>::type>& a))
@@ -123,7 +121,7 @@ define(`DEFINE_ONGOING_STUBBING', `
 
          R invoke(M4_ENUM_BINARY_PARAMS($1, A, a))
          {
-            verifier.calls++;
+            this->calls++;
             tuple_type  args    = tuple_type(M4_ENUM_PARAMS($1, a));
             queue_type& answers = answerMap[args];
             if(answers.empty())
@@ -139,9 +137,6 @@ define(`DEFINE_ONGOING_STUBBING', `
                { answers.pop_front(); }
             return answer->execute();
          }
-
-         const Verifier& getVerifier() const
-            { return verifier; }
       };
 ')
 M4_REPEAT(11, `DEFINE_ONGOING_STUBBING')dnl

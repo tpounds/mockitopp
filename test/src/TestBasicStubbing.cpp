@@ -15,7 +15,7 @@ TEST(TestBasicStubbing, VoidVoid)
    VoidVoidInterface& i = mock.getInstance();
 
    i.foo();
-   ASSERT_TRUE(mock.verify(&VoidVoidInterface::foo).exactly(1));
+   ASSERT_TRUE(mock(&VoidVoidInterface::foo).exactly(1));
 
    ASSERT_THROW(i.foo(), std::string);
 }
@@ -32,7 +32,7 @@ TEST(TestBasicStubbing, CharVoid)
    CharVoidInterface& i = mock.getInstance();
 
    ASSERT_EQ('A', i.foo());
-   ASSERT_TRUE(mock.verify(&CharVoidInterface::foo).exactly(1));
+   ASSERT_TRUE(mock(&CharVoidInterface::foo).exactly(1));
 
    ASSERT_THROW(i.foo(), std::string);
 }
@@ -48,5 +48,5 @@ TEST(TestBasicStubbing, VoidStringRef)
    VoidStringRefInterface& i = mock.getInstance();
 
    i.foo("bar");
-   ASSERT_TRUE(mock.verify(&VoidStringRefInterface::foo).exactly(1));
+   ASSERT_TRUE(mock(&VoidStringRefInterface::foo).exactly(1));
 }

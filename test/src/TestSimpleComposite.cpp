@@ -47,8 +47,8 @@ TEST(TestSimpleComposite, Add)
    SimpleComposite c = SimpleComposite(i1, i2);
 
    ASSERT_EQ(12, c.simpleAdd());
-   ASSERT_TRUE(mock1.verify(&Interface1::foo).exactly(1));
-   ASSERT_TRUE(mock2.verify(&Interface2::bar).exactly(1));
+   ASSERT_TRUE(mock1(&Interface1::foo).exactly(1));
+   ASSERT_TRUE(mock2(&Interface2::bar).exactly(1));
 }
 
 TEST(TestSimpleComposite, Multiply)
@@ -64,8 +64,8 @@ TEST(TestSimpleComposite, Multiply)
    SimpleComposite c = SimpleComposite(i1, i2);
 
    ASSERT_EQ(100, c.simpleMultiply());
-   ASSERT_TRUE(mock1.verify(&Interface1::foo).exactly(1));
-   ASSERT_TRUE(mock2.verify(&Interface2::bar).exactly(1));
+   ASSERT_TRUE(mock1(&Interface1::foo).exactly(1));
+   ASSERT_TRUE(mock2(&Interface2::bar).exactly(1));
 }
 
 TEST(TestSimpleComposite, Add_and_Multiply)
@@ -82,6 +82,6 @@ TEST(TestSimpleComposite, Add_and_Multiply)
 
    ASSERT_EQ(20,  c.simpleAdd());
    ASSERT_EQ(100, c.simpleMultiply());
-   ASSERT_TRUE(mock1.verify(&Interface1::foo).exactly(2));
-   ASSERT_TRUE(mock2.verify(&Interface2::bar).exactly(2));
+   ASSERT_TRUE(mock1(&Interface1::foo).exactly(2));
+   ASSERT_TRUE(mock2(&Interface2::bar).exactly(2));
 }

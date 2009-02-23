@@ -72,7 +72,7 @@ namespace mockitopp
 
  
       template <typename R, typename C>
-      struct OngoingStubbing<R (C::*)()> : public OngoingStubbingBase<R>
+      struct OngoingStubbing<R (C::*)()> : public OngoingStubbingBase<R>, public Verifier
       {
          typedef tr1::tuple<> tuple_type;
          typedef tr1::tuple<> matcher_tuple_type;
@@ -84,13 +84,11 @@ namespace mockitopp
          std::map<tuple_type, queue_type> answerMap;
          std::list<KeyPair<matcher_tuple_type, queue_type> > answerList;
 
-         Verifier   verifier;
-
          OngoingStubbing()
             : OngoingStubbingBase<R>()
+            , Verifier()
             , answerMap()
             , answerList()
-            , verifier()
             {}
 
          OngoingStubbing& __DISABLE_OVERLOAD__when()
@@ -115,7 +113,7 @@ namespace mockitopp
 
          R invoke()
          {
-            verifier.calls++;
+            this->calls++;
             tuple_type  args    = tuple_type();
             queue_type& answers = answerMap[args];
             if(answers.empty())
@@ -131,13 +129,10 @@ namespace mockitopp
                { answers.pop_front(); }
             return answer->execute();
          }
-
-         const Verifier& getVerifier() const
-            { return verifier; }
       };
  
       template <typename R, typename C, typename A0>
-      struct OngoingStubbing<R (C::*)(A0)> : public OngoingStubbingBase<R>
+      struct OngoingStubbing<R (C::*)(A0)> : public OngoingStubbingBase<R>, public Verifier
       {
          typedef tr1::tuple<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type> tuple_type;
          typedef tr1::tuple<MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type> > matcher_tuple_type;
@@ -149,13 +144,11 @@ namespace mockitopp
          std::map<tuple_type, queue_type> answerMap;
          std::list<KeyPair<matcher_tuple_type, queue_type> > answerList;
 
-         Verifier   verifier;
-
          OngoingStubbing()
             : OngoingStubbingBase<R>()
+            , Verifier()
             , answerMap()
             , answerList()
-            , verifier()
             {}
 
          OngoingStubbing& when(const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type>& a0)
@@ -180,7 +173,7 @@ namespace mockitopp
 
          R invoke(A0 a0)
          {
-            verifier.calls++;
+            this->calls++;
             tuple_type  args    = tuple_type(a0);
             queue_type& answers = answerMap[args];
             if(answers.empty())
@@ -196,13 +189,10 @@ namespace mockitopp
                { answers.pop_front(); }
             return answer->execute();
          }
-
-         const Verifier& getVerifier() const
-            { return verifier; }
       };
  
       template <typename R, typename C, typename A0, typename A1>
-      struct OngoingStubbing<R (C::*)(A0, A1)> : public OngoingStubbingBase<R>
+      struct OngoingStubbing<R (C::*)(A0, A1)> : public OngoingStubbingBase<R>, public Verifier
       {
          typedef tr1::tuple<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type> tuple_type;
          typedef tr1::tuple<MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type> > matcher_tuple_type;
@@ -214,13 +204,11 @@ namespace mockitopp
          std::map<tuple_type, queue_type> answerMap;
          std::list<KeyPair<matcher_tuple_type, queue_type> > answerList;
 
-         Verifier   verifier;
-
          OngoingStubbing()
             : OngoingStubbingBase<R>()
+            , Verifier()
             , answerMap()
             , answerList()
-            , verifier()
             {}
 
          OngoingStubbing& when(const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type>& a0, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type>& a1)
@@ -245,7 +233,7 @@ namespace mockitopp
 
          R invoke(A0 a0, A1 a1)
          {
-            verifier.calls++;
+            this->calls++;
             tuple_type  args    = tuple_type(a0, a1);
             queue_type& answers = answerMap[args];
             if(answers.empty())
@@ -261,13 +249,10 @@ namespace mockitopp
                { answers.pop_front(); }
             return answer->execute();
          }
-
-         const Verifier& getVerifier() const
-            { return verifier; }
       };
  
       template <typename R, typename C, typename A0, typename A1, typename A2>
-      struct OngoingStubbing<R (C::*)(A0, A1, A2)> : public OngoingStubbingBase<R>
+      struct OngoingStubbing<R (C::*)(A0, A1, A2)> : public OngoingStubbingBase<R>, public Verifier
       {
          typedef tr1::tuple<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type> tuple_type;
          typedef tr1::tuple<MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type> > matcher_tuple_type;
@@ -279,13 +264,11 @@ namespace mockitopp
          std::map<tuple_type, queue_type> answerMap;
          std::list<KeyPair<matcher_tuple_type, queue_type> > answerList;
 
-         Verifier   verifier;
-
          OngoingStubbing()
             : OngoingStubbingBase<R>()
+            , Verifier()
             , answerMap()
             , answerList()
-            , verifier()
             {}
 
          OngoingStubbing& when(const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type>& a0, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type>& a1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type>& a2)
@@ -310,7 +293,7 @@ namespace mockitopp
 
          R invoke(A0 a0, A1 a1, A2 a2)
          {
-            verifier.calls++;
+            this->calls++;
             tuple_type  args    = tuple_type(a0, a1, a2);
             queue_type& answers = answerMap[args];
             if(answers.empty())
@@ -326,13 +309,10 @@ namespace mockitopp
                { answers.pop_front(); }
             return answer->execute();
          }
-
-         const Verifier& getVerifier() const
-            { return verifier; }
       };
  
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3>
-      struct OngoingStubbing<R (C::*)(A0, A1, A2, A3)> : public OngoingStubbingBase<R>
+      struct OngoingStubbing<R (C::*)(A0, A1, A2, A3)> : public OngoingStubbingBase<R>, public Verifier
       {
          typedef tr1::tuple<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type> tuple_type;
          typedef tr1::tuple<MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type> > matcher_tuple_type;
@@ -344,13 +324,11 @@ namespace mockitopp
          std::map<tuple_type, queue_type> answerMap;
          std::list<KeyPair<matcher_tuple_type, queue_type> > answerList;
 
-         Verifier   verifier;
-
          OngoingStubbing()
             : OngoingStubbingBase<R>()
+            , Verifier()
             , answerMap()
             , answerList()
-            , verifier()
             {}
 
          OngoingStubbing& when(const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type>& a0, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type>& a1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type>& a2, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type>& a3)
@@ -375,7 +353,7 @@ namespace mockitopp
 
          R invoke(A0 a0, A1 a1, A2 a2, A3 a3)
          {
-            verifier.calls++;
+            this->calls++;
             tuple_type  args    = tuple_type(a0, a1, a2, a3);
             queue_type& answers = answerMap[args];
             if(answers.empty())
@@ -391,13 +369,10 @@ namespace mockitopp
                { answers.pop_front(); }
             return answer->execute();
          }
-
-         const Verifier& getVerifier() const
-            { return verifier; }
       };
  
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4>
-      struct OngoingStubbing<R (C::*)(A0, A1, A2, A3, A4)> : public OngoingStubbingBase<R>
+      struct OngoingStubbing<R (C::*)(A0, A1, A2, A3, A4)> : public OngoingStubbingBase<R>, public Verifier
       {
          typedef tr1::tuple<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type> tuple_type;
          typedef tr1::tuple<MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type> > matcher_tuple_type;
@@ -409,13 +384,11 @@ namespace mockitopp
          std::map<tuple_type, queue_type> answerMap;
          std::list<KeyPair<matcher_tuple_type, queue_type> > answerList;
 
-         Verifier   verifier;
-
          OngoingStubbing()
             : OngoingStubbingBase<R>()
+            , Verifier()
             , answerMap()
             , answerList()
-            , verifier()
             {}
 
          OngoingStubbing& when(const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type>& a0, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type>& a1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type>& a2, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type>& a3, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type>& a4)
@@ -440,7 +413,7 @@ namespace mockitopp
 
          R invoke(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4)
          {
-            verifier.calls++;
+            this->calls++;
             tuple_type  args    = tuple_type(a0, a1, a2, a3, a4);
             queue_type& answers = answerMap[args];
             if(answers.empty())
@@ -456,13 +429,10 @@ namespace mockitopp
                { answers.pop_front(); }
             return answer->execute();
          }
-
-         const Verifier& getVerifier() const
-            { return verifier; }
       };
  
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5>
-      struct OngoingStubbing<R (C::*)(A0, A1, A2, A3, A4, A5)> : public OngoingStubbingBase<R>
+      struct OngoingStubbing<R (C::*)(A0, A1, A2, A3, A4, A5)> : public OngoingStubbingBase<R>, public Verifier
       {
          typedef tr1::tuple<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type> tuple_type;
          typedef tr1::tuple<MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type> > matcher_tuple_type;
@@ -474,13 +444,11 @@ namespace mockitopp
          std::map<tuple_type, queue_type> answerMap;
          std::list<KeyPair<matcher_tuple_type, queue_type> > answerList;
 
-         Verifier   verifier;
-
          OngoingStubbing()
             : OngoingStubbingBase<R>()
+            , Verifier()
             , answerMap()
             , answerList()
-            , verifier()
             {}
 
          OngoingStubbing& when(const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type>& a0, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type>& a1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type>& a2, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type>& a3, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type>& a4, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type>& a5)
@@ -505,7 +473,7 @@ namespace mockitopp
 
          R invoke(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5)
          {
-            verifier.calls++;
+            this->calls++;
             tuple_type  args    = tuple_type(a0, a1, a2, a3, a4, a5);
             queue_type& answers = answerMap[args];
             if(answers.empty())
@@ -521,13 +489,10 @@ namespace mockitopp
                { answers.pop_front(); }
             return answer->execute();
          }
-
-         const Verifier& getVerifier() const
-            { return verifier; }
       };
  
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
-      struct OngoingStubbing<R (C::*)(A0, A1, A2, A3, A4, A5, A6)> : public OngoingStubbingBase<R>
+      struct OngoingStubbing<R (C::*)(A0, A1, A2, A3, A4, A5, A6)> : public OngoingStubbingBase<R>, public Verifier
       {
          typedef tr1::tuple<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type> tuple_type;
          typedef tr1::tuple<MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type> > matcher_tuple_type;
@@ -539,13 +504,11 @@ namespace mockitopp
          std::map<tuple_type, queue_type> answerMap;
          std::list<KeyPair<matcher_tuple_type, queue_type> > answerList;
 
-         Verifier   verifier;
-
          OngoingStubbing()
             : OngoingStubbingBase<R>()
+            , Verifier()
             , answerMap()
             , answerList()
-            , verifier()
             {}
 
          OngoingStubbing& when(const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type>& a0, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type>& a1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type>& a2, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type>& a3, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type>& a4, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type>& a5, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type>& a6)
@@ -570,7 +533,7 @@ namespace mockitopp
 
          R invoke(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6)
          {
-            verifier.calls++;
+            this->calls++;
             tuple_type  args    = tuple_type(a0, a1, a2, a3, a4, a5, a6);
             queue_type& answers = answerMap[args];
             if(answers.empty())
@@ -586,13 +549,10 @@ namespace mockitopp
                { answers.pop_front(); }
             return answer->execute();
          }
-
-         const Verifier& getVerifier() const
-            { return verifier; }
       };
  
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7>
-      struct OngoingStubbing<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7)> : public OngoingStubbingBase<R>
+      struct OngoingStubbing<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7)> : public OngoingStubbingBase<R>, public Verifier
       {
          typedef tr1::tuple<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A7 >::type>::type> tuple_type;
          typedef tr1::tuple<MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A7 >::type>::type> > matcher_tuple_type;
@@ -604,13 +564,11 @@ namespace mockitopp
          std::map<tuple_type, queue_type> answerMap;
          std::list<KeyPair<matcher_tuple_type, queue_type> > answerList;
 
-         Verifier   verifier;
-
          OngoingStubbing()
             : OngoingStubbingBase<R>()
+            , Verifier()
             , answerMap()
             , answerList()
-            , verifier()
             {}
 
          OngoingStubbing& when(const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type>& a0, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type>& a1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type>& a2, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type>& a3, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type>& a4, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type>& a5, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type>& a6, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A7 >::type>::type>& a7)
@@ -635,7 +593,7 @@ namespace mockitopp
 
          R invoke(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7)
          {
-            verifier.calls++;
+            this->calls++;
             tuple_type  args    = tuple_type(a0, a1, a2, a3, a4, a5, a6, a7);
             queue_type& answers = answerMap[args];
             if(answers.empty())
@@ -651,13 +609,10 @@ namespace mockitopp
                { answers.pop_front(); }
             return answer->execute();
          }
-
-         const Verifier& getVerifier() const
-            { return verifier; }
       };
  
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8>
-      struct OngoingStubbing<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7, A8)> : public OngoingStubbingBase<R>
+      struct OngoingStubbing<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7, A8)> : public OngoingStubbingBase<R>, public Verifier
       {
          typedef tr1::tuple<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A7 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A8 >::type>::type> tuple_type;
          typedef tr1::tuple<MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A7 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A8 >::type>::type> > matcher_tuple_type;
@@ -669,13 +624,11 @@ namespace mockitopp
          std::map<tuple_type, queue_type> answerMap;
          std::list<KeyPair<matcher_tuple_type, queue_type> > answerList;
 
-         Verifier   verifier;
-
          OngoingStubbing()
             : OngoingStubbingBase<R>()
+            , Verifier()
             , answerMap()
             , answerList()
-            , verifier()
             {}
 
          OngoingStubbing& when(const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type>& a0, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type>& a1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type>& a2, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type>& a3, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type>& a4, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type>& a5, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type>& a6, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A7 >::type>::type>& a7, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A8 >::type>::type>& a8)
@@ -700,7 +653,7 @@ namespace mockitopp
 
          R invoke(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8)
          {
-            verifier.calls++;
+            this->calls++;
             tuple_type  args    = tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8);
             queue_type& answers = answerMap[args];
             if(answers.empty())
@@ -716,13 +669,10 @@ namespace mockitopp
                { answers.pop_front(); }
             return answer->execute();
          }
-
-         const Verifier& getVerifier() const
-            { return verifier; }
       };
  
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9>
-      struct OngoingStubbing<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9)> : public OngoingStubbingBase<R>
+      struct OngoingStubbing<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9)> : public OngoingStubbingBase<R>, public Verifier
       {
          typedef tr1::tuple<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A7 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A8 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A9 >::type>::type> tuple_type;
          typedef tr1::tuple<MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A7 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A8 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A9 >::type>::type> > matcher_tuple_type;
@@ -734,13 +684,11 @@ namespace mockitopp
          std::map<tuple_type, queue_type> answerMap;
          std::list<KeyPair<matcher_tuple_type, queue_type> > answerList;
 
-         Verifier   verifier;
-
          OngoingStubbing()
             : OngoingStubbingBase<R>()
+            , Verifier()
             , answerMap()
             , answerList()
-            , verifier()
             {}
 
          OngoingStubbing& when(const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type>& a0, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type>& a1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type>& a2, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type>& a3, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type>& a4, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type>& a5, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type>& a6, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A7 >::type>::type>& a7, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A8 >::type>::type>& a8, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A9 >::type>::type>& a9)
@@ -765,7 +713,7 @@ namespace mockitopp
 
          R invoke(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8, A9 a9)
          {
-            verifier.calls++;
+            this->calls++;
             tuple_type  args    = tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
             queue_type& answers = answerMap[args];
             if(answers.empty())
@@ -781,9 +729,6 @@ namespace mockitopp
                { answers.pop_front(); }
             return answer->execute();
          }
-
-         const Verifier& getVerifier() const
-            { return verifier; }
       };
    } // namespace detail
 } // namespace mockitopp
