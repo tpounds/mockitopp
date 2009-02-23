@@ -37,6 +37,16 @@ TEST(test_verify, atMost)
    ASSERT_TRUE(mock(&verify_interface::func).atMost(4));
 }
 
+TEST(test_verify, between)
+{
+   VERIFY_MOCK_DEFINITION
+
+   ASSERT_FALSE(mock(&verify_interface::func).between(0, 2));
+   ASSERT_FALSE(mock(&verify_interface::func).between(4, 9));
+   ASSERT_TRUE(mock(&verify_interface::func).between(1, 5));
+   ASSERT_TRUE(mock(&verify_interface::func).between(3, 3));
+}
+
 TEST(test_verify, exactly)
 {
    VERIFY_MOCK_DEFINITION
