@@ -1,6 +1,7 @@
 #ifndef __MOCKITOPP_ONGOING_STUBBING_HPP__
 #define __MOCKITOPP_ONGOING_STUBBING_HPP__
 
+#include <algorithm>
 #include <list>
 #include <map>
 
@@ -103,7 +104,7 @@ define(`DEFINE_ONGOING_STUBBING', `
          {
             matcher_tuple_type arguments = matcher_tuple_type(M4_ENUM_PARAMS($1, a));
             typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-            pair_it = find(answerList.begin(), answerList.end(), arguments);
+            pair_it = std::find(answerList.begin(), answerList.end(), arguments);
             if(pair_it == answerList.end())
             {
                answerList.push_back(KeyPair<matcher_tuple_type, queue_type>(arguments, queue_type()));
@@ -127,7 +128,7 @@ define(`DEFINE_ONGOING_STUBBING', `
             if(answers.empty())
             {
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-               pair_it = find(answerList.begin(), answerList.end(), args);
+               pair_it = std::find(answerList.begin(), answerList.end(), args);
                if(pair_it == answerList.end())
                   { throw IncompleteImplementationException(); }
                answers = pair_it->value;
