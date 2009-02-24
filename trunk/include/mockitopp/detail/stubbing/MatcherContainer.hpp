@@ -11,20 +11,17 @@ namespace mockitopp
       struct MatcherContainer
       {
          matcher::Matcher<T>* matcher;
-
-         MatcherContainer()
-            : matcher(0)
-            {}
   
          MatcherContainer(const matcher::Matcher<T>& _matcher)
             : matcher(_matcher.clone())
             {}
 
-         ~MatcherContainer()
-         {
-//            if(matcher != 0)
-//               { delete matcher; }
-         }
+         MatcherContainer(const MatcherContainer& rhs)
+            : matcher(rhs.matcher->clone())
+            {}
+
+         virtual ~MatcherContainer()
+            { delete matcher; }
 
          bool operator== (const T& rhs) const
             { return (*matcher == rhs); }

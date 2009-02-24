@@ -14,12 +14,11 @@ namespace mockitopp
             : matcher(matcher.clone())
             {}
 
-         NotT(Matcher<T>* matcher)
-            : matcher(matcher)
-            {}
+         virtual ~NotT()
+            { delete matcher; }
 
          virtual Matcher<T>* clone() const
-            { return new NotT(matcher); }
+            { return new NotT(*matcher); }
 
          virtual bool operator== (const T& rhs) const
             { return !(*matcher == rhs); }

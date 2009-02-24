@@ -18,8 +18,11 @@ namespace mockitopp
             : hc_matcher(hc_matcher.copy())
             {}
 
+         virtual ~HamcrestT()
+            { delete hc_matcher; }
+
          virtual Matcher<T>* clone() const
-            { return new HamcrestT(hc_matcher); }
+            { return new HamcrestT(*hc_matcher); }
 
          virtual bool operator== (const T& rhs) const
             { return (*hc_matcher)(rhs); }
@@ -27,10 +30,6 @@ namespace mockitopp
          private:
 
             ::hamcrest::matcher<T>* hc_matcher;
-
-            HamcrestT(::hamcrest::matcher<T>* hc_matcher)
-               : hc_matcher(hc_matcher)
-            {}
       };
 
       template <typename T>
