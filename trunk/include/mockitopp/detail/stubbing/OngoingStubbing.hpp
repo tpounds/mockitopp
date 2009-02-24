@@ -1,6 +1,7 @@
 #ifndef __MOCKITOPP_ONGOING_STUBBING_HPP__
 #define __MOCKITOPP_ONGOING_STUBBING_HPP__
 
+#include <algorithm>
 #include <list>
 #include <map>
 
@@ -95,7 +96,7 @@ namespace mockitopp
          {
             matcher_tuple_type arguments = matcher_tuple_type();
             typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-            pair_it = find(answerList.begin(), answerList.end(), arguments);
+            pair_it = std::find(answerList.begin(), answerList.end(), arguments);
             if(pair_it == answerList.end())
             {
                answerList.push_back(KeyPair<matcher_tuple_type, queue_type>(arguments, queue_type()));
@@ -119,7 +120,7 @@ namespace mockitopp
             if(answers.empty())
             {
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-               pair_it = find(answerList.begin(), answerList.end(), args);
+               pair_it = std::find(answerList.begin(), answerList.end(), args);
                if(pair_it == answerList.end())
                   { throw IncompleteImplementationException(); }
                answers = pair_it->value;
@@ -155,7 +156,7 @@ namespace mockitopp
          {
             matcher_tuple_type arguments = matcher_tuple_type(a0);
             typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-            pair_it = find(answerList.begin(), answerList.end(), arguments);
+            pair_it = std::find(answerList.begin(), answerList.end(), arguments);
             if(pair_it == answerList.end())
             {
                answerList.push_back(KeyPair<matcher_tuple_type, queue_type>(arguments, queue_type()));
@@ -179,7 +180,7 @@ namespace mockitopp
             if(answers.empty())
             {
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-               pair_it = find(answerList.begin(), answerList.end(), args);
+               pair_it = std::find(answerList.begin(), answerList.end(), args);
                if(pair_it == answerList.end())
                   { throw IncompleteImplementationException(); }
                answers = pair_it->value;
@@ -215,7 +216,7 @@ namespace mockitopp
          {
             matcher_tuple_type arguments = matcher_tuple_type(a0, a1);
             typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-            pair_it = find(answerList.begin(), answerList.end(), arguments);
+            pair_it = std::find(answerList.begin(), answerList.end(), arguments);
             if(pair_it == answerList.end())
             {
                answerList.push_back(KeyPair<matcher_tuple_type, queue_type>(arguments, queue_type()));
@@ -239,7 +240,7 @@ namespace mockitopp
             if(answers.empty())
             {
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-               pair_it = find(answerList.begin(), answerList.end(), args);
+               pair_it = std::find(answerList.begin(), answerList.end(), args);
                if(pair_it == answerList.end())
                   { throw IncompleteImplementationException(); }
                answers = pair_it->value;
@@ -275,7 +276,7 @@ namespace mockitopp
          {
             matcher_tuple_type arguments = matcher_tuple_type(a0, a1, a2);
             typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-            pair_it = find(answerList.begin(), answerList.end(), arguments);
+            pair_it = std::find(answerList.begin(), answerList.end(), arguments);
             if(pair_it == answerList.end())
             {
                answerList.push_back(KeyPair<matcher_tuple_type, queue_type>(arguments, queue_type()));
@@ -299,7 +300,7 @@ namespace mockitopp
             if(answers.empty())
             {
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-               pair_it = find(answerList.begin(), answerList.end(), args);
+               pair_it = std::find(answerList.begin(), answerList.end(), args);
                if(pair_it == answerList.end())
                   { throw IncompleteImplementationException(); }
                answers = pair_it->value;
@@ -335,7 +336,7 @@ namespace mockitopp
          {
             matcher_tuple_type arguments = matcher_tuple_type(a0, a1, a2, a3);
             typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-            pair_it = find(answerList.begin(), answerList.end(), arguments);
+            pair_it = std::find(answerList.begin(), answerList.end(), arguments);
             if(pair_it == answerList.end())
             {
                answerList.push_back(KeyPair<matcher_tuple_type, queue_type>(arguments, queue_type()));
@@ -359,7 +360,7 @@ namespace mockitopp
             if(answers.empty())
             {
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-               pair_it = find(answerList.begin(), answerList.end(), args);
+               pair_it = std::find(answerList.begin(), answerList.end(), args);
                if(pair_it == answerList.end())
                   { throw IncompleteImplementationException(); }
                answers = pair_it->value;
@@ -395,7 +396,7 @@ namespace mockitopp
          {
             matcher_tuple_type arguments = matcher_tuple_type(a0, a1, a2, a3, a4);
             typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-            pair_it = find(answerList.begin(), answerList.end(), arguments);
+            pair_it = std::find(answerList.begin(), answerList.end(), arguments);
             if(pair_it == answerList.end())
             {
                answerList.push_back(KeyPair<matcher_tuple_type, queue_type>(arguments, queue_type()));
@@ -419,7 +420,7 @@ namespace mockitopp
             if(answers.empty())
             {
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-               pair_it = find(answerList.begin(), answerList.end(), args);
+               pair_it = std::find(answerList.begin(), answerList.end(), args);
                if(pair_it == answerList.end())
                   { throw IncompleteImplementationException(); }
                answers = pair_it->value;
@@ -455,7 +456,7 @@ namespace mockitopp
          {
             matcher_tuple_type arguments = matcher_tuple_type(a0, a1, a2, a3, a4, a5);
             typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-            pair_it = find(answerList.begin(), answerList.end(), arguments);
+            pair_it = std::find(answerList.begin(), answerList.end(), arguments);
             if(pair_it == answerList.end())
             {
                answerList.push_back(KeyPair<matcher_tuple_type, queue_type>(arguments, queue_type()));
@@ -479,7 +480,7 @@ namespace mockitopp
             if(answers.empty())
             {
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-               pair_it = find(answerList.begin(), answerList.end(), args);
+               pair_it = std::find(answerList.begin(), answerList.end(), args);
                if(pair_it == answerList.end())
                   { throw IncompleteImplementationException(); }
                answers = pair_it->value;
@@ -515,7 +516,7 @@ namespace mockitopp
          {
             matcher_tuple_type arguments = matcher_tuple_type(a0, a1, a2, a3, a4, a5, a6);
             typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-            pair_it = find(answerList.begin(), answerList.end(), arguments);
+            pair_it = std::find(answerList.begin(), answerList.end(), arguments);
             if(pair_it == answerList.end())
             {
                answerList.push_back(KeyPair<matcher_tuple_type, queue_type>(arguments, queue_type()));
@@ -539,7 +540,7 @@ namespace mockitopp
             if(answers.empty())
             {
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-               pair_it = find(answerList.begin(), answerList.end(), args);
+               pair_it = std::find(answerList.begin(), answerList.end(), args);
                if(pair_it == answerList.end())
                   { throw IncompleteImplementationException(); }
                answers = pair_it->value;
@@ -575,7 +576,7 @@ namespace mockitopp
          {
             matcher_tuple_type arguments = matcher_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7);
             typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-            pair_it = find(answerList.begin(), answerList.end(), arguments);
+            pair_it = std::find(answerList.begin(), answerList.end(), arguments);
             if(pair_it == answerList.end())
             {
                answerList.push_back(KeyPair<matcher_tuple_type, queue_type>(arguments, queue_type()));
@@ -599,7 +600,7 @@ namespace mockitopp
             if(answers.empty())
             {
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-               pair_it = find(answerList.begin(), answerList.end(), args);
+               pair_it = std::find(answerList.begin(), answerList.end(), args);
                if(pair_it == answerList.end())
                   { throw IncompleteImplementationException(); }
                answers = pair_it->value;
@@ -635,7 +636,7 @@ namespace mockitopp
          {
             matcher_tuple_type arguments = matcher_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8);
             typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-            pair_it = find(answerList.begin(), answerList.end(), arguments);
+            pair_it = std::find(answerList.begin(), answerList.end(), arguments);
             if(pair_it == answerList.end())
             {
                answerList.push_back(KeyPair<matcher_tuple_type, queue_type>(arguments, queue_type()));
@@ -659,7 +660,7 @@ namespace mockitopp
             if(answers.empty())
             {
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-               pair_it = find(answerList.begin(), answerList.end(), args);
+               pair_it = std::find(answerList.begin(), answerList.end(), args);
                if(pair_it == answerList.end())
                   { throw IncompleteImplementationException(); }
                answers = pair_it->value;
@@ -695,7 +696,7 @@ namespace mockitopp
          {
             matcher_tuple_type arguments = matcher_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
             typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-            pair_it = find(answerList.begin(), answerList.end(), arguments);
+            pair_it = std::find(answerList.begin(), answerList.end(), arguments);
             if(pair_it == answerList.end())
             {
                answerList.push_back(KeyPair<matcher_tuple_type, queue_type>(arguments, queue_type()));
@@ -719,7 +720,7 @@ namespace mockitopp
             if(answers.empty())
             {
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-               pair_it = find(answerList.begin(), answerList.end(), args);
+               pair_it = std::find(answerList.begin(), answerList.end(), args);
                if(pair_it == answerList.end())
                   { throw IncompleteImplementationException(); }
                answers = pair_it->value;
