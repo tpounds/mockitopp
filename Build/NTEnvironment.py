@@ -37,7 +37,8 @@ class Environment(BaseEnvironment.Environment):
             print "Microsoft Visual C++ 2008 (9.0) Detected"
          # TODO: handle unsupported msvc++ version
 
-         self.AppendUnique(CCFLAGS = ['/EHsc'])
+         # XXX: BOOST_ALL_NO_LIB prevents MSVC from auto-linking a non-existent library
+         self.AppendUnique(CXXFLAGS = ['/EHsc', '/DBOOST_ALL_NO_LIB'])
          self['CXX'] = cxx_bin
 #         self['LINK'] = "link.exe"
          self['CPPPATH'] = os.path.abspath(cxx_dir + "\..\include")
