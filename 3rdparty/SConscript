@@ -1,47 +1,45 @@
 Import('env')
 
+BOOST_DIR = 'boost_1_36_0/'
 BOOST_REGEX_SRC = [
-   'boost_1_36_0/src/regex/src/cpp_regex_traits.cpp',
-   'boost_1_36_0/src/regex/src/cregex.cpp',
-   'boost_1_36_0/src/regex/src/c_regex_traits.cpp',
-   'boost_1_36_0/src/regex/src/fileiter.cpp',
-   'boost_1_36_0/src/regex/src/icu.cpp',
-   'boost_1_36_0/src/regex/src/instances.cpp',
-   'boost_1_36_0/src/regex/src/posix_api.cpp',
-   'boost_1_36_0/src/regex/src/regex.cpp',
-   'boost_1_36_0/src/regex/src/regex_debug.cpp',
-   'boost_1_36_0/src/regex/src/regex_raw_buffer.cpp',
-   'boost_1_36_0/src/regex/src/regex_traits_defaults.cpp',
-   'boost_1_36_0/src/regex/src/static_mutex.cpp',
-   'boost_1_36_0/src/regex/src/usinstances.cpp',
-   'boost_1_36_0/src/regex/src/w32_regex_traits.cpp',
-   'boost_1_36_0/src/regex/src/wc_regex_traits.cpp',
-   'boost_1_36_0/src/regex/src/wide_posix_api.cpp',
-   'boost_1_36_0/src/regex/src/winstances.cpp',
-
+   BOOST_DIR + 'src/regex/src/cpp_regex_traits.cpp',
+   BOOST_DIR + 'src/regex/src/cregex.cpp',
+   BOOST_DIR + 'src/regex/src/c_regex_traits.cpp',
+   BOOST_DIR + 'src/regex/src/fileiter.cpp',
+   BOOST_DIR + 'src/regex/src/icu.cpp',
+   BOOST_DIR + 'src/regex/src/instances.cpp',
+   BOOST_DIR + 'src/regex/src/posix_api.cpp',
+   BOOST_DIR + 'src/regex/src/regex.cpp',
+   BOOST_DIR + 'src/regex/src/regex_debug.cpp',
+   BOOST_DIR + 'src/regex/src/regex_raw_buffer.cpp',
+   BOOST_DIR + 'src/regex/src/regex_traits_defaults.cpp',
+   BOOST_DIR + 'src/regex/src/static_mutex.cpp',
+   BOOST_DIR + 'src/regex/src/usinstances.cpp',
+   BOOST_DIR + 'src/regex/src/w32_regex_traits.cpp',
+   BOOST_DIR + 'src/regex/src/wc_regex_traits.cpp',
+   BOOST_DIR + 'src/regex/src/wide_posix_api.cpp',
+   BOOST_DIR + 'src/regex/src/winstances.cpp',
 ]
 boost_regex = env.Clone()
-boost_regex.AppendUnique(CPPPATH = ['boost_1_36_0/include'])
+boost_regex.AppendUnique(CPPPATH = [BOOST_DIR + 'include'])
 boost_regex.Library('boost-regex', BOOST_REGEX_SRC)
 
+GTEST_DIR = 'googletest-1.2.1/'
 GTEST_SRC = [
-   'googletest-1.1.0/src/gtest.cc',
-   'googletest-1.1.0/src/gtest-death-test.cc',
-   'googletest-1.1.0/src/gtest-filepath.cc',
-   'googletest-1.1.0/src/gtest_main.cc',
-   'googletest-1.1.0/src/gtest-port.cc',
-   'googletest-1.1.0/src/gtest-typed-test.cc',
+   GTEST_DIR + 'src/gtest-all.cc',
+   GTEST_DIR + 'src/gtest_main.cc',
 ]
 gtest = env.Clone()
-gtest.AppendUnique(CPPPATH = ['googletest-1.1.0'])
-gtest.AppendUnique(CPPPATH = ['googletest-1.1.0/include'])
+gtest.AppendUnique(CPPPATH = [GTEST_DIR])
+gtest.AppendUnique(CPPPATH = [GTEST_DIR + 'include'])
 gtest.Library('googletest', GTEST_SRC)
 
+HAMCREST_DIR = 'hamcrest-r389/'
 HAMCREST_SRC = [
-   'hamcrest-r389/core/hc_description.cpp',
-   'hamcrest-r389/core/hc_self_describing.cpp',
+   HAMCREST_DIR + 'core/hc_description.cpp',
+   HAMCREST_DIR + 'core/hc_self_describing.cpp',
 ]
 hamcrest = env.Clone()
-hamcrest.AppendUnique(CPPPATH = ['hamcrest-r389/core'])
+hamcrest.AppendUnique(CPPPATH = [HAMCREST_DIR + 'core'])
 hamcrest.Library('hamcrest', HAMCREST_SRC)
 # vim:ft=python:
