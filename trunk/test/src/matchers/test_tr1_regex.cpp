@@ -1,7 +1,7 @@
 #include <boost/regex.hpp>
 #include <gtest/gtest.h>
 #include <mockitopp/MockObject.hpp>
-#include <mockitopp/matchers/optional/Regex.hpp>
+#include <mockitopp/matchers/optional/tr1_regex.hpp>
 
 using mockitopp::MockObject;
 using mockitopp::matcher::regex;

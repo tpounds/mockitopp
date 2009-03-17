@@ -8,7 +8,7 @@
 #include <matchers/hc_same_instance.h>
 #include <matchers/hc_shortcut_combination.h>
 #include <mockitopp/MockObject.hpp>
-#include <mockitopp/matchers/optional/Hamcrest.hpp>
+#include <mockitopp/matchers/optional/hamcrest.hpp>
 
 using namespace hamcrest;
 using mockitopp::MockObject;

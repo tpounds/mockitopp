@@ -29,7 +29,7 @@ namespace mockitopp
       };
 
       template <typename T>
-      NotT<T> not_(const Matcher<T>& matcher)
+      NotT<T> is_not(const Matcher<T>& matcher)
          { return NotT<T>(matcher); }
    } // namespace matcher
 } // namespace mockitopp

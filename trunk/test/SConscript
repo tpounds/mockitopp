@@ -9,9 +9,13 @@ TEST_SRC = [
 
    'src/test_iterator_style.cpp',
    'src/test_verify.cpp',
+   'src/matchers/test_any.cpp',
+   'src/matchers/test_custom.cpp',
+   'src/matchers/test_equal.cpp',
    'src/matchers/test_hamcrest.cpp',
+   'src/matchers/test_is_not.cpp',
    'src/matchers/test_null.cpp',
-   'src/matchers/test_regex.cpp',
+   'src/matchers/test_tr1_regex.cpp',
 ]
 testenv.AppendUnique(CPPPATH = ['#include'])
 testenv.AppendUnique(CPPPATH = ['#3rdparty/boost_1_36_0/include'])
