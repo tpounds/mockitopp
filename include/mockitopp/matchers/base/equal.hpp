@@ -26,7 +26,7 @@ namespace mockitopp
       };
 
       template <typename T>
-      EqT<T> eq(const T& element)
+      EqT<T> equal(const T& element)
          { return EqT<T>(element); }
    } // namespace matcher
 } // namespace mockitopp

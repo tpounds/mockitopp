@@ -9,10 +9,10 @@
 
 #include <mockitopp/detail/mock/MockObjectImpl.hpp>
 // default matchers
-#include <mockitopp/matchers/Any.hpp>
-#include <mockitopp/matchers/Eq.hpp>
-#include <mockitopp/matchers/Not.hpp>
-#include <mockitopp/matchers/Null.hpp>
+#include <mockitopp/matchers/base/any.hpp>
+#include <mockitopp/matchers/base/equal.hpp>
+#include <mockitopp/matchers/base/is_not.hpp>
+#include <mockitopp/matchers/base/null.hpp>
 
 namespace mockitopp
 {
