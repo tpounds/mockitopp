@@ -38,7 +38,7 @@ class Environment(BaseEnvironment.Environment):
          # TODO: handle unsupported msvc++ version
 
          # XXX: BOOST_ALL_NO_LIB prevents MSVC from auto-linking a non-existent library
-         self.AppendUnique(CXXFLAGS = ['/EHsc', '/DBOOST_ALL_NO_LIB'])
+         self.AppendUnique(CXXFLAGS = ['/EHsc', '/GR', '/DBOOST_ALL_NO_LIB'])
          self['CXX'] = cxx_bin
 #         self['LINK'] = "link.exe"
          self['CPPPATH'] = os.path.abspath(cxx_dir + "\..\include")
