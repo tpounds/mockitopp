@@ -28,6 +28,9 @@ namespace mockitopp
       template <typename T>
       EqT<T> equal(const T& element)
          { return EqT<T>(element); }
+
+      inline EqT<std::string> equal(const char* element)
+         { return EqT<std::string>(element); }
    } // namespace matcher
 } // namespace mockitopp
 

@@ -6,3 +6,4 @@
 * add passed in arguments to incomplete stubbing exceptions?
 * add additional matchers
 * add pseudo-lambda function support
+* add equal matcher tolerance for floating point types

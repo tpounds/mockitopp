@@ -1,0 +1,58 @@
+#include <gtest/gtest.h>
+#include <mockitopp/MockObject.hpp>
+
+using mockitopp::MockObject;
+using mockitopp::matcher::equal;
+
+struct equal_test_interface
+{
+   virtual int prim_void_ptr(void*) = 0;
+   virtual int prim_char(char) = 0;
+//   virtual int prim_float(std::string) = 0;
+   virtual int std_string(std::string) = 0;
+};
+
+TEST(test_equal, equal_void_ptr)
+{
+   MockObject<equal_test_interface> mock;
+   mock(&equal_test_interface::prim_void_ptr).when(equal<void*>(0)).thenReturn(0);
+   void* void_ptr = new int;
+   mock(&equal_test_interface::prim_void_ptr).when(equal(void_ptr)).thenReturn(1);
+   equal_test_interface& obj = mock.getInstance();
+
+   ASSERT_EQ(0, obj.prim_void_ptr(0));
+   ASSERT_EQ(1, obj.prim_void_ptr(void_ptr));
+   ASSERT_THROW(obj.prim_void_ptr(new int), mockitopp::detail::IncompleteImplementationException);
+}
+
+TEST(test_equal, equal_prim_char)
+{
+   MockObject<equal_test_interface> mock;
+   mock(&equal_test_interface::prim_char).when(equal(' ')).thenReturn(32);
+   mock(&equal_test_interface::prim_char).when(equal('0')).thenReturn(48);
+   mock(&equal_test_interface::prim_char).when(equal('A')).thenReturn(65);
+   equal_test_interface& obj = mock.getInstance();
+
+   ASSERT_EQ(32, obj.prim_char(' '));
+   ASSERT_EQ(48, obj.prim_char('0'));
+   ASSERT_EQ(65, obj.prim_char('A'));
+   ASSERT_THROW(obj.prim_char('@'), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.prim_char('9'), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.prim_char('Z'), mockitopp::detail::IncompleteImplementationException);
+}
+
+TEST(test_equal, equal_std_string)
+{
+   MockObject<equal_test_interface> mock;
+   mock(&equal_test_interface::std_string).when(equal("foo")).thenReturn(0);
+   mock(&equal_test_interface::std_string).when(equal("w00t")).thenReturn(1);
+   mock(&equal_test_interface::std_string).when(equal("hello")).thenReturn(2);
+   equal_test_interface& obj = mock.getInstance();
+
+   ASSERT_EQ(0, obj.std_string("foo"));
+   ASSERT_EQ(1, obj.std_string("w00t"));
+   ASSERT_EQ(2, obj.std_string("hello"));
+   ASSERT_THROW(obj.std_string("ABCDEFXYZ"), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.std_string("124356789"), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.std_string("!@#$%^&*("), mockitopp::detail::IncompleteImplementationException);
+}
