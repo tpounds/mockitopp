@@ -7,30 +7,33 @@ namespace mockitopp
 {
    namespace matcher
    {
-      template <typename T>
-      struct NotT : public Matcher<T>
+      namespace detail
       {
-         NotT(const Matcher<T>& matcher)
-            : matcher(matcher.clone())
-            {}
+         template <typename T>
+         struct NotT : public Matcher<T>
+         {
+            NotT(const Matcher<T>& matcher)
+               : matcher(matcher.clone())
+               {}
 
-         virtual ~NotT()
-            { delete matcher; }
+            virtual ~NotT()
+               { delete matcher; }
 
-         virtual Matcher<T>* clone() const
-            { return new NotT(*matcher); }
+            virtual Matcher<T>* clone() const
+               { return new NotT(*matcher); }
 
-         virtual bool operator== (const T& rhs) const
-            { return !(*matcher == rhs); }
+            virtual bool operator== (const T& rhs) const
+               { return !(*matcher == rhs); }
 
-         private:
+            private:
 
-            Matcher<T>* matcher;
-      };
+               Matcher<T>* matcher;
+         };
+      } // namespace detail
 
       template <typename T>
-      NotT<T> is_not(const Matcher<T>& matcher)
-         { return NotT<T>(matcher); }
+      detail::NotT<T> is_not(const Matcher<T>& matcher)
+         { return detail::NotT<T>(matcher); }
    } // namespace matcher
 } // namespace mockitopp
 
