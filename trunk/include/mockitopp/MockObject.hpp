@@ -8,11 +8,11 @@
 #define MAX_VIRTUAL_FUNCTION_ARITY 11
 
 #include <mockitopp/detail/mock/MockObjectImpl.hpp>
-// default matchers
 #include <mockitopp/matchers/base/any.hpp>
 #include <mockitopp/matchers/base/equal.hpp>
 #include <mockitopp/matchers/base/is_not.hpp>
 #include <mockitopp/matchers/base/null.hpp>
+#include <mockitopp/matchers/type/string_literal.hpp>
 
 namespace mockitopp
 {
