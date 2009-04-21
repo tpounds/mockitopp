@@ -2,35 +2,39 @@
 #define __MOCKITOPP_MATCHER_EQ_HPP__
 
 #include <mockitopp/matchers/Matcher.hpp>
+#include <string>
 
 namespace mockitopp
 {
    namespace matcher
    {
-      template <typename T>
-      struct EqT : public Matcher<T>
+      namespace detail
       {
-         EqT(const T& element)
-            : element(element)
-            {}
+         template <typename T>
+         struct EqualT : public Matcher<T>
+         {
+            EqualT(const T& element)
+               : element(element)
+               {}
 
-         virtual Matcher<T>* clone() const
-            { return new EqT(element); }
+            virtual Matcher<T>* clone() const
+               { return new EqualT(element); }
 
-         virtual bool operator== (const T& rhs) const
-            { return element == rhs; }
+            virtual bool operator== (const T& rhs) const
+               { return element == rhs; }
 
-         private:
+            private:
 
-            T element;
-      };
+               T element;
+         };
+      } // namespace detail
 
       template <typename T>
-      EqT<T> equal(const T& element)
-         { return EqT<T>(element); }
+      detail::EqualT<T> equal(const T& element)
+         { return detail::EqualT<T>(element); }
 
-      inline EqT<std::string> equal(const char* element)
-         { return EqT<std::string>(element); }
+      inline detail::EqualT<std::string> equal(const char* element)
+         { return detail::EqualT<std::string>(element); }
    } // namespace matcher
 } // namespace mockitopp
 

@@ -7,22 +7,25 @@ namespace mockitopp
 {
    namespace matcher
    {
-      template <typename T>
-      struct NullT : public Matcher<T>
+      namespace detail
       {
-         NullT()
-            {}
+         template <typename T>
+         struct NullT : public Matcher<T>
+         {
+            NullT()
+               {}
 
-         virtual Matcher<T>* clone() const
-            { return new NullT(); }
+            virtual Matcher<T>* clone() const
+               { return new NullT(); }
 
-         virtual bool operator== (const T& rhs) const
-            { return rhs == 0; }
-      };
+            virtual bool operator== (const T& rhs) const
+               { return rhs == 0; }
+         };
+      } // namespace detail
 
       template <typename T>
-      NullT<T> null()
-         { return NullT<T>(); }
+      detail::NullT<T> null()
+         { return detail::NullT<T>(); }
    } // namespace matcher
 } // namespace mockitopp
 

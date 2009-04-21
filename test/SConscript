@@ -15,6 +15,7 @@ TEST_SRC = [
    'src/matchers/test_hamcrest.cpp',
    'src/matchers/test_is_not.cpp',
    'src/matchers/test_null.cpp',
+   'src/matchers/test_string_literal.cpp',
    'src/matchers/test_tr1_regex.cpp',
 ]
 testenv.AppendUnique(CPPPATH = ['#include'])
