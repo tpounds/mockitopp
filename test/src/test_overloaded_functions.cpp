@@ -16,7 +16,7 @@ struct overloaded_interface
 TEST(test_overloaded_functions, foo)
 {
    MockObject<overloaded_interface> mock;
-   mock(&overloaded_interface::foo).when().thenReturn(0);
+   mock(static_cast<int (overloaded_interface::*)()>(&overloaded_interface::foo)).when().thenReturn(0);
    mock(static_cast<int (overloaded_interface::*)(bool)>(&overloaded_interface::foo)).when(true).thenReturn(0);
    mock(static_cast<int (overloaded_interface::*)(char)>(&overloaded_interface::foo)).when('A').thenReturn(0);
    mock(static_cast<int (overloaded_interface::*)(char)>(&overloaded_interface::foo)).when('%').thenReturn(1);
