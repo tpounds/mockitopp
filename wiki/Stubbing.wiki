@@ -188,7 +188,7 @@ TEST(OverloadedFunctionsTest, ByStaticCast)
    // mock using static_cast operator
    mock(static_cast<void (OverloadedInterface::*)()>(&overloaded_inteface::foo)).when().thenReturn();
    mock(static_cast<void (OverloadedInterface::*)(int)>(&overloaded_inteface::foo)).when(1234).thenReturn();
-   mock(static_cast<void (OverloadedInterface::*)(std::string)>(&overloaded_inteface::foo)).when("Hellow World!).thenReturn();
+   mock(static_cast<void (OverloadedInterface::*)(std::string)>(&overloaded_inteface::foo)).when("Hellow World!").thenReturn();
    OverloadedInterface& obj = mock.getInstance();
 
    // do stuff with mock object as normal
