@@ -1,4 +1,6 @@
 #labels Featured
+<wiki:toc max_depth="3" />
+
 == Simple Example ==
 This example is trivial but shows the basics for constructing a simple mock of an interface and stubbing its only virtual function.
 {{{
@@ -143,5 +145,52 @@ TEST(MyTestCase, Enumeration)
    ASSERT_EQ(2, e.next()); // should return 2
    ASSERT_EQ(3, e.next()); // should return 3
    ASSERT_EQ(3, e.next()); // remaining consecutive calls return the last stubbed value
+}
+}}}
+
+== Overloaded Functions ==
+In some cases an interface may have several overloaded functions. The mocking behavior is similar to the other examples but requires an extra step for resolving the overloaded function. There are currently two ways in which you can resolve the member function pointer: {{{(1)}}} define an intermediate variable acting as a proxy for the lookup, or {{{(2)}}} use the static_cast operator to provide the compiler lookup. Unfortunately, both ways are a little bit more verbose but are required for the compiler to resolve the functions properly.
+{{{
+#include <gtest/gtest.h>
+#include <mockitopp/MockObject.hpp>
+
+// overloaded interface
+struct OverloadedInterface
+{
+   virtual void foo() = 0;
+   virtual void foo(int) = 0;
+   virtual void foo(std::string) = 0;
+};
+
+using mockitopp::MockObject;
+
+// Example 1: using variable proxy resolution
+TEST(OverloadedFunctionsTest, ByVariableProxy)
+{
+   MockObject<OverloadedInterface> mock;
+   // create overloaded lookups via variable proxy
+   void (OverloadedInterface::*void_proxy_ptr)() = &OverloadedInterface::foo;
+   void (OverloadedInterface::*int_proxy_ptr)(int) = &OverloadedInterface::foo;
+   void (OverloadedInterface::*str_proxy_ptr)(std::string) = &OverloadedInterface::foo;
+   // mock using the proxies in place of function address
+   mock(void_proxy_ptr).when().thenReturn();
+   mock(int_proxy_ptr).when(1234).thenReturn();
+   mock(str_proxy_ptr).when("Hello World!").thenReturn();
+   OverloadedInterface& obj = mock.getInstance();
+
+   // do stuff with mock object as normal
+}
+
+// Example 2: using static_cast operator resolution
+TEST(OverloadedFunctionsTest, ByStaticCast)
+{
+   MockObject<OverloadedInterface> mock;
+   // mock using static_cast operator
+   mock(static_cast<void (OverloadedInterface::*)()>(&overloaded_inteface::foo)).when().thenReturn();
+   mock(static_cast<void (OverloadedInterface::*)(int)>(&overloaded_inteface::foo)).when(1234).thenReturn();
+   mock(static_cast<void (OverloadedInterface::*)(std::string)>(&overloaded_inteface::foo)).when("Hellow World!).thenReturn();
+   OverloadedInterface& obj = mock.getInstance();
+
+   // do stuff with mock object as normal
 }
 }}}
