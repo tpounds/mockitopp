@@ -1,3 +1,5 @@
+#include <algorithm> // needed internally by hamcrest for some compilers
+
 #include <gtest/gtest.h>
 #include <matchers/hc_all_of.h>
 #include <matchers/hc_any_of.h>
