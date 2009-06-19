@@ -9,6 +9,8 @@ namespace mockitopp
       struct Answer
       {
          virtual R execute() = 0;
+
+         virtual ~Answer() {}
       };
    } // namespace detail
 } // namespace mockitopp

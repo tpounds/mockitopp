@@ -18,7 +18,7 @@ class Environment(BaseEnvironment.Environment):
       cxx_bin = os.path.basename(cxx).lower()
       cxx_dir = os.path.dirname(cxx)
 
-      if cxx_bin == "cl.exe":
+      if cxx_bin.startswith("cl"):
          common = cxx_dir + "\..\.."
          if os.path.exists(common + "\Common\IDE"):
            os.environ['PATH'] = common + "\Common\IDE" + ";" + cxx_dir
@@ -57,7 +57,7 @@ class Environment(BaseEnvironment.Environment):
             self.AppendUnique(LIBPATH=[sdk_dir + "\lib"])
          #TODO: handle windows.h not found
 
-      elif cxx_bin == "g++.exe":
+      elif cxx_bin.startswith("g++"):
          os.environ['PATH'] = cxx_dir
          proc = Popen(cxx_bin + " --version", stderr=STDOUT, stdout=PIPE)
          proc.wait()
@@ -72,5 +72,6 @@ class Environment(BaseEnvironment.Environment):
          if '/nologo' in self['CCFLAGS']:
             self['CCFLAGS'].remove('/nologo')
 
+         self.AppendUnique(CXXFLAGS=['-Wall'])
          self.AppendUnique(CPPPATH=[os.path.abspath(cxx_dir + "\..\include")])
          self.AppendUnique(LIBPATH=[os.path.abspath(cxx_dir + "\..\lib")])

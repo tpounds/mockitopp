@@ -8,6 +8,8 @@ namespace mockitopp
       template <typename T>
       struct Matcher
       {
+         virtual ~Matcher() {}
+
          virtual Matcher* clone() const = 0;
 
          virtual bool operator== (const T& rhs) const = 0;
