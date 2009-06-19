@@ -8,6 +8,7 @@ TEST_SRC = [
    'src/TestSimpleComposite.cpp',
 
    'src/test_iterator_style.cpp',
+   'src/test_overloaded_functions.cpp',
    'src/test_verify.cpp',
    'src/matchers/test_any.cpp',
    'src/matchers/test_custom.cpp',
