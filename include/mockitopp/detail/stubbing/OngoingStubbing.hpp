@@ -70,7 +70,6 @@ namespace mockitopp
       // TODO: add sequence matcher
 
       //TODO: clean up typedef nomenclature
-
  
       template <typename R, typename C>
       struct OngoingStubbing<R (C::*)()> : public OngoingStubbingBase<R>, public Verifier
@@ -92,19 +91,7 @@ namespace mockitopp
             , answerList()
             {}
 
-         OngoingStubbing& __DISABLE_OVERLOAD__when()
-         {
-            matcher_tuple_type arguments = matcher_tuple_type();
-            typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-            pair_it = std::find(answerList.begin(), answerList.end(), arguments);
-            if(pair_it == answerList.end())
-            {
-               answerList.push_back(KeyPair<matcher_tuple_type, queue_type>(arguments, queue_type()));
-               pair_it = --answerList.end();
-            }
-            this->ongoingMatch = &(pair_it->value);
-            return *this;
-         }
+         
 
          OngoingStubbing& when()
          {

@@ -20,7 +20,7 @@ namespace mockitopp
 include(`mockitopp/detail/m4/REPEAT.m4')dnl
 define(`DEFINE_OFFSET_LOOKUP_FUNCTION', `        virtual int offset$1() { return $1; }
 ')dnl
-M4_REPEAT(50, `DEFINE_OFFSET_LOOKUP_FUNCTION')dnl
+M4_REPEAT(MOCKITOPP_MAX_VIRTUAL_FUNCTIONS, `DEFINE_OFFSET_LOOKUP_FUNCTION')dnl
       };
 
    } // namespace detail
