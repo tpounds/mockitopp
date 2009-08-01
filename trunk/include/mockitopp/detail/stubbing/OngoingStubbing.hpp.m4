@@ -100,7 +100,7 @@ define(`DEFINE_ONGOING_STUBBING', `
             , answerList()
             {}
 
-         OngoingStubbing& M4_IF($1, when, __DISABLE_OVERLOAD__when)(M4_ENUM_BINARY_PARAMS($1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A, >::type>::type>& a))
+         M4_IF($1, `OngoingStubbing& when(M4_ENUM_BINARY_PARAMS($1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A, >::type>::type>& a))
          {
             matcher_tuple_type arguments = matcher_tuple_type(M4_ENUM_PARAMS($1, a));
             typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
@@ -112,7 +112,7 @@ define(`DEFINE_ONGOING_STUBBING', `
             }
             this->ongoingMatch = &(pair_it->value);
             return *this;
-         }
+         }',)
 
          OngoingStubbing& when(M4_ENUM_BINARY_PARAMS($1, A, a))
          {
@@ -139,8 +139,8 @@ define(`DEFINE_ONGOING_STUBBING', `
             return answer->execute();
          }
       };
-')
-M4_REPEAT(11, `DEFINE_ONGOING_STUBBING')dnl
+')dnl
+M4_REPEAT(MOCKITOPP_MAX_VIRTUAL_FUNCTION_ARITY, `DEFINE_ONGOING_STUBBING')dnl
    } // namespace detail
 } // namespace mockitopp
 

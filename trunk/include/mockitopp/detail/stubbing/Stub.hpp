@@ -15,7 +15,7 @@ namespace mockitopp
       {
          void* __PAD_FOR_MOCK_vptr;
          OngoingStubbing<R (C::*)()>*
-            __PAD_FOR_MOCK_spys[MAX_VIRTUAL_FUNCTIONS];
+            __PAD_FOR_MOCK_spys[50];
 
          R invoke()
             { return __PAD_FOR_MOCK_spys[OFFSET]->invoke(); }
@@ -26,7 +26,7 @@ namespace mockitopp
       {
          void* __PAD_FOR_MOCK_vptr;
          OngoingStubbing<R (C::*)(A0)>*
-            __PAD_FOR_MOCK_spys[MAX_VIRTUAL_FUNCTIONS];
+            __PAD_FOR_MOCK_spys[50];
 
          R invoke(A0 a0)
             { return __PAD_FOR_MOCK_spys[OFFSET]->invoke(a0); }
@@ -37,7 +37,7 @@ namespace mockitopp
       {
          void* __PAD_FOR_MOCK_vptr;
          OngoingStubbing<R (C::*)(A0, A1)>*
-            __PAD_FOR_MOCK_spys[MAX_VIRTUAL_FUNCTIONS];
+            __PAD_FOR_MOCK_spys[50];
 
          R invoke(A0 a0, A1 a1)
             { return __PAD_FOR_MOCK_spys[OFFSET]->invoke(a0, a1); }
@@ -48,7 +48,7 @@ namespace mockitopp
       {
          void* __PAD_FOR_MOCK_vptr;
          OngoingStubbing<R (C::*)(A0, A1, A2)>*
-            __PAD_FOR_MOCK_spys[MAX_VIRTUAL_FUNCTIONS];
+            __PAD_FOR_MOCK_spys[50];
 
          R invoke(A0 a0, A1 a1, A2 a2)
             { return __PAD_FOR_MOCK_spys[OFFSET]->invoke(a0, a1, a2); }
@@ -59,7 +59,7 @@ namespace mockitopp
       {
          void* __PAD_FOR_MOCK_vptr;
          OngoingStubbing<R (C::*)(A0, A1, A2, A3)>*
-            __PAD_FOR_MOCK_spys[MAX_VIRTUAL_FUNCTIONS];
+            __PAD_FOR_MOCK_spys[50];
 
          R invoke(A0 a0, A1 a1, A2 a2, A3 a3)
             { return __PAD_FOR_MOCK_spys[OFFSET]->invoke(a0, a1, a2, a3); }
@@ -70,7 +70,7 @@ namespace mockitopp
       {
          void* __PAD_FOR_MOCK_vptr;
          OngoingStubbing<R (C::*)(A0, A1, A2, A3, A4)>*
-            __PAD_FOR_MOCK_spys[MAX_VIRTUAL_FUNCTIONS];
+            __PAD_FOR_MOCK_spys[50];
 
          R invoke(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4)
             { return __PAD_FOR_MOCK_spys[OFFSET]->invoke(a0, a1, a2, a3, a4); }
@@ -81,7 +81,7 @@ namespace mockitopp
       {
          void* __PAD_FOR_MOCK_vptr;
          OngoingStubbing<R (C::*)(A0, A1, A2, A3, A4, A5)>*
-            __PAD_FOR_MOCK_spys[MAX_VIRTUAL_FUNCTIONS];
+            __PAD_FOR_MOCK_spys[50];
 
          R invoke(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5)
             { return __PAD_FOR_MOCK_spys[OFFSET]->invoke(a0, a1, a2, a3, a4, a5); }
@@ -92,7 +92,7 @@ namespace mockitopp
       {
          void* __PAD_FOR_MOCK_vptr;
          OngoingStubbing<R (C::*)(A0, A1, A2, A3, A4, A5, A6)>*
-            __PAD_FOR_MOCK_spys[MAX_VIRTUAL_FUNCTIONS];
+            __PAD_FOR_MOCK_spys[50];
 
          R invoke(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6)
             { return __PAD_FOR_MOCK_spys[OFFSET]->invoke(a0, a1, a2, a3, a4, a5, a6); }
@@ -103,7 +103,7 @@ namespace mockitopp
       {
          void* __PAD_FOR_MOCK_vptr;
          OngoingStubbing<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7)>*
-            __PAD_FOR_MOCK_spys[MAX_VIRTUAL_FUNCTIONS];
+            __PAD_FOR_MOCK_spys[50];
 
          R invoke(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7)
             { return __PAD_FOR_MOCK_spys[OFFSET]->invoke(a0, a1, a2, a3, a4, a5, a6, a7); }
@@ -114,7 +114,7 @@ namespace mockitopp
       {
          void* __PAD_FOR_MOCK_vptr;
          OngoingStubbing<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7, A8)>*
-            __PAD_FOR_MOCK_spys[MAX_VIRTUAL_FUNCTIONS];
+            __PAD_FOR_MOCK_spys[50];
 
          R invoke(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8)
             { return __PAD_FOR_MOCK_spys[OFFSET]->invoke(a0, a1, a2, a3, a4, a5, a6, a7, a8); }
@@ -125,7 +125,7 @@ namespace mockitopp
       {
          void* __PAD_FOR_MOCK_vptr;
          OngoingStubbing<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9)>*
-            __PAD_FOR_MOCK_spys[MAX_VIRTUAL_FUNCTIONS];
+            __PAD_FOR_MOCK_spys[50];
 
          R invoke(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8, A9 a9)
             { return __PAD_FOR_MOCK_spys[OFFSET]->invoke(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9); }
