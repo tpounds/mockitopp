@@ -140,7 +140,8 @@ define(`DEFINE_ONGOING_STUBBING', `
          }
       };
 ')dnl
-M4_REPEAT(MOCKITOPP_MAX_VIRTUAL_FUNCTION_ARITY, `DEFINE_ONGOING_STUBBING')dnl
+dnl add one to max arity so we generate 0 argument case
+M4_REPEAT(eval(MOCKITOPP_MAX_VIRTUAL_FUNCTION_ARITY + 1), `DEFINE_ONGOING_STUBBING')dnl
    } // namespace detail
 } // namespace mockitopp
 

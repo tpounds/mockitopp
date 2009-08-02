@@ -27,7 +27,8 @@ define(`DEFINE_STUB_IMPL',
       };
 
 ')dnl
-M4_REPEAT(MOCKITOPP_MAX_VIRTUAL_FUNCTION_ARITY, `DEFINE_STUB_IMPL')dnl
+dnl add one to max arity so we generate 0 argument case
+M4_REPEAT(eval(MOCKITOPP_MAX_VIRTUAL_FUNCTION_ARITY + 1), `DEFINE_STUB_IMPL')dnl
 
       template <typename M>
       struct Stub

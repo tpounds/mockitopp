@@ -7,14 +7,14 @@ if 'm4-generate' in COMMAND_LINE_TARGETS:
       '-I' + os.path.abspath(sys.path[0]) + '/include',
       # maximum supported virtual functions, increase for classes with large vtables
       '-DMOCKITOPP_MAX_VIRTUAL_FUNCTIONS=50',
-      # maximum supported arity, increase for function signatures with larger number of arguments
-      # boost::tuple supports 0-10 elements, so don't support arity > 11 with this implementation.
-      '-DMOCKITOPP_MAX_VIRTUAL_FUNCTION_ARITY=11',
+      # maximum supported arity, increase for function signatures with more arguments
+      '-DMOCKITOPP_MAX_VIRTUAL_FUNCTION_ARITY=10',
    ])
    Alias('m4-generate', [
       env.M4('include/mockitopp/detail/stubbing/OngoingStubbing.hpp.m4'),
       env.M4('include/mockitopp/detail/stubbing/Stub.hpp.m4'),
-      env.M4('include/mockitopp/detail/utility/Function.hpp.m4')
+      env.M4('include/mockitopp/detail/utility/Function.hpp.m4'),
+      env.M4('include/mockitopp/detail/utility/tr1_tuple.hpp.m4')
    ])
 
 test = SConscript('test/SConscript', build_dir='test/build', duplicate=0)
