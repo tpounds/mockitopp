@@ -73,37 +73,37 @@ namespace mockitopp
 
       struct dynamic_object
       {
-         struct vtable
-         {
-            void* __vtable[MAX_VIRTUAL_FUNCTIONS];
-
-            template <typename T>
-            vtable(T function)
-            {
-               for(int i = 0; i < MAX_VIRTUAL_FUNCTIONS; i++)
-                  { __vtable[i] = horrible_cast<void*>(function); }
-            }
-         };
+         struct vtable { void* __vtable[MAX_VIRTUAL_FUNCTIONS]; };
 
          vtable* __vptr;
          void*   __spys[MAX_VIRTUAL_FUNCTIONS];
 
          dynamic_object()
-            : __vptr(new vtable(&dynamic_object::NotImplemented))
-            { memset(__spys, 0, MAX_VIRTUAL_FUNCTIONS); }
+            : __vptr(new vtable)
+         {
+            for(int i = 0; i < MAX_VIRTUAL_FUNCTIONS; i++)
+            {
+               __vptr->__vtable[i] = horrible_cast<void*>(&dynamic_object::NotImplemented);
+               __spys[i] = 0;
+            }
+         }
 
          ~dynamic_object()
          {
+            // delete __vptr->__vtable[i] not necessary, entries point to static addresses
             delete __vptr;
-//            for(int i = 0; i < MAX_VIRTUAL_FUNCTIONS; i++)
-//               { delete __spys[i]; }
+            for(int i = 0; i < MAX_VIRTUAL_FUNCTIONS; i++)
+            {
+               if(__spys[i] != 0)
+                  { delete reinterpret_cast<dynamic_vfunction_polymorphic_destructor*>(__spys[i]); }
+            }
          }
 
          template <typename M>
          OngoingStubbing<M>& beginStubbing(M ptr2member)
          {
             int offset = vfunction_offset_helper::get(ptr2member);
-            if(__spys[offset] == NULL)
+            if(__spys[offset] == 0)
             {
                __vptr->__vtable[offset] = Stub<M>::getInstance(ptr2member);
                __spys[offset] = new OngoingStubbing<M>();

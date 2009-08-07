@@ -20,8 +20,11 @@ namespace mockitopp
 {
    namespace detail
    {
+      // simple base class to allow polymorphic desctruction with unknown subtype
+      struct dynamic_vfunction_polymorphic_destructor { virtual ~dynamic_vfunction_polymorphic_destructor() {} };
+
       template <typename R>
-      struct OngoingStubbingBase
+      struct OngoingStubbingBase : dynamic_vfunction_polymorphic_destructor
       {
          typedef Answer<R>*             answer_type;
          typedef std::list<answer_type> queue_type;
