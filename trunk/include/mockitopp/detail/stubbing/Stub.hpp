@@ -2,7 +2,7 @@
 #define __MOCKITOPP_STUB_HPP__
 
 #include <mockitopp/detail/stubbing/OngoingStubbing.hpp>
-#include <mockitopp/detail/utility/HorribleCast.hpp>
+#include <mockitopp/detail/util/horrible_cast.hpp>
 
 namespace mockitopp
 {

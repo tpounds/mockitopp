@@ -2,7 +2,7 @@
 #define __MOCKITOPP_STUB_HPP__
 
 #include <mockitopp/detail/stubbing/OngoingStubbing.hpp>
-#include <mockitopp/detail/utility/HorribleCast.hpp>
+#include <mockitopp/detail/util/horrible_cast.hpp>
 
 include(`mockitopp/detail/m4/ENUM_BINARY_PARAMS.m4')dnl
 include(`mockitopp/detail/m4/ENUM_PARAMS.m4')dnl

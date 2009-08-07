@@ -5,7 +5,7 @@
 // increase to support more virtual functions
 #define MAX_VIRTUAL_FUNCTIONS 50
 
-#include <mockitopp/detail/mock/MockObjectImpl.hpp>
+#include <mockitopp/detail/stubbing/dynamic_object.hpp>
 #include <mockitopp/matchers/base/any.hpp>
 #include <mockitopp/matchers/base/equal.hpp>
 #include <mockitopp/matchers/base/is_not.hpp>
@@ -20,7 +20,7 @@ namespace mockitopp
     * @author Trevor Pounds
     */
    template <typename T>
-   struct MockObject : protected detail::MockObjectImpl
+   struct MockObject : protected detail::dynamic_object
    {
       /**
        * returns a mock object of the given abstract base class/interface
