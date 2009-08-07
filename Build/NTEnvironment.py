@@ -29,7 +29,11 @@ class Environment(BaseEnvironment.Environment):
          proc.wait()
          version = "".join(proc.stdout.readlines())
 
-         if re.search("Version 13\.10", version):
+         if re.search("Version 12\.00", version):
+            print "Microsoft Visual C++ (6.0) Detected"
+         elif re.search("Version 13\.00", version):
+            print "Microsoft Visual C++ .NET 2002 (7.0) Detected"
+         elif re.search("Version 13\.10", version):
             print "Microsoft Visual C++ .NET 2003 (7.1) Detected"
          elif re.search("Version 14\.00", version):
             print "Microsoft Visual C++ 2005 (8.0) Detected"
