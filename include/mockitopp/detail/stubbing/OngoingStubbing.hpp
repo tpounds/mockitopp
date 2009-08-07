@@ -11,9 +11,9 @@
 #include <mockitopp/detail/stubbing/Returns.hpp>
 #include <mockitopp/detail/stubbing/Throws.hpp>
 #include <mockitopp/detail/stubbing/Verifier.hpp>
-#include <mockitopp/detail/utility/KeyPair.hpp>
-#include <mockitopp/detail/utility/tr1_tuple.hpp>
-#include <mockitopp/detail/utility/tr1_type_traits.hpp>
+#include <mockitopp/detail/util/KeyPair.hpp>
+#include <mockitopp/detail/util/tr1_tuple.hpp>
+#include <mockitopp/detail/util/tr1_type_traits.hpp>
 
 // TODO: add documentation
 namespace mockitopp

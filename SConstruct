@@ -11,10 +11,10 @@ if 'm4-generate' in COMMAND_LINE_TARGETS:
       '-DMOCKITOPP_MAX_VIRTUAL_FUNCTION_ARITY=10',
    ])
    Alias('m4-generate', [
+      env.M4('include/mockitopp/detail/stubbing/dynamic_object.hpp.m4'),
       env.M4('include/mockitopp/detail/stubbing/OngoingStubbing.hpp.m4'),
       env.M4('include/mockitopp/detail/stubbing/Stub.hpp.m4'),
-      env.M4('include/mockitopp/detail/utility/Function.hpp.m4'),
-      env.M4('include/mockitopp/detail/utility/tr1_tuple.hpp.m4')
+      env.M4('include/mockitopp/detail/util/tr1_tuple.hpp.m4')
    ])
 
 test = SConscript('test/SConscript', build_dir='test/build', duplicate=0)

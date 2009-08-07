@@ -1,7 +1,7 @@
 #ifndef __MOCKITOPP_TR1_TUPLE_HPP__
 #define __MOCKITOPP_TR1_TUPLE_HPP__
 
-#include <mockitopp/detail/utility/tr1_type_traits.hpp>
+#include <mockitopp/detail/util/tr1_type_traits.hpp>
 
 include(`mockitopp/detail/m4/ENUM_BINARY_PARAMS.m4')dnl
 include(`mockitopp/detail/m4/ENUM_SHIFTED_PARAMS.m4')dnl

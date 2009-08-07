@@ -11,9 +11,9 @@
 #include <mockitopp/detail/stubbing/Returns.hpp>
 #include <mockitopp/detail/stubbing/Throws.hpp>
 #include <mockitopp/detail/stubbing/Verifier.hpp>
-#include <mockitopp/detail/utility/KeyPair.hpp>
-#include <mockitopp/detail/utility/tr1_tuple.hpp>
-#include <mockitopp/detail/utility/tr1_type_traits.hpp>
+#include <mockitopp/detail/util/KeyPair.hpp>
+#include <mockitopp/detail/util/tr1_tuple.hpp>
+#include <mockitopp/detail/util/tr1_type_traits.hpp>
 
 include(`mockitopp/detail/m4/ENUM_BINARY_PARAMS.m4')dnl
 include(`mockitopp/detail/m4/ENUM_PARAMS.m4')dnl
