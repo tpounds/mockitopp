@@ -51,7 +51,7 @@ namespace mockitopp
       };
 
       template <>
-      struct OngoingStubbingBase<void>
+      struct OngoingStubbingBase<void> : dynamic_vfunction_polymorphic_destructor
       {
          typedef Answer<void>*          answer_type;
          typedef std::list<answer_type> queue_type;

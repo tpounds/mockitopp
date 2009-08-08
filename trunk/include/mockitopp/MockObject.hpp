@@ -1,10 +1,6 @@
 #ifndef __MOCKITOPP_MOCK_OBJECT_HPP__
 #define __MOCKITOPP_MOCK_OBJECT_HPP__
 
-// TODO: deprecate preprocessor macro
-// increase to support more virtual functions
-#define MAX_VIRTUAL_FUNCTIONS 50
-
 #include <mockitopp/detail/stubbing/dynamic_object.hpp>
 #include <mockitopp/matchers/base/any.hpp>
 #include <mockitopp/matchers/base/equal.hpp>
