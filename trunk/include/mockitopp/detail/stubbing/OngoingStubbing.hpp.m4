@@ -6,10 +6,8 @@
 #include <map>
 
 #include <mockitopp/detail/exception/IncompleteImplementationException.hpp>
-#include <mockitopp/detail/stubbing/Answer.hpp>
+#include <mockitopp/detail/stubbing/action.hpp>
 #include <mockitopp/detail/stubbing/MatcherContainer.hpp>
-#include <mockitopp/detail/stubbing/Returns.hpp>
-#include <mockitopp/detail/stubbing/Throws.hpp>
 #include <mockitopp/detail/stubbing/Verifier.hpp>
 #include <mockitopp/detail/util/KeyPair.hpp>
 #include <mockitopp/detail/util/tr1_tuple.hpp>
@@ -31,21 +29,21 @@ namespace mockitopp
       template <typename R>
       struct OngoingStubbingBase : dynamic_vfunction_polymorphic_destructor
       {
-         typedef Answer<R>*             answer_type;
-         typedef std::list<answer_type> queue_type;
+         typedef action<R>*             action_type;
+         typedef std::list<action_type> queue_type;
 
          queue_type* ongoingMatch;
 
          OngoingStubbingBase& thenReturn(R value)
          {
-            ongoingMatch->push_back(new Returns<R>(value));
+            ongoingMatch->push_back(new returnable_action<R>(value));
             return *this;
          }
 
          template <typename T>
          OngoingStubbingBase& thenThrow(T throwable)
          {
-            ongoingMatch->push_back(new Throws<R, T>(throwable));
+            ongoingMatch->push_back(new throwable_action<R, T>(throwable));
             return *this;
          }
       };
@@ -53,21 +51,21 @@ namespace mockitopp
       template <>
       struct OngoingStubbingBase<void> : dynamic_vfunction_polymorphic_destructor
       {
-         typedef Answer<void>*          answer_type;
-         typedef std::list<answer_type> queue_type;
+         typedef action<void>*          action_type;
+         typedef std::list<action_type> queue_type;
 
          queue_type* ongoingMatch;
 
          OngoingStubbingBase& thenReturn()
          {
-            ongoingMatch->push_back(new Returns<void>());
+            ongoingMatch->push_back(new returnable_action<void>());
             return *this;
          }
 
          template <typename T>
          OngoingStubbingBase& thenThrow(T throwable)
          {
-            ongoingMatch->push_back(new Throws<void, T>(throwable));
+            ongoingMatch->push_back(new throwable_action<void, T>(throwable));
             return *this;
          }
       };
@@ -89,29 +87,29 @@ define(`DEFINE_ONGOING_STUBBING', `
             MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A, >::type>::type> ,
                M4_INTERCEPT)> matcher_tuple_type;
 
-         typedef typename OngoingStubbingBase<R>::answer_type answer_type;
+         typedef typename OngoingStubbingBase<R>::action_type action_type;
          typedef typename OngoingStubbingBase<R>::queue_type  queue_type;
 
          //TODO: rename argument lists
-         std::map<tuple_type, queue_type> answerMap;
-         std::list<KeyPair<matcher_tuple_type, queue_type> > answerList;
+         std::map<tuple_type, queue_type> actionMap;
+         std::list<KeyPair<matcher_tuple_type, queue_type> > actionList;
 
          OngoingStubbing()
             : OngoingStubbingBase<R>()
             , Verifier()
-            , answerMap()
-            , answerList()
+            , actionMap()
+            , actionList()
             {}
 
          M4_IF($1, `OngoingStubbing& when(M4_ENUM_BINARY_PARAMS($1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A, >::type>::type>& a))
          {
             matcher_tuple_type arguments = matcher_tuple_type(M4_ENUM_PARAMS($1, a));
             typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-            pair_it = std::find(answerList.begin(), answerList.end(), arguments);
-            if(pair_it == answerList.end())
+            pair_it = std::find(actionList.begin(), actionList.end(), arguments);
+            if(pair_it == actionList.end())
             {
-               answerList.push_back(KeyPair<matcher_tuple_type, queue_type>(arguments, queue_type()));
-               pair_it = --answerList.end();
+               actionList.push_back(KeyPair<matcher_tuple_type, queue_type>(arguments, queue_type()));
+               pair_it = --actionList.end();
             }
             this->ongoingMatch = &(pair_it->value);
             return *this;
@@ -119,7 +117,7 @@ define(`DEFINE_ONGOING_STUBBING', `
 
          OngoingStubbing& when(M4_ENUM_BINARY_PARAMS($1, A, a))
          {
-            this->ongoingMatch = &(answerMap[tuple_type(M4_ENUM_PARAMS($1, a))]);
+            this->ongoingMatch = &(actionMap[tuple_type(M4_ENUM_PARAMS($1, a))]);
             return *this;
          }
 
@@ -127,19 +125,19 @@ define(`DEFINE_ONGOING_STUBBING', `
          {
             this->calls++;
             tuple_type  args    = tuple_type(M4_ENUM_PARAMS($1, a));
-            queue_type& answers = answerMap[args];
-            if(answers.empty())
+            queue_type& actions = actionMap[args];
+            if(actions.empty())
             {
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-               pair_it = std::find(answerList.begin(), answerList.end(), args);
-               if(pair_it == answerList.end())
+               pair_it = std::find(actionList.begin(), actionList.end(), args);
+               if(pair_it == actionList.end())
                   { throw IncompleteImplementationException(); }
-               answers = pair_it->value;
+               actions = pair_it->value;
             }
-            answer_type answer = answers.front();
-            if(answers.size() > 1)
-               { answers.pop_front(); }
-            return answer->execute();
+            action_type action = actions.front();
+            if(actions.size() > 1)
+               { actions.pop_front(); }
+            return action->invoke();
          }
       };
 ')dnl
