@@ -73,15 +73,15 @@ namespace mockitopp
 
       struct dynamic_object
       {
-         struct vtable { void* __vtable[MAX_VIRTUAL_FUNCTIONS]; };
+         struct vtable { void* __vtable[50]; };
 
          vtable* __vptr;
-         void*   __spys[MAX_VIRTUAL_FUNCTIONS];
+         void*   __spys[50];
 
          dynamic_object()
             : __vptr(new vtable)
          {
-            for(int i = 0; i < MAX_VIRTUAL_FUNCTIONS; i++)
+            for(int i = 0; i < 50; i++)
             {
                __vptr->__vtable[i] = horrible_cast<void*>(&dynamic_object::NotImplemented);
                __spys[i] = 0;
@@ -92,7 +92,7 @@ namespace mockitopp
          {
             // delete __vptr->__vtable[i] not necessary, entries point to static addresses
             delete __vptr;
-            for(int i = 0; i < MAX_VIRTUAL_FUNCTIONS; i++)
+            for(int i = 0; i < 50; i++)
             {
                if(__spys[i] != 0)
                   { delete reinterpret_cast<dynamic_vfunction_polymorphic_destructor*>(__spys[i]); }
