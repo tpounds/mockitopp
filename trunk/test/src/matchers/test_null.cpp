@@ -20,7 +20,7 @@ TEST(test_null, prim_int_ptr)
    null_test_interface& obj = mock.getInstance();
 
    ASSERT_EQ("int* == NULL", obj.prim_int_ptr(0));
-   ASSERT_THROW(obj.prim_int_ptr(new int), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.prim_int_ptr(new int), mockitopp::partial_implementation_exception);
 }
 
 TEST(test_null, std_string_ptr)
@@ -30,8 +30,8 @@ TEST(test_null, std_string_ptr)
    null_test_interface& obj = mock.getInstance();
 
    ASSERT_EQ("std::string* == NULL", obj.std_string_ptr(0));
-   ASSERT_THROW(obj.std_string_ptr(new std::string("foo")), mockitopp::detail::IncompleteImplementationException);
-   ASSERT_THROW(obj.std_string_ptr(new std::string("bar")), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.std_string_ptr(new std::string("foo")), mockitopp::partial_implementation_exception);
+   ASSERT_THROW(obj.std_string_ptr(new std::string("bar")), mockitopp::partial_implementation_exception);
 }
 
 TEST(test_null, object_ptr)
@@ -41,5 +41,5 @@ TEST(test_null, object_ptr)
    null_test_interface& obj = mock.getInstance();
 
    ASSERT_EQ("null_test_obj* == NULL", obj.object_ptr(0));
-   ASSERT_THROW(obj.object_ptr(new null_test_object), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.object_ptr(new null_test_object), mockitopp::partial_implementation_exception);
 }

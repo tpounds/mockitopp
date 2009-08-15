@@ -5,7 +5,7 @@
 #include <list>
 #include <map>
 
-#include <mockitopp/detail/exception/IncompleteImplementationException.hpp>
+#include <mockitopp/exceptions.hpp>
 #include <mockitopp/detail/stubbing/action.hpp>
 #include <mockitopp/detail/stubbing/MatcherContainer.hpp>
 #include <mockitopp/detail/stubbing/Verifier.hpp>
@@ -110,7 +110,7 @@ namespace mockitopp
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
                pair_it = std::find(actionList.begin(), actionList.end(), args);
                if(pair_it == actionList.end())
-                  { throw IncompleteImplementationException(); }
+                  { throw partial_implementation_exception(); }
                actions = pair_it->value;
             }
             action_type action = actions.front();
@@ -170,7 +170,7 @@ namespace mockitopp
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
                pair_it = std::find(actionList.begin(), actionList.end(), args);
                if(pair_it == actionList.end())
-                  { throw IncompleteImplementationException(); }
+                  { throw partial_implementation_exception(); }
                actions = pair_it->value;
             }
             action_type action = actions.front();
@@ -230,7 +230,7 @@ namespace mockitopp
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
                pair_it = std::find(actionList.begin(), actionList.end(), args);
                if(pair_it == actionList.end())
-                  { throw IncompleteImplementationException(); }
+                  { throw partial_implementation_exception(); }
                actions = pair_it->value;
             }
             action_type action = actions.front();
@@ -290,7 +290,7 @@ namespace mockitopp
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
                pair_it = std::find(actionList.begin(), actionList.end(), args);
                if(pair_it == actionList.end())
-                  { throw IncompleteImplementationException(); }
+                  { throw partial_implementation_exception(); }
                actions = pair_it->value;
             }
             action_type action = actions.front();
@@ -350,7 +350,7 @@ namespace mockitopp
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
                pair_it = std::find(actionList.begin(), actionList.end(), args);
                if(pair_it == actionList.end())
-                  { throw IncompleteImplementationException(); }
+                  { throw partial_implementation_exception(); }
                actions = pair_it->value;
             }
             action_type action = actions.front();
@@ -410,7 +410,7 @@ namespace mockitopp
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
                pair_it = std::find(actionList.begin(), actionList.end(), args);
                if(pair_it == actionList.end())
-                  { throw IncompleteImplementationException(); }
+                  { throw partial_implementation_exception(); }
                actions = pair_it->value;
             }
             action_type action = actions.front();
@@ -470,7 +470,7 @@ namespace mockitopp
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
                pair_it = std::find(actionList.begin(), actionList.end(), args);
                if(pair_it == actionList.end())
-                  { throw IncompleteImplementationException(); }
+                  { throw partial_implementation_exception(); }
                actions = pair_it->value;
             }
             action_type action = actions.front();
@@ -530,7 +530,7 @@ namespace mockitopp
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
                pair_it = std::find(actionList.begin(), actionList.end(), args);
                if(pair_it == actionList.end())
-                  { throw IncompleteImplementationException(); }
+                  { throw partial_implementation_exception(); }
                actions = pair_it->value;
             }
             action_type action = actions.front();
@@ -590,7 +590,7 @@ namespace mockitopp
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
                pair_it = std::find(actionList.begin(), actionList.end(), args);
                if(pair_it == actionList.end())
-                  { throw IncompleteImplementationException(); }
+                  { throw partial_implementation_exception(); }
                actions = pair_it->value;
             }
             action_type action = actions.front();
@@ -650,7 +650,7 @@ namespace mockitopp
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
                pair_it = std::find(actionList.begin(), actionList.end(), args);
                if(pair_it == actionList.end())
-                  { throw IncompleteImplementationException(); }
+                  { throw partial_implementation_exception(); }
                actions = pair_it->value;
             }
             action_type action = actions.front();
@@ -710,7 +710,7 @@ namespace mockitopp
                typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
                pair_it = std::find(actionList.begin(), actionList.end(), args);
                if(pair_it == actionList.end())
-                  { throw IncompleteImplementationException(); }
+                  { throw partial_implementation_exception(); }
                actions = pair_it->value;
             }
             action_type action = actions.front();

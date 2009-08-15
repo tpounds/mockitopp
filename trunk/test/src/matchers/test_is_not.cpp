@@ -20,7 +20,7 @@ TEST(test_is_not, is_not_null_ptr)
 
    ASSERT_EQ("void* != NULL", obj.prim_void_ptr(new char));
    ASSERT_EQ("void* != NULL", obj.prim_void_ptr(new double));
-   ASSERT_THROW(obj.prim_void_ptr(0), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.prim_void_ptr(0), mockitopp::partial_implementation_exception);
 }
 
 TEST(test_is_not, is_not_is_not_equal_ptr)
@@ -31,5 +31,5 @@ TEST(test_is_not, is_not_is_not_equal_ptr)
    is_not_test_interface& obj = mock.getInstance();
 
    ASSERT_EQ("void* == new char", obj.prim_void_ptr(void_ptr));
-   ASSERT_THROW(obj.prim_void_ptr(0), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.prim_void_ptr(0), mockitopp::partial_implementation_exception);
 }

@@ -1,7 +1,7 @@
 #ifndef __MOCKITOPP_MOCK_OBJECT_IMPL_HPP__
 #define __MOCKITOPP_MOCK_OBJECT_IMPL_HPP__
 
-#include <mockitopp/detail/exception/NotImplementedException.hpp>
+#include <mockitopp/exceptions.hpp>
 #include <mockitopp/detail/stubbing/OngoingStubbing.hpp>
 #include <mockitopp/detail/stubbing/Stub.hpp>
 
@@ -37,7 +37,7 @@ M4_REPEAT(MOCKITOPP_MAX_VIRTUAL_FUNCTIONS, `VFUNCTION_OFFSET_HELPER_METHOD')dnl
          {
             for(int i = 0; i < MOCKITOPP_MAX_VIRTUAL_FUNCTIONS; i++)
             {
-               __vptr->__vtable[i] = horrible_cast<void*>(&dynamic_object::NotImplemented);
+               __vptr->__vtable[i] = horrible_cast<void*>(&dynamic_object::missing_vfunction);
                __spys[i] = 0;
             }
          }
@@ -65,8 +65,8 @@ M4_REPEAT(MOCKITOPP_MAX_VIRTUAL_FUNCTIONS, `VFUNCTION_OFFSET_HELPER_METHOD')dnl
             return *reinterpret_cast<OngoingStubbing<M>*>(__spys[offset]);
          }
 
-         void NotImplemented()
-            { throw NotImplementedException(); }
+         void missing_vfunction()
+            { throw missing_implementation_exception(); }
       };
    } // namespace detail
 } // namespace mockitopp
