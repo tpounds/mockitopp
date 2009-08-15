@@ -22,7 +22,7 @@ TEST(test_equal, equal_void_ptr)
 
    ASSERT_EQ(0, obj.prim_void_ptr(0));
    ASSERT_EQ(1, obj.prim_void_ptr(void_ptr));
-   ASSERT_THROW(obj.prim_void_ptr(new int), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.prim_void_ptr(new int), mockitopp::partial_implementation_exception);
 }
 
 TEST(test_equal, equal_prim_char)
@@ -36,9 +36,9 @@ TEST(test_equal, equal_prim_char)
    ASSERT_EQ(32, obj.prim_char(' '));
    ASSERT_EQ(48, obj.prim_char('0'));
    ASSERT_EQ(65, obj.prim_char('A'));
-   ASSERT_THROW(obj.prim_char('@'), mockitopp::detail::IncompleteImplementationException);
-   ASSERT_THROW(obj.prim_char('9'), mockitopp::detail::IncompleteImplementationException);
-   ASSERT_THROW(obj.prim_char('Z'), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.prim_char('@'), mockitopp::partial_implementation_exception);
+   ASSERT_THROW(obj.prim_char('9'), mockitopp::partial_implementation_exception);
+   ASSERT_THROW(obj.prim_char('Z'), mockitopp::partial_implementation_exception);
 }
 
 TEST(test_equal, equal_std_string)
@@ -52,7 +52,7 @@ TEST(test_equal, equal_std_string)
    ASSERT_EQ(0, obj.std_string("foo"));
    ASSERT_EQ(1, obj.std_string("w00t"));
    ASSERT_EQ(2, obj.std_string("hello"));
-   ASSERT_THROW(obj.std_string("ABCDEFXYZ"), mockitopp::detail::IncompleteImplementationException);
-   ASSERT_THROW(obj.std_string("124356789"), mockitopp::detail::IncompleteImplementationException);
-   ASSERT_THROW(obj.std_string("!@#$%^&*("), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.std_string("ABCDEFXYZ"), mockitopp::partial_implementation_exception);
+   ASSERT_THROW(obj.std_string("124356789"), mockitopp::partial_implementation_exception);
+   ASSERT_THROW(obj.std_string("!@#$%^&*("), mockitopp::partial_implementation_exception);
 }

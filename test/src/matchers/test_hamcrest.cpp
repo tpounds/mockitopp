@@ -33,8 +33,8 @@ TEST(test_hamcrest, all_of)
    ASSERT_EQ("is_not_foo__is_not_bar__is_not_abc", obj.hc_test("beef"));
    ASSERT_EQ("is_not_foo__is_not_bar__is_not_abc", obj.hc_test("Hello World!"));
    ASSERT_EQ("is_foo__is_not_bar", obj.hc_test("foo"));
-   ASSERT_THROW(obj.hc_test("bar"), mockitopp::detail::IncompleteImplementationException);
-   ASSERT_THROW(obj.hc_test("abc"), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.hc_test("bar"), mockitopp::partial_implementation_exception);
+   ASSERT_THROW(obj.hc_test("abc"), mockitopp::partial_implementation_exception);
 }
 
 TEST(test_hamcrest, any_of)
@@ -51,7 +51,7 @@ TEST(test_hamcrest, any_of)
    ASSERT_EQ("is_123__is_not_890", obj.hc_test("456"));
    ASSERT_EQ("is_123__is_not_890", obj.hc_test("foobar"));
    ASSERT_EQ("is_123__is_not_890", obj.hc_test("abcdefghijklmnopqrstuvwxyz"));
-   ASSERT_THROW(obj.hc_test("890"), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.hc_test("890"), mockitopp::partial_implementation_exception);
 }
 
 TEST(test_hamcrest, anything)
@@ -73,7 +73,7 @@ TEST(test_hamcrest, equal_to)
    hc_interface& obj = mock.getInstance();
 
    ASSERT_EQ("equal_to_foo", obj.hc_test("foo"));
-   ASSERT_THROW(obj.hc_test("bar"), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.hc_test("bar"), mockitopp::partial_implementation_exception);
 }
 
 TEST(test_hamcrest, is)
@@ -83,8 +83,8 @@ TEST(test_hamcrest, is)
    hc_interface& obj = mock.getInstance();
 
    ASSERT_EQ("is_foo", obj.hc_test("foo"));
-   ASSERT_THROW(obj.hc_test("abc"), mockitopp::detail::IncompleteImplementationException);
-   ASSERT_THROW(obj.hc_test("bar"), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.hc_test("abc"), mockitopp::partial_implementation_exception);
+   ASSERT_THROW(obj.hc_test("bar"), mockitopp::partial_implementation_exception);
 }
 
 TEST(test_hamcrest, is_not)
@@ -95,7 +95,7 @@ TEST(test_hamcrest, is_not)
 
    ASSERT_EQ("is_not_foo", obj.hc_test("abc"));
    ASSERT_EQ("is_not_foo", obj.hc_test("bar"));
-   ASSERT_THROW(obj.hc_test("foo"), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.hc_test("foo"), mockitopp::partial_implementation_exception);
 }
 
 /* FIXME: broken?
@@ -108,7 +108,7 @@ TEST(test_hamcrest, same_instance)
    hc_interface& obj = mock.getInstance();
 
    ASSERT_EQ("same foo instance", obj.hc_test(argument));
-   ASSERT_THROW(obj.hc_test("foo"), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.hc_test("foo"), mockitopp::partial_implementation_exception);
 }*/
 
 // TODO: shortcut combination

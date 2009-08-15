@@ -20,7 +20,7 @@ TEST(test_string_literal, char_ptr)
 
    ASSERT_EQ(0, obj.char_ptr("FOO"));
    ASSERT_EQ(1, obj.char_ptr("BAR"));
-   ASSERT_THROW(obj.char_ptr("NO MATCH"), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.char_ptr("NO MATCH"), mockitopp::partial_implementation_exception);
 }
 
 TEST(test_string_literal, const_char_ptr)
@@ -32,5 +32,5 @@ TEST(test_string_literal, const_char_ptr)
 
    ASSERT_EQ(0, obj.const_char_ptr("1234567890"));
    ASSERT_EQ(1, obj.const_char_ptr("!@$#"));
-   ASSERT_THROW(obj.const_char_ptr("NO MATCH"), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.const_char_ptr("NO MATCH"), mockitopp::partial_implementation_exception);
 }

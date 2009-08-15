@@ -29,7 +29,7 @@ TEST(TestArguments, PlainOleDataTypes)
    ASSERT_EQ(2, i.__int(0));
    ASSERT_EQ(2, i.__int(0));
    ASSERT_EQ(2, i.__int(0));
-   ASSERT_THROW(i.__int(999), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(i.__int(999), mockitopp::partial_implementation_exception);
    ASSERT_TRUE(m(&PlainOleDataTypes::__int).exactly(10));
 
    ASSERT_EQ(false, i.__bool(true));
@@ -38,6 +38,6 @@ TEST(TestArguments, PlainOleDataTypes)
 
    ASSERT_EQ('Z', i.__char('A'));
    ASSERT_EQ('0', i.__char('Z'));
-   ASSERT_THROW(i.__char('B'), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(i.__char('B'), mockitopp::partial_implementation_exception);
    ASSERT_TRUE(m(&PlainOleDataTypes::__char).exactly(3));
 }

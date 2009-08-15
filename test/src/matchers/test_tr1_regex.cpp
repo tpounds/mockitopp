@@ -24,8 +24,8 @@ TEST(test_regex, const_char)
    ASSERT_EQ("matches__.*foo.*", obj.const_char_s("foo"));
    ASSERT_EQ("matches__.*bar.*", obj.const_char_s("bar"));
    ASSERT_EQ("matches__[A-Z]*",  obj.const_char_s("ABCDEFGHIKLMNOPQRSTUVWXYZ"));
-   ASSERT_THROW(obj.const_char_s("FOO-BAR"),    mockitopp::detail::IncompleteImplementationException);
-   ASSERT_THROW(obj.const_char_s("1234567890"), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.const_char_s("FOO-BAR"),    mockitopp::partial_implementation_exception);
+   ASSERT_THROW(obj.const_char_s("1234567890"), mockitopp::partial_implementation_exception);
 }
 
 TEST(test_regex, std_string)
@@ -39,8 +39,8 @@ TEST(test_regex, std_string)
    ASSERT_EQ("matches__.*foo.*", obj.std_string("foo"));
    ASSERT_EQ("matches__.*bar.*", obj.std_string("bar"));
    ASSERT_EQ("matches__[A-Z]*",  obj.std_string("ABCDEFGHIKLMNOPQRSTUVWXYZ"));
-   ASSERT_THROW(obj.std_string("FOO-BAR"),    mockitopp::detail::IncompleteImplementationException);
-   ASSERT_THROW(obj.std_string("1234567890"), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.std_string("FOO-BAR"),    mockitopp::partial_implementation_exception);
+   ASSERT_THROW(obj.std_string("1234567890"), mockitopp::partial_implementation_exception);
 }
 
 TEST(test_regex, composite)
@@ -56,6 +56,6 @@ TEST(test_regex, composite)
    ASSERT_EQ("matches__.*FOO.*__.*BAR.*", obj.composite("FOO", "BAR"));
    ASSERT_EQ("matches__.*FOO.*__.*BAR.*", obj.composite("FOOTLONG SANDWICH", "BARLEY SOUP"));
    ASSERT_EQ("matches__[a-z]*__[A-Z]*",   obj.composite("abcdefghijklmnopqrstuvwxyz", "ABCDEFGHIKLMNOPQRSTUVWXYZ"));
-   ASSERT_THROW(obj.composite("foo", "abcdefghij"), mockitopp::detail::IncompleteImplementationException);
-   ASSERT_THROW(obj.composite("1234567890", "bar"), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.composite("foo", "abcdefghij"), mockitopp::partial_implementation_exception);
+   ASSERT_THROW(obj.composite("1234567890", "bar"), mockitopp::partial_implementation_exception);
 }

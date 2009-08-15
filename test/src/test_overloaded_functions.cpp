@@ -25,13 +25,13 @@ TEST(test_overloaded_functions, foo)
    overloaded_interface& obj = mock.getInstance();
 
    ASSERT_EQ(0, obj.foo(true));
-   ASSERT_THROW(obj.foo(false), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.foo(false), mockitopp::partial_implementation_exception);
    ASSERT_EQ(0, obj.foo('A'));
    ASSERT_EQ(1, obj.foo('%'));
-   ASSERT_THROW(obj.foo('#'), mockitopp::detail::IncompleteImplementationException);
+   ASSERT_THROW(obj.foo('#'), mockitopp::partial_implementation_exception);
 //   ASSERT_EQ(50, obj.foo("bar"));
 //   ASSERT_EQ(10, obj.foo("hello"));
-//   ASSERT_THROW(obj.foo("!@#$%"), mockitopp::detail::IncompleteImplementationException);
+//   ASSERT_THROW(obj.foo("!@#$%"), mockitopp::partial_implementation_exception);
 
    ASSERT_TRUE(mock(static_cast<int (overloaded_interface::*)(bool)>(&overloaded_interface::foo)).exactly(2));
    ASSERT_TRUE(mock(static_cast<int (overloaded_interface::*)(char)>(&overloaded_interface::foo)).exactly(3));
