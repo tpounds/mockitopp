@@ -1,7 +1,7 @@
 #ifndef __MOCKITOPP_STUB_HPP__
 #define __MOCKITOPP_STUB_HPP__
 
-#include <mockitopp/detail/stubbing/OngoingStubbing.hpp>
+#include <mockitopp/detail/stubbing/dynamic_vfunction.hpp>
 #include <mockitopp/detail/util/horrible_cast.hpp>
 
 include(`mockitopp/detail/m4/ENUM_BINARY_PARAMS.m4')dnl

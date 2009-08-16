@@ -2,8 +2,8 @@
 #define __MOCKITOPP_MOCK_OBJECT_IMPL_HPP__
 
 #include <mockitopp/exceptions.hpp>
-#include <mockitopp/detail/stubbing/OngoingStubbing.hpp>
-#include <mockitopp/detail/stubbing/Stub.hpp>
+#include <mockitopp/detail/stubbing/dynamic_vfunction.hpp>
+#include <mockitopp/detail/stubbing/proxy_vfunction.hpp>
 
 // TODO: add documentation
 namespace mockitopp

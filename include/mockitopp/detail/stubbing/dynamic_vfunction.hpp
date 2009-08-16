@@ -1,5 +1,5 @@
-#ifndef __MOCKITOPP_ONGOING_STUBBING_HPP__
-#define __MOCKITOPP_ONGOING_STUBBING_HPP__
+#ifndef __MOCKITOPP_DYNAMIC_VFUNCTION_HPP__
+#define __MOCKITOPP_DYNAMIC_VFUNCTION_HPP__
 
 #include <algorithm>
 #include <list>
@@ -722,4 +722,4 @@ namespace mockitopp
    } // namespace detail
 } // namespace mockitopp
 
-#endif //__MOCKITOPP_ONGOING_STUBBING_HPP__
+#endif //__MOCKITOPP_DYNAMIC_VFUNCTION_HPP__
