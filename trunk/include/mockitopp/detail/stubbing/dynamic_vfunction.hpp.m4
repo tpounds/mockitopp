@@ -1,5 +1,5 @@
-#ifndef __MOCKITOPP_ONGOING_STUBBING_HPP__
-#define __MOCKITOPP_ONGOING_STUBBING_HPP__
+#ifndef __MOCKITOPP_DYNAMIC_VFUNCTION_HPP__
+#define __MOCKITOPP_DYNAMIC_VFUNCTION_HPP__
 
 #include <algorithm>
 #include <list>
@@ -146,4 +146,4 @@ M4_REPEAT(eval(MOCKITOPP_MAX_VIRTUAL_FUNCTION_ARITY + 1), `DEFINE_ONGOING_STUBBI
    } // namespace detail
 } // namespace mockitopp
 
-#endif //__MOCKITOPP_ONGOING_STUBBING_HPP__
+#endif //__MOCKITOPP_DYNAMIC_VFUNCTION_HPP__
