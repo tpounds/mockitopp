@@ -1,5 +1,5 @@
-#ifndef __MOCKITOPP_STUB_HPP__
-#define __MOCKITOPP_STUB_HPP__
+#ifndef __MOCKITOPP_PROXY_VFUNCTION_HPP__
+#define __MOCKITOPP_PROXY_VFUNCTION_HPP__
 
 #include <mockitopp/detail/stubbing/dynamic_vfunction.hpp>
 #include <mockitopp/detail/util/horrible_cast.hpp>
@@ -12,14 +12,14 @@ namespace mockitopp
 {
    namespace detail
    {
-      template <int OFFSET, typename T> struct StubImpl;
+      template <int OFFSET, typename T> struct proxy_vfunction;
 
-define(`DEFINE_STUB_IMPL',
+define(`DEFINE_PROXY_VFUNCTION',
 `     template <int OFFSET, typename R, typename C M4_ENUM_TRAILING_PARAMS($1, typename A)>
-      struct StubImpl<OFFSET, R (C::*)(M4_ENUM_PARAMS($1, A))>
+      struct proxy_vfunction<OFFSET, R (C::*)(M4_ENUM_PARAMS($1, A))>
       {
          void* __PAD_FOR_MOCK_vptr;
-         OngoingStubbing<R (C::*)(M4_ENUM_PARAMS($1, A))>*
+         dynamic_vfunction<R (C::*)(M4_ENUM_PARAMS($1, A))>*
             __PAD_FOR_MOCK_spys[MOCKITOPP_MAX_VIRTUAL_FUNCTIONS];
 
          R invoke(M4_ENUM_BINARY_PARAMS($1, A, a))
@@ -28,22 +28,22 @@ define(`DEFINE_STUB_IMPL',
 
 ')dnl
 dnl add one to max arity so we generate 0 argument case
-M4_REPEAT(eval(MOCKITOPP_MAX_VIRTUAL_FUNCTION_ARITY + 1), `DEFINE_STUB_IMPL')dnl
+M4_REPEAT(eval(MOCKITOPP_MAX_VIRTUAL_FUNCTION_ARITY + 1), `DEFINE_PROXY_VFUNCTION')dnl
 
       template <typename M>
-      struct Stub
+      struct proxy_vfunction_factory
       {
-         static void* getInstance(M ptr2member)
+         static void* get(M ptr2member)
          {
-            Stub s;
-            return (s.*reinterpret_cast<void* (Stub::*)()>(ptr2member))();
+            proxy_vfunction_factory s;
+            return (s.*reinterpret_cast<void* (proxy_vfunction_factory::*)()>(ptr2member))();
          }
 
-define(`DEFINE_DYNAMIC_INVOKE_PROXY', `        virtual void* invoke_proxy$1() { return horrible_cast<void*>(&StubImpl<$1, M>::invoke); }
+define(`DEFINE_PROXY_VFUNCTION_FACTORY_OFFSET_FUNCTION', `        virtual void* offset$1() { return horrible_cast<void*>(&proxy_vfunction<$1, M>::invoke); }
 ')dnl
-M4_REPEAT(MOCKITOPP_MAX_VIRTUAL_FUNCTIONS, `DEFINE_DYNAMIC_INVOKE_PROXY')dnl
+M4_REPEAT(MOCKITOPP_MAX_VIRTUAL_FUNCTIONS, `DEFINE_PROXY_VFUNCTION_FACTORY_OFFSET_FUNCTION')dnl
       };
    } // namespace detail
 } // namespace mockitopp
 
-#endif //__MOCKITOPP_STUB_HPP__
+#endif //__MOCKITOPP_PROXY_VFUNCTION_HPP__

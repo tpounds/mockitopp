@@ -1,22 +1,24 @@
-#ifndef __MOCKITOPP_MOCK_OBJECT_IMPL_HPP__
-#define __MOCKITOPP_MOCK_OBJECT_IMPL_HPP__
+#ifndef __MOCKITOPP_DYNAMIC_OBJECT_HPP__
+#define __MOCKITOPP_DYNAMIC_OBJECT_HPP__
 
 #include <mockitopp/exceptions.hpp>
 #include <mockitopp/detail/stubbing/dynamic_vfunction.hpp>
 #include <mockitopp/detail/stubbing/proxy_vfunction.hpp>
 
-// TODO: add documentation
 namespace mockitopp
 {
    namespace detail
    {
-      struct vfunction_offset_helper
+      /**
+       * helper class to find the vtable offset given a member function pointer
+       */
+      struct vtable_offset_helper
       {
          template <typename T>
          static int get(T ptr2member)
          {
-            vfunction_offset_helper f;
-            return (f.*reinterpret_cast<int (vfunction_offset_helper::*)()>(ptr2member))();
+            vtable_offset_helper f;
+            return (f.*reinterpret_cast<int (vtable_offset_helper::*)()>(ptr2member))();
          }
 
          virtual int offset0() { return 0; }
@@ -71,6 +73,9 @@ namespace mockitopp
          virtual int offset49() { return 49; }
       };
 
+      /**
+       * implementation class for pseduo-dynamically defining an interface
+       */
       struct dynamic_object
       {
          struct vtable { void* __vtable[50]; };
@@ -90,7 +95,7 @@ namespace mockitopp
 
          ~dynamic_object()
          {
-            // delete __vptr->__vtable[i] not necessary, entries point to static addresses
+            // delete __vptr->__vtable[i] not necessary, entries point to statically defined functions
             delete __vptr;
             for(int i = 0; i < 50; i++)
             {
@@ -100,15 +105,15 @@ namespace mockitopp
          }
 
          template <typename M>
-         OngoingStubbing<M>& beginStubbing(M ptr2member)
+         dynamic_vfunction<M>& define_function(M ptr2member)
          {
-            int offset = vfunction_offset_helper::get(ptr2member);
+            int offset = vtable_offset_helper::get(ptr2member);
             if(__spys[offset] == 0)
             {
-               __vptr->__vtable[offset] = Stub<M>::getInstance(ptr2member);
-               __spys[offset] = new OngoingStubbing<M>();
+               __vptr->__vtable[offset] = proxy_vfunction_factory<M>::get(ptr2member);
+               __spys[offset] = new dynamic_vfunction<M>();
             }
-            return *reinterpret_cast<OngoingStubbing<M>*>(__spys[offset]);
+            return *reinterpret_cast<dynamic_vfunction<M>*>(__spys[offset]);
          }
 
          void missing_vfunction()
@@ -117,4 +122,4 @@ namespace mockitopp
    } // namespace detail
 } // namespace mockitopp
 
-#endif //__MOCKITOPP_MOCK_OBJECT_IMPL_HPP__
+#endif //__MOCKITOPP_DYNAMIC_OBJECT_HPP__
