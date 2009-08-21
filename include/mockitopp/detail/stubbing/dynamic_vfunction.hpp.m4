@@ -27,21 +27,21 @@ namespace mockitopp
       struct dynamic_vfunction_polymorphic_destructor { virtual ~dynamic_vfunction_polymorphic_destructor() {} };
 
       template <typename R>
-      struct OngoingStubbingBase : dynamic_vfunction_polymorphic_destructor
+      struct dynamic_vfunction_base : dynamic_vfunction_polymorphic_destructor
       {
          typedef action<R>*             action_type;
-         typedef std::list<action_type> queue_type;
+         typedef std::list<action_type> action_queue_type;
 
-         queue_type* ongoingMatch;
+         action_queue_type* ongoingMatch;
 
-         OngoingStubbingBase& thenReturn(R value)
+         dynamic_vfunction_base& thenReturn(R value)
          {
             ongoingMatch->push_back(new returnable_action<R>(value));
             return *this;
          }
 
          template <typename T>
-         OngoingStubbingBase& thenThrow(T throwable)
+         dynamic_vfunction_base& thenThrow(T throwable)
          {
             ongoingMatch->push_back(new throwable_action<R, T>(throwable));
             return *this;
@@ -49,88 +49,88 @@ namespace mockitopp
       };
 
       template <>
-      struct OngoingStubbingBase<void> : dynamic_vfunction_polymorphic_destructor
+      struct dynamic_vfunction_base<void> : dynamic_vfunction_polymorphic_destructor
       {
          typedef action<void>*          action_type;
-         typedef std::list<action_type> queue_type;
+         typedef std::list<action_type> action_queue_type;
 
-         queue_type* ongoingMatch;
+         action_queue_type* ongoingMatch;
 
-         OngoingStubbingBase& thenReturn()
+         dynamic_vfunction_base& thenReturn()
          {
             ongoingMatch->push_back(new returnable_action<void>());
             return *this;
          }
 
          template <typename T>
-         OngoingStubbingBase& thenThrow(T throwable)
+         dynamic_vfunction_base& thenThrow(T throwable)
          {
             ongoingMatch->push_back(new throwable_action<void, T>(throwable));
             return *this;
          }
       };
 
-      template <typename T> struct OngoingStubbing;
+      template <typename T> struct dynamic_vfunction;
 
       // TODO: clean up impl
       // TODO: add sequence matcher
 
       //TODO: clean up typedef nomenclature
-define(`DEFINE_ONGOING_STUBBING', `
+define(`DEFINE_DYNAMIC_VFUNCTION', `
+      // $1 arity template
       template <typename R, typename C`'M4_ENUM_TRAILING_PARAMS($1, typename A)>
-      struct OngoingStubbing<R (C::*)(M4_ENUM_PARAMS($1, A))> : public OngoingStubbingBase<R>, public Verifier
+      struct dynamic_vfunction<R (C::*)(M4_ENUM_PARAMS($1, A))> : public dynamic_vfunction_base<R>, public Verifier
       {
          typedef tr1::tuple<M4_ENUM_BINARY_PARAMS($1,
             typename tr1::remove_const<typename tr1::remove_reference<A, >::type>::type,
-               M4_INTERCEPT)> tuple_type;
+               M4_INTERCEPT)> raw_tuple_type;
          typedef tr1::tuple<M4_ENUM_BINARY_PARAMS($1,
             MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A, >::type>::type> ,
                M4_INTERCEPT)> matcher_tuple_type;
 
-         typedef typename OngoingStubbingBase<R>::action_type action_type;
-         typedef typename OngoingStubbingBase<R>::queue_type  queue_type;
+         typedef typename dynamic_vfunction_base<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
 
-         //TODO: rename argument lists
-         std::map<tuple_type, queue_type> actionMap;
-         std::list<KeyPair<matcher_tuple_type, queue_type> > actionList;
+         std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
+         std::list<KeyPair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
-         OngoingStubbing()
-            : OngoingStubbingBase<R>()
+         dynamic_vfunction()
+            : dynamic_vfunction_base<R>()
             , Verifier()
-            , actionMap()
-            , actionList()
+            , raw_actions_map()
+            , matcher_actions_map()
             {}
 
-         M4_IF($1, `OngoingStubbing& when(M4_ENUM_BINARY_PARAMS($1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A, >::type>::type>& a))
+         M4_IF($1, `dynamic_vfunction& when(M4_ENUM_BINARY_PARAMS($1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A, >::type>::type>& a))
          {
-            matcher_tuple_type arguments = matcher_tuple_type(M4_ENUM_PARAMS($1, a));
-            typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-            pair_it = std::find(actionList.begin(), actionList.end(), arguments);
-            if(pair_it == actionList.end())
+            matcher_tuple_type args = matcher_tuple_type(M4_ENUM_PARAMS($1, a));
+            typename std::list<KeyPair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
+            pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
+            if(pair_it == matcher_actions_map.end())
             {
-               actionList.push_back(KeyPair<matcher_tuple_type, queue_type>(arguments, queue_type()));
-               pair_it = --actionList.end();
+               matcher_actions_map.push_back(KeyPair<matcher_tuple_type, action_queue_type>(args, action_queue_type()));
+               pair_it = --matcher_actions_map.end();
             }
             this->ongoingMatch = &(pair_it->value);
             return *this;
          }',)
 
-         OngoingStubbing& when(M4_ENUM_BINARY_PARAMS($1, A, a))
+         dynamic_vfunction& when(M4_ENUM_BINARY_PARAMS($1, A, a))
          {
-            this->ongoingMatch = &(actionMap[tuple_type(M4_ENUM_PARAMS($1, a))]);
+            this->ongoingMatch = &(raw_actions_map[raw_tuple_type(M4_ENUM_PARAMS($1, a))]);
             return *this;
          }
 
          R invoke(M4_ENUM_BINARY_PARAMS($1, A, a))
          {
             this->calls++;
-            tuple_type  args    = tuple_type(M4_ENUM_PARAMS($1, a));
-            queue_type& actions = actionMap[args];
+            raw_tuple_type     args    = raw_tuple_type(M4_ENUM_PARAMS($1, a));
+            action_queue_type& actions = raw_actions_map[args];
             if(actions.empty())
             {
-               typename std::list<KeyPair<matcher_tuple_type, queue_type> >::iterator pair_it;
-               pair_it = std::find(actionList.begin(), actionList.end(), args);
-               if(pair_it == actionList.end())
+               typename std::list<KeyPair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
+               pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
+               if(pair_it == matcher_actions_map.end())
                   { throw partial_implementation_exception(); }
                actions = pair_it->value;
             }
@@ -142,7 +142,7 @@ define(`DEFINE_ONGOING_STUBBING', `
       };
 ')dnl
 dnl add one to max arity so we generate 0 argument case
-M4_REPEAT(eval(MOCKITOPP_MAX_VIRTUAL_FUNCTION_ARITY + 1), `DEFINE_ONGOING_STUBBING')dnl
+M4_REPEAT(eval(MOCKITOPP_MAX_VIRTUAL_FUNCTION_ARITY + 1), `DEFINE_DYNAMIC_VFUNCTION')dnl
    } // namespace detail
 } // namespace mockitopp
 

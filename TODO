@@ -7,3 +7,4 @@
 * add additional matchers
 * add pseudo-lambda function support
 * add equal matcher tolerance for floating point types
+* support multiple inheritance
