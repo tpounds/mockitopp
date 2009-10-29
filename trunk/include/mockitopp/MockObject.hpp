@@ -32,7 +32,7 @@ namespace mockitopp
        * @param ptr2member method to be stubbed
        */
       template <typename M>
-      detail::dynamic_vfunction<M>& operator() (M ptr2member)
+      detail::dynamic_vfunction<typename detail::remove_member_function_pointer_cv<M>::type>& operator() (M ptr2member)
          { return define_function(ptr2member); }
    };
 } // namespace mockitopp

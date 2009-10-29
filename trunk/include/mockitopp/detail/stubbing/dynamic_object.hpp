@@ -4,6 +4,7 @@
 #include <mockitopp/exceptions.hpp>
 #include <mockitopp/detail/stubbing/dynamic_vfunction.hpp>
 #include <mockitopp/detail/stubbing/proxy_vfunction.hpp>
+#include <mockitopp/detail/util/remove_member_function_pointer_cv.hpp>
 
 namespace mockitopp
 {
@@ -105,15 +106,15 @@ namespace mockitopp
          }
 
          template <typename M>
-         dynamic_vfunction<M>& define_function(M ptr2member)
+         dynamic_vfunction<typename remove_member_function_pointer_cv<M>::type>& define_function(M ptr2member)
          {
             int offset = vtable_offset_helper::get(ptr2member);
             if(__spys[offset] == 0)
             {
                __vptr->__vtable[offset] = proxy_vfunction_factory<M>::get(ptr2member);
-               __spys[offset] = new dynamic_vfunction<M>();
+               __spys[offset] = new dynamic_vfunction<typename remove_member_function_pointer_cv<M>::type>();
             }
-            return *reinterpret_cast<dynamic_vfunction<M>*>(__spys[offset]);
+            return *reinterpret_cast<dynamic_vfunction<typename remove_member_function_pointer_cv<M>::type>*>(__spys[offset]);
          }
 
          void missing_vfunction()

@@ -14,6 +14,7 @@ if 'm4-generate' in COMMAND_LINE_TARGETS:
       env.M4('include/mockitopp/detail/stubbing/dynamic_object.hpp.m4'),
       env.M4('include/mockitopp/detail/stubbing/dynamic_vfunction.hpp.m4'),
       env.M4('include/mockitopp/detail/stubbing/proxy_vfunction.hpp.m4'),
+      env.M4('include/mockitopp/detail/util/remove_member_function_pointer_cv.hpp.m4'),
       env.M4('include/mockitopp/detail/util/tr1_tuple.hpp.m4')
    ])
 
