@@ -8,6 +8,7 @@ TEST_SRC = [
    'src/TestSimpleComposite.cpp',
 
    'src/test_iterator_style.cpp',
+   'src/test_mfp_cv.cpp',
    'src/test_multiple_inheritance.cpp',
    'src/test_overloaded_functions.cpp',
    'src/test_verify.cpp',
@@ -22,7 +23,7 @@ TEST_SRC = [
 ]
 testenv.AppendUnique(CPPPATH = ['#include'])
 testenv.AppendUnique(CPPPATH = ['#3rdparty/boost_1_36_0/include'])
-testenv.AppendUnique(CPPPATH = ['#3rdparty/googletest-1.3.0/include'])
+testenv.AppendUnique(CPPPATH = ['#3rdparty/googletest-1.4.0/include'])
 testenv.AppendUnique(CPPPATH = ['#3rdparty/hamcrest-r389/core'])
 testenv.AppendUnique(LIBPATH = ['#3rdparty/build'])
 testenv.AppendUnique(LIBS = ['boost-regex'])

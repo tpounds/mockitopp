@@ -3,6 +3,7 @@
 
 #include <mockitopp/detail/stubbing/dynamic_vfunction.hpp>
 #include <mockitopp/detail/util/horrible_cast.hpp>
+#include <mockitopp/detail/util/remove_member_function_pointer_cv.hpp>
 
 include(`mockitopp/detail/m4/ENUM_BINARY_PARAMS.m4')dnl
 include(`mockitopp/detail/m4/ENUM_PARAMS.m4')dnl
@@ -39,7 +40,7 @@ M4_REPEAT(eval(MOCKITOPP_MAX_VIRTUAL_FUNCTION_ARITY + 1), `DEFINE_PROXY_VFUNCTIO
             return (s.*reinterpret_cast<void* (proxy_vfunction_factory::*)()>(ptr2member))();
          }
 
-define(`DEFINE_PROXY_VFUNCTION_FACTORY_OFFSET_FUNCTION', `        virtual void* offset$1() { return horrible_cast<void*>(&proxy_vfunction<$1, M>::invoke); }
+define(`DEFINE_PROXY_VFUNCTION_FACTORY_OFFSET_FUNCTION', `        virtual void* offset$1() { return horrible_cast<void*>(&proxy_vfunction<$1, typename remove_member_function_pointer_cv<M>::type>::invoke); }
 ')dnl
 M4_REPEAT(MOCKITOPP_MAX_VIRTUAL_FUNCTIONS, `DEFINE_PROXY_VFUNCTION_FACTORY_OFFSET_FUNCTION')dnl
       };
