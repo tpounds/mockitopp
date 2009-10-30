@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <mockitopp/MockObject.hpp>
+#include <mockitopp/mockitopp.hpp>
 
-using mockitopp::MockObject;
+using mockitopp::mock_object;
 
 struct iterator_interface
 {
@@ -11,7 +11,7 @@ struct iterator_interface
 
 TEST(test_iterator_style, next)
 {
-   MockObject<iterator_interface> mock;
+   mock_object<iterator_interface> mock;
    mock(&iterator_interface::hasMore).when().thenReturn(true);
    mock(&iterator_interface::next).when().thenReturn(0)
                                          .thenReturn(1)
@@ -30,7 +30,7 @@ TEST(test_iterator_style, next)
 
 TEST(test_iterator_style, hasMore)
 {
-   MockObject<iterator_interface> mock;
+   mock_object<iterator_interface> mock;
    mock(&iterator_interface::hasMore).when().thenReturn(true)
                                             .thenReturn(true)
                                             .thenReturn(true)
@@ -45,7 +45,7 @@ TEST(test_iterator_style, hasMore)
 
 TEST(test_iterator_style, typical_use_case)
 {
-   MockObject<iterator_interface> mock;
+   mock_object<iterator_interface> mock;
    mock(&iterator_interface::hasMore).when().thenReturn(true)
                                             .thenReturn(true)
                                             .thenReturn(true)

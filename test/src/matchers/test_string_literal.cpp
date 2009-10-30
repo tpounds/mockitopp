@@ -1,8 +1,7 @@
 #include <gtest/gtest.h>
-#include <mockitopp/MockObject.hpp>
-#include <mockitopp/matchers/type/string_literal.hpp>
+#include <mockitopp/mockitopp.hpp>
 
-using mockitopp::MockObject;
+using mockitopp::mock_object;
 using mockitopp::matcher::string_literal;
 
 struct string_literal_test_interface
@@ -13,7 +12,7 @@ struct string_literal_test_interface
 
 TEST(test_string_literal, char_ptr)
 {
-   MockObject<string_literal_test_interface> mock;
+   mock_object<string_literal_test_interface> mock;
    mock(&string_literal_test_interface::char_ptr).when(string_literal<char*>("FOO")).thenReturn(0);
    mock(&string_literal_test_interface::char_ptr).when(string_literal<char*>("BAR")).thenReturn(1);
    string_literal_test_interface& obj = mock.getInstance();
@@ -25,7 +24,7 @@ TEST(test_string_literal, char_ptr)
 
 TEST(test_string_literal, const_char_ptr)
 {
-   MockObject<string_literal_test_interface> mock;
+   mock_object<string_literal_test_interface> mock;
    mock(&string_literal_test_interface::const_char_ptr).when(string_literal<const char*>("1234567890")).thenReturn(0);
    mock(&string_literal_test_interface::const_char_ptr).when(string_literal<const char*>("!@$#")).thenReturn(1);
    string_literal_test_interface& obj = mock.getInstance();

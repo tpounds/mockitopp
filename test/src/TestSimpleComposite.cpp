@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <mockitopp/MockObject.hpp>
+#include <mockitopp/mockitopp.hpp>
 
-using mockitopp::MockObject;
+using mockitopp::mock_object;
 
 struct Interface1
 {
@@ -36,11 +36,11 @@ struct SimpleComposite
 
 TEST(TestSimpleComposite, Add)
 {
-   MockObject<Interface1> mock1;
+   mock_object<Interface1> mock1;
    mock1(&Interface1::foo).when().thenReturn(2);
    Interface1& i1 = mock1.getInstance();
 
-   MockObject<Interface2> mock2;
+   mock_object<Interface2> mock2;
    mock2(&Interface2::bar).when().thenReturn(10);
    Interface2& i2 = mock2.getInstance();
 
@@ -53,11 +53,11 @@ TEST(TestSimpleComposite, Add)
 
 TEST(TestSimpleComposite, Multiply)
 {
-   MockObject<Interface1> mock1;
+   mock_object<Interface1> mock1;
    mock1(&Interface1::foo).when().thenReturn(10);
    Interface1& i1 = mock1.getInstance();
 
-   MockObject<Interface2> mock2;
+   mock_object<Interface2> mock2;
    mock2(&Interface2::bar).when().thenReturn(10);
    Interface2& i2 = mock2.getInstance();
 
@@ -70,11 +70,11 @@ TEST(TestSimpleComposite, Multiply)
 
 TEST(TestSimpleComposite, Add_and_Multiply)
 {
-   MockObject<Interface1> mock1;
+   mock_object<Interface1> mock1;
    mock1(&Interface1::foo).when().thenReturn(10);
    Interface1& i1 = mock1.getInstance();
 
-   MockObject<Interface2> mock2;
+   mock_object<Interface2> mock2;
    mock2(&Interface2::bar).when().thenReturn(10);
    Interface2& i2 = mock2.getInstance();
 

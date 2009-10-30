@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <mockitopp/MockObject.hpp>
+#include <mockitopp/mockitopp.hpp>
 
-using mockitopp::MockObject;
+using mockitopp::mock_object;
 
 struct cv_interface
 {
@@ -12,7 +12,7 @@ struct cv_interface
 
 TEST(test_mfp_cv, compile)
 {
-   MockObject<cv_interface> mock;
+   mock_object<cv_interface> mock;
    mock(&cv_interface::__no_cv).when().thenReturn(0);
    mock(&cv_interface::__has_c).when().thenReturn(0);
    mock(&cv_interface::__has_cv).when().thenReturn(0);

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <mockitopp/MockObject.hpp>
+#include <mockitopp/mockitopp.hpp>
 
-using mockitopp::MockObject;
+using mockitopp::mock_object;
 using mockitopp::matcher::any;
 
 struct any_test_interface
@@ -14,7 +14,7 @@ struct any_test_interface
 
 TEST(test_any, prim_int_ptr)
 {
-   MockObject<any_test_interface> mock;
+   mock_object<any_test_interface> mock;
    mock(&any_test_interface::prim_int_ptr).when(any<int*>()).thenReturn(1234);
    any_test_interface& obj = mock.getInstance();
 
@@ -26,7 +26,7 @@ TEST(test_any, prim_int_ptr)
 
 TEST(test_any, prim_char)
 {
-   MockObject<any_test_interface> mock;
+   mock_object<any_test_interface> mock;
    mock(&any_test_interface::prim_char).when(any<char>()).thenReturn(1234);
    any_test_interface& obj = mock.getInstance();
 
@@ -38,7 +38,7 @@ TEST(test_any, prim_char)
 
 TEST(test_any, prim_float)
 {
-   MockObject<any_test_interface> mock;
+   mock_object<any_test_interface> mock;
    mock(&any_test_interface::prim_float).when(any<float>()).thenReturn(1234);
    any_test_interface& obj = mock.getInstance();
 
@@ -50,7 +50,7 @@ TEST(test_any, prim_float)
 
 TEST(test_any, std_string)
 {
-   MockObject<any_test_interface> mock;
+   mock_object<any_test_interface> mock;
    mock(&any_test_interface::std_string).when(any<std::string>()).thenReturn(1234);
    any_test_interface& obj = mock.getInstance();
 

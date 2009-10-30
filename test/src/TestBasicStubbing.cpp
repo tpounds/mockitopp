@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <mockitopp/MockObject.hpp>
+#include <mockitopp/mockitopp.hpp>
 
-using mockitopp::MockObject;
+using mockitopp::mock_object;
 
 struct VoidVoidInterface
 {
@@ -9,7 +9,7 @@ struct VoidVoidInterface
 };
 TEST(TestBasicStubbing, VoidVoid)
 {
-   MockObject<VoidVoidInterface> mock;
+   mock_object<VoidVoidInterface> mock;
    mock(&VoidVoidInterface::foo).when().thenReturn();
    mock(&VoidVoidInterface::foo).when().thenThrow(std::string("Hypothetical Error!"));
    VoidVoidInterface& i = mock.getInstance();
@@ -26,7 +26,7 @@ struct CharVoidInterface
 };
 TEST(TestBasicStubbing, CharVoid)
 {
-   MockObject<CharVoidInterface> mock;
+   mock_object<CharVoidInterface> mock;
    mock(&CharVoidInterface::foo).when().thenReturn('A');
    mock(&CharVoidInterface::foo).when().thenThrow(std::string("Hypothetical Error!"));
    CharVoidInterface& i = mock.getInstance();
@@ -43,7 +43,7 @@ struct VoidStringRefInterface
 };
 TEST(TestBasicStubbing, VoidStringRef)
 {
-   MockObject<VoidStringRefInterface> mock;
+   mock_object<VoidStringRefInterface> mock;
    mock(&VoidStringRefInterface::foo).when("bar").thenReturn();
    VoidStringRefInterface& i = mock.getInstance();
 

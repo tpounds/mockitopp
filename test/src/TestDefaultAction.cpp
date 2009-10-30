@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include <mockitopp/MockObject.hpp>
+#include <mockitopp/mockitopp.hpp>
 
 // XXX: ASSERT_EQ(NULL, i.getXXX()) generates template warnings, using ASSERT_TRUE for those cases
 
-using mockitopp::MockObject;
+using mockitopp::mock_object;
 
 struct ReferenceInterface
 {
@@ -11,7 +11,7 @@ struct ReferenceInterface
 };
 TEST(TestDefaultAction, ReferenceInterface)
 {
-   MockObject<ReferenceInterface> mock;
+   mock_object<ReferenceInterface> mock;
    mock(&ReferenceInterface::get);
    ReferenceInterface& i = mock.getInstance();
 
@@ -25,7 +25,7 @@ struct PointerInterface
 };
 TEST(TestDefaultAction, PointerInterface)
 {
-   MockObject<PointerInterface> mock;
+   mock_object<PointerInterface> mock;
    mock(&PointerInterface::get);
    PointerInterface& i = mock.getInstance();
 
@@ -39,7 +39,7 @@ struct VoidInterface
 };
 TEST(TestDefaultAction, VoidInterface)
 {
-   MockObject<VoidInterface> mock;
+   mock_object<VoidInterface> mock;
    mock(&VoidInterface::get);
    VoidInterface& i = mock.getInstance();
 
@@ -54,7 +54,7 @@ struct StringInterface
 };
 TEST(TestDefaultAction, StringInterface)
 {
-   MockObject<StringInterface> mock;
+   mock_object<StringInterface> mock;
    mock(&StringInterface::get);
    StringInterface& i = mock.getInstance();
 
@@ -73,7 +73,7 @@ struct PODInterface
 };
 TEST(TestDefaultAction, PODInterface)
 {
-   MockObject<PODInterface> mock;
+   mock_object<PODInterface> mock;
    mock(&PODInterface::getChar);
    mock(&PODInterface::getBool);
    mock(&PODInterface::getInt);
@@ -113,7 +113,7 @@ struct PODPointerInterface
 };
 TEST(TestDefaultAction, PODPointerInterface)
 {
-   MockObject<PODPointerInterface> mock;
+   mock_object<PODPointerInterface> mock;
    mock(&PODPointerInterface::getVoidP);
    mock(&PODPointerInterface::getCharP);
    mock(&PODPointerInterface::getBoolP);

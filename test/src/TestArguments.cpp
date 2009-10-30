@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <mockitopp/MockObject.hpp>
+#include <mockitopp/mockitopp.hpp>
 
-using mockitopp::MockObject;
+using mockitopp::mock_object;
 
 struct PlainOleDataTypes
 {
@@ -11,7 +11,7 @@ struct PlainOleDataTypes
 };
 TEST(TestArguments, PlainOleDataTypes)
 {
-   MockObject<PlainOleDataTypes> m;
+   mock_object<PlainOleDataTypes> m;
    m(&PlainOleDataTypes::__int).when(0).thenReturn(2);
    m(&PlainOleDataTypes::__int).when(100).thenReturn(8);
    m(&PlainOleDataTypes::__bool).when(true).thenReturn(false);

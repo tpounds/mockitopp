@@ -2,11 +2,6 @@
 #define __MOCKITOPP_MOCK_OBJECT_HPP__
 
 #include <mockitopp/detail/stubbing/dynamic_object.hpp>
-#include <mockitopp/matchers/base/any.hpp>
-#include <mockitopp/matchers/base/equal.hpp>
-#include <mockitopp/matchers/base/is_not.hpp>
-#include <mockitopp/matchers/base/null.hpp>
-#include <mockitopp/matchers/type/string_literal.hpp>
 
 namespace mockitopp
 {
@@ -16,7 +11,7 @@ namespace mockitopp
     * @author Trevor Pounds
     */
    template <typename T>
-   struct MockObject : protected detail::dynamic_object
+   struct mock_object : protected detail::dynamic_object
    {
       /**
        * returns a mock object of the given abstract base class/interface

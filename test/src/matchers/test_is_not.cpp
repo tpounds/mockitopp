@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <mockitopp/MockObject.hpp>
+#include <mockitopp/mockitopp.hpp>
 
-using mockitopp::MockObject;
+using mockitopp::mock_object;
 using mockitopp::matcher::equal;
 using mockitopp::matcher::is_not;
 using mockitopp::matcher::null;
@@ -14,7 +14,7 @@ struct is_not_test_interface
 
 TEST(test_is_not, is_not_null_ptr)
 {
-   MockObject<is_not_test_interface> mock;
+   mock_object<is_not_test_interface> mock;
    mock(&is_not_test_interface::prim_void_ptr).when(is_not(null<void*>())).thenReturn("void* != NULL");
    is_not_test_interface& obj = mock.getInstance();
 
@@ -25,7 +25,7 @@ TEST(test_is_not, is_not_null_ptr)
 
 TEST(test_is_not, is_not_is_not_equal_ptr)
 {
-   MockObject<is_not_test_interface> mock;
+   mock_object<is_not_test_interface> mock;
    void* void_ptr = new char;
    mock(&is_not_test_interface::prim_void_ptr).when(is_not(is_not(equal(void_ptr)))).thenReturn("void* == new char");
    is_not_test_interface& obj = mock.getInstance();

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <mockitopp/MockObject.hpp>
+#include <mockitopp/mockitopp.hpp>
 
-using mockitopp::MockObject;
+using mockitopp::mock_object;
 
 struct verify_interface
 {
@@ -9,7 +9,7 @@ struct verify_interface
 };
 
 #define VERIFY_MOCK_DEFINITION \
-   MockObject<verify_interface> mock; \
+   mock_object<verify_interface> mock; \
    mock(&verify_interface::func).when().thenReturn(); \
    verify_interface& obj = mock.getInstance(); \
 \
@@ -57,7 +57,7 @@ TEST(test_verify, exactly)
    ASSERT_FALSE(mock(&verify_interface::func).exactly(4));
 }
 
-TEST(TestVerify, Never)
+TEST(test_verify, never)
 {
    VERIFY_MOCK_DEFINITION
 
