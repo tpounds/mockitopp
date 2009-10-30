@@ -5,7 +5,7 @@
 This example is trivial but shows the basics for constructing a simple mock of an interface and stubbing its only virtual function.
 {{{
 #include <gtest/gtest.h>
-#include <mockitopp/MockObject.hpp>
+#include <mockitopp/mockitopp.hpp>
 
 // some interface
 struct Foo
@@ -14,10 +14,9 @@ struct Foo
 };
 
 // a simple test case
-using mockitopp::MockObject;
 TEST(MyTestCase, Foo)
 {
-   MockObject<Foo> mock;
+   mockitopp::mock_object<Foo> mock;
    mock(&Foo::bar);
    Foo& fooImpl = mock.getInstance();
 
@@ -29,7 +28,7 @@ TEST(MyTestCase, Foo)
 This example shows how you can define simple returnable behavior for an object.  You will notice that we chained a bunch of arguments and their return values together in a nice readable format. We then have our associated gtest {{{ASSERT_?}}} macros verify the expected behavior. As you can see we make a call to {{{adderImpl.add(4, 5)}}}, but we didn't define any behavior for it. What happens in this case is the stub implementation will try to return the default behavior for function's signature.  This means for POD (i.e. {{{int}}}, {{{bool}}}, etc.) it will return 0, false, 0.0, etc.  For objects it will try to return the object using the default constructor (i.e. {{{std::string()}}}, {{{std::vector()}}}, etc).  For pointers it will return {{{NULL}}}. For reference types it will do a very dangerous cast from a pointer to a primitive to a reference of the return type (which may or may not be desired, SO BE CAREFUL).
 {{{
 #include <gtest/gtest.h>
-#include <mockitopp/MockObject.hpp>
+#include <mockitopp/mockitopp.hpp>
 
 // some interface
 struct Adder
@@ -38,10 +37,9 @@ struct Adder
 };
 
 // test case
-using mockitopp::MockObject;
 TEST(MyTestCase, Adder)
 {
-   MockObject<Adder> mock;
+   mockitopp::mock_object<Adder> mock;
    mock(&Adder::add).when(0, 0).thenReturn(0);
    mock(&Adder::add).when(1, 1).thenReturn(2)
    mock(&Adder::add).when(2, 2).thenReturn(5); // most certainly 2 + 2 = 5!
@@ -60,7 +58,7 @@ TEST(MyTestCase, Adder)
 This example shows how you can define simple throwable behavior for an object.  Similarly to the returnable action behavior you can instead decide to use {{{thenThrow(...)}}} to define a throwable action. AS you may have noticed you can chain together multiple throwable and returnable actions.  This is useful for cases where your mock object is only expected to handle certain argument types.
 {{{
 #include <gtest/gtest.h>
-#include <mockitopp/MockObject.hpp>
+#include <mockitopp/mockitopp.hpp>
 
 // some interface
 struct Adder
@@ -69,10 +67,9 @@ struct Adder
 };
 
 // test case
-using mockitopp::MockObject;
 TEST(MyTestCase)
 {
-   MockObject<Adder> mock;
+   mockitopp::mock_object<Adder> mock;
    mock(&Adder::add).when(0, 0).thenReturn(0)
    mock(&Adder::add).when(1, 1).thenReturn(2)
    mock(&Adder::add).when(2, 2).thenThrow(std::string("I don't support this!")); // Don't believe me? I dare you to try it!
@@ -90,7 +87,7 @@ You can stub functions that return {{{void}}} similarly to the way it is done fo
 What happens when you don't stub behavior for a given input? In this case it operates as if you stubbed the argument using the {{{thenReturn}}} method.
 {{{
 #include <gtest/gtest.h>
-#include <mockitopp/MockObject.hpp>
+#include <mockitopp/mockitopp.hpp>
 
 // some interface
 struct Foo
@@ -99,10 +96,9 @@ struct Foo
 };
 
 // test case
-using mockitopp::MockObject;
 TEST(MyTestCase)
 {
-   MockObject<Foo> mock;
+   mockitopp::mock_object<Foo> mock;
    mock(&Foo::bar).when(0).thenReturn();
    mock(&Foo::bar).when(1).thenReturn();
    mock(&Foo::bar).when(2).thenThrow(std::string("Invalid argument!"));
@@ -119,7 +115,7 @@ TEST(MyTestCase)
 You can stub arguments to return different values on consecutive calls.  This is useful for modeling iterator like behavior for a given argument list.  It even works with a function that takes no arguments.  The configuration is similar to the previous uses except you chain together consecutive calls to the {{{thenReturn}}} and {{{thenThrow}}} methods from a single call to the {{{when}}} method.  Also, the last stubbed {{{thenReturn}}} or {{{thenThrow}}} becomes the default behavior on consecutive calls after the the last element is hit.
 {{{
 #include <gtest/gtest.h>
-#include <mockitopp/MockObject.hpp>
+#include <mockitopp/mockitopp.hpp>
 
 // some interface
 struct Enumeration
@@ -128,10 +124,9 @@ struct Enumeration
 };
 
 // test case
-using mockitopp::MockObject;
 TEST(MyTestCase, Enumeration)
 {
-   MockObject<Enumeration> mock;
+   mockitopp::mock_object<Enumeration> mock;
    mock(&Enumeration::next).when().thenReturn(0)
                                   .thenReturn(1)
                                   .thenThrow(std::string("Invalid argument!"))
@@ -152,7 +147,7 @@ TEST(MyTestCase, Enumeration)
 In some cases an interface may have several overloaded functions. The mocking behavior is similar to the other examples but requires an extra step for resolving the overloaded function. There are currently two ways in which you can resolve the member function pointer: {{{(1)}}} define an intermediate variable acting as a proxy for the lookup, or {{{(2)}}} use the static_cast operator to provide the compiler lookup. Unfortunately, both ways are a little bit more verbose but are required for the compiler to resolve the functions properly.
 {{{
 #include <gtest/gtest.h>
-#include <mockitopp/MockObject.hpp>
+#include <mockitopp/mockitopp.hpp>
 
 // overloaded interface
 struct OverloadedInterface
@@ -162,12 +157,11 @@ struct OverloadedInterface
    virtual void foo(std::string) = 0;
 };
 
-using mockitopp::MockObject;
 
 // Example 1: using variable proxy resolution
 TEST(OverloadedFunctionsTest, ByVariableProxy)
 {
-   MockObject<OverloadedInterface> mock;
+   mockitopp::mock_object<OverloadedInterface> mock;
    // create overloaded lookups via variable proxy
    void (OverloadedInterface::*void_proxy_ptr)() = &OverloadedInterface::foo;
    void (OverloadedInterface::*int_proxy_ptr)(int) = &OverloadedInterface::foo;
@@ -184,7 +178,7 @@ TEST(OverloadedFunctionsTest, ByVariableProxy)
 // Example 2: using static_cast operator resolution
 TEST(OverloadedFunctionsTest, ByStaticCast)
 {
-   MockObject<OverloadedInterface> mock;
+   mockitopp::mock_object<OverloadedInterface> mock;
    // mock using static_cast operator
    mock(static_cast<void (OverloadedInterface::*)()>(&overloaded_inteface::foo)).when().thenReturn();
    mock(static_cast<void (OverloadedInterface::*)(int)>(&overloaded_inteface::foo)).when(1234).thenReturn();

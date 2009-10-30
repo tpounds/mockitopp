@@ -13,7 +13,7 @@ struct Foo
 {{{
 TEST(TestVerify, Exactly)
 {
-   MockObject<Foo> mock;
+   mockitopp::mock_object<Foo> mock;
    mock(&Foo::bar);
    Foo& fooImpl = mock.getInstance();
 
@@ -29,7 +29,7 @@ TEST(TestVerify, Exactly)
 {{{
 TEST(TestVerify, AtLeast)
 {
-   MockObject<Foo> mock;
+   mockitopp::mock_object<Foo> mock;
    mock(&Foo::bar);
    Foo& fooImpl = mock.getInstance();
 
@@ -48,7 +48,7 @@ TEST(TestVerify, AtLeast)
 {{{
 TEST(TestVerify, AtMost)
 {
-   MockObject<Foo> mock;
+   mockitopp::mock_object<Foo> mock;
    mock(&Foo::bar);
    Foo& fooImpl = mock.getInstance();
 
@@ -66,7 +66,7 @@ TEST(TestVerify, AtMost)
 {{{
 TEST(TestVerify, Never)
 {
-   MockObject<Foo> mock;
+   mockitopp::mock_object<Foo> mock;
    mock(&Foo::bar);
    Foo& fooImpl = mock.getInstance();
 
@@ -80,7 +80,7 @@ TEST(TestVerify, Never)
 {{{
 TEST(TestVerify, Range)
 {
-   MockObject<Foo> mock;
+   mockitopp::mock_object<Foo> mock;
    mock(&Foo::bar);
    Foo& fooImpl = mock.getInstance();
 

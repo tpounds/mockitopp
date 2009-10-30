@@ -5,9 +5,8 @@ Usually, test cases are required to cover a large permutation of user inputs. Th
 === Built-in ===
 {{{
 #include <gtest/gtest.h>
-#include <mockitopp/MockObject.hpp>
+#include <mockitopp/mockitopp.hpp>
 
-using mockitopp::MockObject;
 using mockitopp::matcher::eq;
 using mockitopp::matcher::not_;
 using mockitopp::matcher::null;
@@ -20,7 +19,7 @@ struct interface
 
 TEST(test, built_in)
 {
-   MockObject<interface> mock;
+   mockitopp::mock_object<interface> mock;
    mock(&interface::func1).when(null<int*>()).thenReturn(true);
    mock(&interface::func2).when(not_(eq(std::string("foo")))).thenReturn(true);
    interface& obj = mock.getInstance();
@@ -41,7 +40,6 @@ TEST(test, built_in)
 
 using hamcrest::any_of;
 using hamcrest::equal_to;
-using mockitopp::MockObject;
 using mockitopp::matcher::hc;
 
 struct interface
@@ -51,7 +49,7 @@ struct interface
 
 TEST(test, hamcrest)
 {
-   MockObject<interface> mock;
+   mockitopp::mock_object<interface> mock;
    mock(&interface::func).when(hc(any_of(is("foo"), is("bar")))).thenReturn(true);
    interface& obj = mock.getInstance();
 
@@ -66,10 +64,9 @@ TEST(test, hamcrest)
 {{{
 #include <regex> // or <boost/regex.hpp>
 #include <gtest/gtest.h>
-#include <mockitopp/MockObject.hpp>
+#include <mockitopp/mockitopp.hpp>
 #include <mockitopp/matchers/optional/Regex.hpp>
 
-using mockitopp::MockObject;
 using mockitopp::matcher::regex;
 
 struct interface
@@ -79,7 +76,7 @@ struct interface
 
 TEST(test, regex)
 {
-   MockObject<interface> mock;
+   mockitopp::mock_object<interface> mock;
    mock(&interface::func).when(regex("[0-9]*")).thenReturn(true);
    mock(&interface::func).when(regex("he.*ld")).thenReturn(true);
    regex_interface& obj = mock.getInstance();
