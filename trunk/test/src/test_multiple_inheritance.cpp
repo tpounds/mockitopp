@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <mockitopp/MockObject.hpp>
+#include <mockitopp/mockitopp.hpp>
 
-using mockitopp::MockObject;
+using mockitopp::mock_object;
 
 struct interface1 { virtual bool foo1(int) = 0; };
 struct interface2 { virtual bool foo2(int) = 0; };
@@ -13,7 +13,7 @@ struct unsupported_interface : public interface1, public interface2, public inte
 
 TEST(test_multiple_inheritance, unsupported_interface)
 {
-   MockObject<unsupported_interface> mock;
+   mock_object<unsupported_interface> mock;
    mock(&unsupported_interface::foo1).when(1234).thenReturn(true);
    mock(&unsupported_interface::foo1).when(5678).thenReturn(false);
    mock(&unsupported_interface::foo2).when(1234).thenReturn(true);

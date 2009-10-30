@@ -1,9 +1,9 @@
 #include <boost/regex.hpp>
 #include <gtest/gtest.h>
-#include <mockitopp/MockObject.hpp>
+#include <mockitopp/mockitopp.hpp>
 #include <mockitopp/matchers/optional/tr1_regex.hpp>
 
-using mockitopp::MockObject;
+using mockitopp::mock_object;
 using mockitopp::matcher::regex;
 
 struct regex_interface
@@ -15,7 +15,7 @@ struct regex_interface
 
 TEST(test_regex, const_char)
 {
-   MockObject<regex_interface> mock;
+   mock_object<regex_interface> mock;
    mock(&regex_interface::const_char_s).when(regex(".*foo.*")).thenReturn("matches__.*foo.*");
    mock(&regex_interface::const_char_s).when(regex(".*bar.*")).thenReturn("matches__.*bar.*");
    mock(&regex_interface::const_char_s).when(regex("[A-Z]*")).thenReturn("matches__[A-Z]*");
@@ -30,7 +30,7 @@ TEST(test_regex, const_char)
 
 TEST(test_regex, std_string)
 {
-   MockObject<regex_interface> mock;
+   mock_object<regex_interface> mock;
    mock(&regex_interface::std_string).when(regex(std::string(".*foo.*"))).thenReturn("matches__.*foo.*");
    mock(&regex_interface::std_string).when(regex(std::string(".*bar.*"))).thenReturn("matches__.*bar.*");
    mock(&regex_interface::std_string).when(regex(std::string("[A-Z]*"))).thenReturn("matches__[A-Z]*");
@@ -45,7 +45,7 @@ TEST(test_regex, std_string)
 
 TEST(test_regex, composite)
 {
-   MockObject<regex_interface> mock;
+   mock_object<regex_interface> mock;
    mock(&regex_interface::composite).when(regex(".*foo.*"), regex(std::string(".*bar.*"))).thenReturn("matches__.*foo.*__.*bar.*");
    mock(&regex_interface::composite).when(regex(".*FOO.*"), regex(std::string(".*BAR.*"))).thenReturn("matches__.*FOO.*__.*BAR.*");
    mock(&regex_interface::composite).when(regex("[a-z]*"),  regex(std::string("[A-Z]*"))).thenReturn("matches__[a-z]*__[A-Z]*");

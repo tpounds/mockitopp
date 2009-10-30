@@ -9,11 +9,11 @@
 #include <matchers/hc_is_not.h>
 #include <matchers/hc_same_instance.h>
 #include <matchers/hc_shortcut_combination.h>
-#include <mockitopp/MockObject.hpp>
+#include <mockitopp/mockitopp.hpp>
 #include <mockitopp/matchers/optional/hamcrest.hpp>
 
 using namespace hamcrest;
-using mockitopp::MockObject;
+using mockitopp::mock_object;
 using mockitopp::matcher::hc;
 
 struct hc_interface
@@ -23,7 +23,7 @@ struct hc_interface
 
 TEST(test_hamcrest, all_of)
 {
-   MockObject<hc_interface> mock;
+   mock_object<hc_interface> mock;
    mock(&hc_interface::hc_test).when(hc(all_of(is_not("foo"), is_not("bar"), is_not("abc")))).thenReturn("is_not_foo__is_not_bar__is_not_abc");
    mock(&hc_interface::hc_test).when(hc(all_of(is("foo"), is_not("bar")))).thenReturn("is_foo__is_not_bar");
    hc_interface& obj = mock.getInstance();
@@ -39,7 +39,7 @@ TEST(test_hamcrest, all_of)
 
 TEST(test_hamcrest, any_of)
 {
-   MockObject<hc_interface> mock;
+   mock_object<hc_interface> mock;
    mock(&hc_interface::hc_test).when(hc(any_of(is("foo"), is("bar"), is("abc")))).thenReturn("is_foo__is_bar__is_abc");
    mock(&hc_interface::hc_test).when(hc(any_of(is("123"), is_not("890")))).thenReturn("is_123__is_not_890");
    hc_interface& obj = mock.getInstance();
@@ -56,7 +56,7 @@ TEST(test_hamcrest, any_of)
 
 TEST(test_hamcrest, anything)
 {
-   MockObject<hc_interface> mock;
+   mock_object<hc_interface> mock;
    mock(&hc_interface::hc_test).when(hc(anything<const char*>())).thenReturn("anything");
    hc_interface& obj = mock.getInstance();
 
@@ -68,7 +68,7 @@ TEST(test_hamcrest, anything)
 
 TEST(test_hamcrest, equal_to)
 {
-   MockObject<hc_interface> mock;
+   mock_object<hc_interface> mock;
    mock(&hc_interface::hc_test).when(hc(equal_to("foo"))).thenReturn("equal_to_foo");
    hc_interface& obj = mock.getInstance();
 
@@ -78,7 +78,7 @@ TEST(test_hamcrest, equal_to)
 
 TEST(test_hamcrest, is)
 {
-   MockObject<hc_interface> mock;
+   mock_object<hc_interface> mock;
    mock(&hc_interface::hc_test).when(hc(is("foo"))).thenReturn("is_foo");
    hc_interface& obj = mock.getInstance();
 
@@ -89,7 +89,7 @@ TEST(test_hamcrest, is)
 
 TEST(test_hamcrest, is_not)
 {
-   MockObject<hc_interface> mock;
+   mock_object<hc_interface> mock;
    mock(&hc_interface::hc_test).when(hc(is_not("foo"))).thenReturn("is_not_foo");
    hc_interface& obj = mock.getInstance();
 
@@ -103,7 +103,7 @@ TEST(test_hamcrest, same_instance)
 {
    const char* argument = "foo";
 
-   MockObject<hc_interface> mock;
+   mock_object<hc_interface> mock;
    mock(&hc_interface::hc_test).when(hc(same_instance(argument))).thenReturn("same foo instance");
    hc_interface& obj = mock.getInstance();
 

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <mockitopp/MockObject.hpp>
+#include <mockitopp/mockitopp.hpp>
 
-using mockitopp::MockObject;
+using mockitopp::mock_object;
 using mockitopp::matcher::equal;
 
 struct equal_test_interface
@@ -14,7 +14,7 @@ struct equal_test_interface
 
 TEST(test_equal, equal_void_ptr)
 {
-   MockObject<equal_test_interface> mock;
+   mock_object<equal_test_interface> mock;
    mock(&equal_test_interface::prim_void_ptr).when(equal<void*>(0)).thenReturn(0);
    void* void_ptr = new int;
    mock(&equal_test_interface::prim_void_ptr).when(equal(void_ptr)).thenReturn(1);
@@ -27,7 +27,7 @@ TEST(test_equal, equal_void_ptr)
 
 TEST(test_equal, equal_prim_char)
 {
-   MockObject<equal_test_interface> mock;
+   mock_object<equal_test_interface> mock;
    mock(&equal_test_interface::prim_char).when(equal(' ')).thenReturn(32);
    mock(&equal_test_interface::prim_char).when(equal('0')).thenReturn(48);
    mock(&equal_test_interface::prim_char).when(equal('A')).thenReturn(65);
@@ -43,7 +43,7 @@ TEST(test_equal, equal_prim_char)
 
 TEST(test_equal, equal_std_string)
 {
-   MockObject<equal_test_interface> mock;
+   mock_object<equal_test_interface> mock;
    mock(&equal_test_interface::std_string).when(equal("foo")).thenReturn(0);
    mock(&equal_test_interface::std_string).when(equal("w00t")).thenReturn(1);
    mock(&equal_test_interface::std_string).when(equal("hello")).thenReturn(2);

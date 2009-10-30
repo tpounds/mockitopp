@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <mockitopp/MockObject.hpp>
+#include <mockitopp/mockitopp.hpp>
 
-using mockitopp::MockObject;
+using mockitopp::mock_object;
 using mockitopp::matcher::null;
 
 struct null_test_object {};
@@ -15,7 +15,7 @@ struct null_test_interface
 
 TEST(test_null, prim_int_ptr)
 {
-   MockObject<null_test_interface> mock;
+   mock_object<null_test_interface> mock;
    mock(&null_test_interface::prim_int_ptr).when(null<int*>()).thenReturn("int* == NULL");
    null_test_interface& obj = mock.getInstance();
 
@@ -25,7 +25,7 @@ TEST(test_null, prim_int_ptr)
 
 TEST(test_null, std_string_ptr)
 {
-   MockObject<null_test_interface> mock;
+   mock_object<null_test_interface> mock;
    mock(&null_test_interface::std_string_ptr).when(null<std::string*>()).thenReturn("std::string* == NULL");
    null_test_interface& obj = mock.getInstance();
 
@@ -36,7 +36,7 @@ TEST(test_null, std_string_ptr)
 
 TEST(test_null, object_ptr)
 {
-   MockObject<null_test_interface> mock;
+   mock_object<null_test_interface> mock;
    mock(&null_test_interface::object_ptr).when(null<null_test_object*>()).thenReturn("null_test_obj* == NULL");
    null_test_interface& obj = mock.getInstance();
 
