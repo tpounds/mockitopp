@@ -18,7 +18,7 @@ namespace mockitopp
             virtual Matcher<T>* clone() const
                { return new NullT(); }
 
-            virtual bool operator== (const T& rhs) const
+            virtual bool operator== (typename mockitopp::detail::tr1::add_reference<typename mockitopp::detail::tr1::add_const<T>::type>::type rhs) const
                { return rhs == 0; }
          };
       } // namespace detail
