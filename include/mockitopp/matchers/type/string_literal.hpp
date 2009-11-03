@@ -24,8 +24,8 @@ namespace mockitopp
             virtual Matcher<T>* clone() const
                { return new StringLiteralT(const_cast<T>(internal_string.c_str())); }
 
-            virtual bool operator== (const T& string_lit) const
-               { return internal_string == string_lit; }
+            virtual bool operator== (typename mockitopp::detail::tr1::add_reference<typename mockitopp::detail::tr1::add_const<T>::type>::type rhs) const
+               { return internal_string == rhs; }
 
             private:
 

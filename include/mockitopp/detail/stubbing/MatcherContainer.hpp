@@ -23,7 +23,7 @@ namespace mockitopp
          virtual ~MatcherContainer()
             { delete matcher; }
 
-         bool operator== (const T& rhs) const
+         bool operator== (typename tr1::add_reference<typename tr1::add_const<T>::type>::type rhs) const
             { return (*matcher == rhs); }
 
          bool operator== (const MatcherContainer& rhs) const

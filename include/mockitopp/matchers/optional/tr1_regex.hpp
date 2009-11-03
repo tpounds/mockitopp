@@ -20,14 +20,14 @@ namespace mockitopp
          template <typename T>
          struct RegexT : public Matcher<T>
          {
-            RegexT(const T& expr)
+            RegexT(typename mockitopp::detail::tr1::add_reference<typename mockitopp::detail::tr1::add_const<T>::type>::type expr)
                : expr(expr)
                {}
 
             virtual Matcher<T>* clone() const
                { return new RegexT(expr); }
 
-            virtual bool operator== (const T& rhs) const
+            virtual bool operator== (typename mockitopp::detail::tr1::add_reference<typename mockitopp::detail::tr1::add_const<T>::type>::type rhs) const
                { return __tr1::regex_match(rhs, expr); }
 
             private:
