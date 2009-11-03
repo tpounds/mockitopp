@@ -26,6 +26,8 @@ include(`mockitopp/detail/m4/REPEAT.m4')dnl
 define(`DEFINE_VTABLE_OFFSET_HELPER_FUNCTION', `        virtual int offset$1() { return $1; }
 ')dnl
 M4_REPEAT(MOCKITOPP_MAX_VIRTUAL_FUNCTIONS, `DEFINE_VTABLE_OFFSET_HELPER_FUNCTION')dnl
+
+         virtual ~vtable_offset_helper() {}
       };
 
       /**
@@ -55,7 +57,7 @@ M4_REPEAT(MOCKITOPP_MAX_VIRTUAL_FUNCTIONS, `DEFINE_VTABLE_OFFSET_HELPER_FUNCTION
             for(int i = 0; i < MOCKITOPP_MAX_VIRTUAL_FUNCTIONS; i++)
             {
                if(__spys[i] != 0)
-                  { delete reinterpret_cast<dynamic_vfunction_polymorphic_destructor*>(__spys[i]); }
+                  { delete reinterpret_cast<dynamic_vfunction_base*>(__spys[i]); }
             }
          }
 

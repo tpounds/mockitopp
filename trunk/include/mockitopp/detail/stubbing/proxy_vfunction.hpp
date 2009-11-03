@@ -192,6 +192,8 @@ namespace mockitopp
          virtual void* offset47() { return horrible_cast<void*>(&proxy_vfunction<47, typename remove_member_function_pointer_cv<M>::type>::invoke); }
          virtual void* offset48() { return horrible_cast<void*>(&proxy_vfunction<48, typename remove_member_function_pointer_cv<M>::type>::invoke); }
          virtual void* offset49() { return horrible_cast<void*>(&proxy_vfunction<49, typename remove_member_function_pointer_cv<M>::type>::invoke); }
+
+         virtual ~proxy_vfunction_factory() {}
       };
    } // namespace detail
 } // namespace mockitopp
