@@ -11,7 +11,6 @@
 #include <mockitopp/detail/stubbing/MatcherContainer.hpp>
 #include <mockitopp/detail/stubbing/Verifier.hpp>
 #include <mockitopp/detail/util/tr1_tuple.hpp>
-#include <mockitopp/detail/util/tr1_type_traits.hpp>
 
 include(`mockitopp/detail/m4/ENUM_BINARY_PARAMS.m4')dnl
 include(`mockitopp/detail/m4/ENUM_PARAMS.m4')dnl
@@ -97,12 +96,8 @@ define(`DEFINE_DYNAMIC_VFUNCTION', `
       template <typename R, typename C`'M4_ENUM_TRAILING_PARAMS($1, typename A)>
       struct dynamic_vfunction<R (C::*)(M4_ENUM_PARAMS($1, A))> : public dynamic_vfunction_base<R>, public Verifier
       {
-         typedef tr1::tuple<M4_ENUM_BINARY_PARAMS($1,
-            typename tr1::remove_const<typename tr1::remove_reference<A, >::type>::type,
-               M4_INTERCEPT)> raw_tuple_type;
-         typedef tr1::tuple<M4_ENUM_BINARY_PARAMS($1,
-            MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A, >::type>::type> ,
-               M4_INTERCEPT)> matcher_tuple_type;
+         typedef tr1::tuple<M4_ENUM_PARAMS($1, A)> raw_tuple_type;
+         typedef tr1::tuple<M4_ENUM_BINARY_PARAMS($1, MatcherContainer<A, >, M4_INTERCEPT) > matcher_tuple_type;
 
          typedef typename dynamic_vfunction_base<R>::action_type       action_type;
          typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
@@ -117,7 +112,7 @@ define(`DEFINE_DYNAMIC_VFUNCTION', `
             , matcher_actions_map()
             {}
 
-         M4_IF($1, `dynamic_vfunction& when(M4_ENUM_BINARY_PARAMS($1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A, >::type>::type>& a))
+         M4_IF($1, `dynamic_vfunction& when(M4_ENUM_BINARY_PARAMS($1, const matcher::Matcher<A, >& a))
          {
             matcher_tuple_type args = matcher_tuple_type(M4_ENUM_PARAMS($1, a));
             typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
@@ -141,18 +136,21 @@ define(`DEFINE_DYNAMIC_VFUNCTION', `
          {
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type(M4_ENUM_PARAMS($1, a));
-            action_queue_type& actions = raw_actions_map[args];
-            if(actions.empty())
+            action_queue_type* actions = 0;
+            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            if(raw_actions_it != raw_actions_map.end())
+               { actions = &(raw_actions_it->second); }
+            if(actions == 0)
             {
                typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
                pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
                if(pair_it == matcher_actions_map.end())
                   { throw partial_implementation_exception(); }
-               actions = pair_it->second;
+               actions = &(pair_it->second);
             }
-            action_type action = actions.front();
-            if(actions.size() > 1)
-               { actions.pop_front(); }
+            action_type action = actions->front();
+            if(actions->size() > 1)
+               { actions->pop_front(); }
             return action->invoke();
          }
       };

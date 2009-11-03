@@ -34,10 +34,11 @@ namespace mockitopp
          template <typename H, typename T>
          struct tuple_cons
          {
-            typename remove_const<typename remove_reference<H>::type>::type head;
-            typename remove_const<typename remove_reference<T>::type>::type tail;
+            H head;
+            T tail;
 
-            tuple_cons(const H& head, const T& tail)
+            tuple_cons(typename add_reference<typename add_const<H>::type>::type head,
+                       typename add_reference<typename add_const<T>::type>::type tail)
                : head(head)
                , tail(tail)
                {}
@@ -73,7 +74,7 @@ namespace mockitopp
          template <typename T0 = tuple_null_type, typename T1 = tuple_null_type, typename T2 = tuple_null_type, typename T3 = tuple_null_type, typename T4 = tuple_null_type, typename T5 = tuple_null_type, typename T6 = tuple_null_type, typename T7 = tuple_null_type, typename T8 = tuple_null_type, typename T9 = tuple_null_type>
          struct tuple : tuple_cons<T0, tuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, tuple_null_type> >
          {
-            tuple(const T0 & t0, const T1 & t1, const T2 & t2, const T3 & t3, const T4 & t4, const T5 & t5, const T6 & t6, const T7 & t7, const T8 & t8, const T9 & t9)
+            tuple(typename add_reference<typename add_const<T0 >::type>::type t0, typename add_reference<typename add_const<T1 >::type>::type t1, typename add_reference<typename add_const<T2 >::type>::type t2, typename add_reference<typename add_const<T3 >::type>::type t3, typename add_reference<typename add_const<T4 >::type>::type t4, typename add_reference<typename add_const<T5 >::type>::type t5, typename add_reference<typename add_const<T6 >::type>::type t6, typename add_reference<typename add_const<T7 >::type>::type t7, typename add_reference<typename add_const<T8 >::type>::type t8, typename add_reference<typename add_const<T9 >::type>::type t9)
                : tuple_cons<T0, tuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, tuple_null_type> >
                   (t0, tuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, tuple_null_type>
                      (t1, t2, t3, t4, t5, t6, t7, t8, t9))
@@ -85,7 +86,7 @@ namespace mockitopp
          struct tuple<T0 , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type>
             : tuple_cons<T0, tuple<> >
          {
-            tuple(const T0 & t0)
+            tuple(typename add_reference<typename add_const<T0 >::type>::type t0)
                : tuple_cons<T0, tuple<> >
                   (t0, tuple<>
                      ())
@@ -97,7 +98,7 @@ namespace mockitopp
          struct tuple<T0, T1 , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type>
             : tuple_cons<T0, tuple<T1> >
          {
-            tuple(const T0 & t0, const T1 & t1)
+            tuple(typename add_reference<typename add_const<T0 >::type>::type t0, typename add_reference<typename add_const<T1 >::type>::type t1)
                : tuple_cons<T0, tuple<T1> >
                   (t0, tuple<T1>
                      (t1))
@@ -109,7 +110,7 @@ namespace mockitopp
          struct tuple<T0, T1, T2 , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type>
             : tuple_cons<T0, tuple<T1, T2> >
          {
-            tuple(const T0 & t0, const T1 & t1, const T2 & t2)
+            tuple(typename add_reference<typename add_const<T0 >::type>::type t0, typename add_reference<typename add_const<T1 >::type>::type t1, typename add_reference<typename add_const<T2 >::type>::type t2)
                : tuple_cons<T0, tuple<T1, T2> >
                   (t0, tuple<T1, T2>
                      (t1, t2))
@@ -121,7 +122,7 @@ namespace mockitopp
          struct tuple<T0, T1, T2, T3 , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type>
             : tuple_cons<T0, tuple<T1, T2, T3> >
          {
-            tuple(const T0 & t0, const T1 & t1, const T2 & t2, const T3 & t3)
+            tuple(typename add_reference<typename add_const<T0 >::type>::type t0, typename add_reference<typename add_const<T1 >::type>::type t1, typename add_reference<typename add_const<T2 >::type>::type t2, typename add_reference<typename add_const<T3 >::type>::type t3)
                : tuple_cons<T0, tuple<T1, T2, T3> >
                   (t0, tuple<T1, T2, T3>
                      (t1, t2, t3))
@@ -133,7 +134,7 @@ namespace mockitopp
          struct tuple<T0, T1, T2, T3, T4 , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type>
             : tuple_cons<T0, tuple<T1, T2, T3, T4> >
          {
-            tuple(const T0 & t0, const T1 & t1, const T2 & t2, const T3 & t3, const T4 & t4)
+            tuple(typename add_reference<typename add_const<T0 >::type>::type t0, typename add_reference<typename add_const<T1 >::type>::type t1, typename add_reference<typename add_const<T2 >::type>::type t2, typename add_reference<typename add_const<T3 >::type>::type t3, typename add_reference<typename add_const<T4 >::type>::type t4)
                : tuple_cons<T0, tuple<T1, T2, T3, T4> >
                   (t0, tuple<T1, T2, T3, T4>
                      (t1, t2, t3, t4))
@@ -145,7 +146,7 @@ namespace mockitopp
          struct tuple<T0, T1, T2, T3, T4, T5 , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type>
             : tuple_cons<T0, tuple<T1, T2, T3, T4, T5> >
          {
-            tuple(const T0 & t0, const T1 & t1, const T2 & t2, const T3 & t3, const T4 & t4, const T5 & t5)
+            tuple(typename add_reference<typename add_const<T0 >::type>::type t0, typename add_reference<typename add_const<T1 >::type>::type t1, typename add_reference<typename add_const<T2 >::type>::type t2, typename add_reference<typename add_const<T3 >::type>::type t3, typename add_reference<typename add_const<T4 >::type>::type t4, typename add_reference<typename add_const<T5 >::type>::type t5)
                : tuple_cons<T0, tuple<T1, T2, T3, T4, T5> >
                   (t0, tuple<T1, T2, T3, T4, T5>
                      (t1, t2, t3, t4, t5))
@@ -157,7 +158,7 @@ namespace mockitopp
          struct tuple<T0, T1, T2, T3, T4, T5, T6 , tuple_null_type , tuple_null_type , tuple_null_type>
             : tuple_cons<T0, tuple<T1, T2, T3, T4, T5, T6> >
          {
-            tuple(const T0 & t0, const T1 & t1, const T2 & t2, const T3 & t3, const T4 & t4, const T5 & t5, const T6 & t6)
+            tuple(typename add_reference<typename add_const<T0 >::type>::type t0, typename add_reference<typename add_const<T1 >::type>::type t1, typename add_reference<typename add_const<T2 >::type>::type t2, typename add_reference<typename add_const<T3 >::type>::type t3, typename add_reference<typename add_const<T4 >::type>::type t4, typename add_reference<typename add_const<T5 >::type>::type t5, typename add_reference<typename add_const<T6 >::type>::type t6)
                : tuple_cons<T0, tuple<T1, T2, T3, T4, T5, T6> >
                   (t0, tuple<T1, T2, T3, T4, T5, T6>
                      (t1, t2, t3, t4, t5, t6))
@@ -169,7 +170,7 @@ namespace mockitopp
          struct tuple<T0, T1, T2, T3, T4, T5, T6, T7 , tuple_null_type , tuple_null_type>
             : tuple_cons<T0, tuple<T1, T2, T3, T4, T5, T6, T7> >
          {
-            tuple(const T0 & t0, const T1 & t1, const T2 & t2, const T3 & t3, const T4 & t4, const T5 & t5, const T6 & t6, const T7 & t7)
+            tuple(typename add_reference<typename add_const<T0 >::type>::type t0, typename add_reference<typename add_const<T1 >::type>::type t1, typename add_reference<typename add_const<T2 >::type>::type t2, typename add_reference<typename add_const<T3 >::type>::type t3, typename add_reference<typename add_const<T4 >::type>::type t4, typename add_reference<typename add_const<T5 >::type>::type t5, typename add_reference<typename add_const<T6 >::type>::type t6, typename add_reference<typename add_const<T7 >::type>::type t7)
                : tuple_cons<T0, tuple<T1, T2, T3, T4, T5, T6, T7> >
                   (t0, tuple<T1, T2, T3, T4, T5, T6, T7>
                      (t1, t2, t3, t4, t5, t6, t7))
@@ -181,7 +182,7 @@ namespace mockitopp
          struct tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8 , tuple_null_type>
             : tuple_cons<T0, tuple<T1, T2, T3, T4, T5, T6, T7, T8> >
          {
-            tuple(const T0 & t0, const T1 & t1, const T2 & t2, const T3 & t3, const T4 & t4, const T5 & t5, const T6 & t6, const T7 & t7, const T8 & t8)
+            tuple(typename add_reference<typename add_const<T0 >::type>::type t0, typename add_reference<typename add_const<T1 >::type>::type t1, typename add_reference<typename add_const<T2 >::type>::type t2, typename add_reference<typename add_const<T3 >::type>::type t3, typename add_reference<typename add_const<T4 >::type>::type t4, typename add_reference<typename add_const<T5 >::type>::type t5, typename add_reference<typename add_const<T6 >::type>::type t6, typename add_reference<typename add_const<T7 >::type>::type t7, typename add_reference<typename add_const<T8 >::type>::type t8)
                : tuple_cons<T0, tuple<T1, T2, T3, T4, T5, T6, T7, T8> >
                   (t0, tuple<T1, T2, T3, T4, T5, T6, T7, T8>
                      (t1, t2, t3, t4, t5, t6, t7, t8))
@@ -193,12 +194,11 @@ namespace mockitopp
          // 0 element template
          template <>
          struct tuple< tuple_null_type ,  tuple_null_type ,  tuple_null_type ,  tuple_null_type ,  tuple_null_type ,  tuple_null_type ,  tuple_null_type ,  tuple_null_type ,  tuple_null_type ,  tuple_null_type >
-            : tuple_cons<tuple_null_type, tuple_cons<tuple_null_type, tuple_null_type> >
+            : tuple_cons<tuple_null_type, tuple_null_type>
          {
             tuple()
-               : tuple_cons<tuple_null_type, tuple_cons<tuple_null_type, tuple_null_type> >
-                  (tuple_null_type(), tuple_cons<tuple_null_type, tuple_null_type>
-                     (tuple_null_type(), tuple_null_type()))
+               : tuple_cons<tuple_null_type, tuple_null_type>
+                  (tuple_null_type(), tuple_null_type())
             {}
          };
       } // namespace tr1
