@@ -8,34 +8,85 @@
 
 #include <mockitopp/exceptions.hpp>
 #include <mockitopp/detail/stubbing/action.hpp>
-#include <mockitopp/detail/stubbing/MatcherContainer.hpp>
-#include <mockitopp/detail/stubbing/Verifier.hpp>
 #include <mockitopp/detail/util/tr1_tuple.hpp>
+#include <mockitopp/matchers/Matcher.hpp>
 
 // TODO: add documentation
 namespace mockitopp
 {
    namespace detail
    {
-      // simple base class to allow polymorphic desctruction with unknown subtype
-      struct dynamic_vfunction_polymorphic_destructor { virtual ~dynamic_vfunction_polymorphic_destructor() {} };
+      struct dynamic_vfunction_base
+      {
+         int calls;
+
+         dynamic_vfunction_base()
+            : calls(0)
+            {}
+
+         // allow polymorphic desctruction with unknown subtype
+         virtual ~dynamic_vfunction_base() {}
+
+         /**
+          * verify method is called within a specified range
+          *
+          * @param min minimum times method should be called
+          * @param max maximum times method should be called
+          */
+         bool between(int min, int max) const
+         {
+            if(calls >= min && calls <= max)
+               { return true; }
+            return false;
+         }
+
+         /**
+          * verify method is called at least (n) times
+          *
+          * @param times minimum number of times method should be called
+          */
+         bool atLeast(int times) const
+            { return between(times, 0x7FFF); }
+
+         /**
+          * verify method is called at most (n) times
+          *
+          * @param times maximum number of times method should be called
+          */
+         bool atMost(int times) const
+            { return between(0, times); }
+
+         /**
+          * verify method is called exactly (n) times
+          *
+          * @param times exact number of times method should be called
+          */
+         bool exactly(int times) const
+            { return between(times, times); }
+
+         /**
+          * verify method is never called
+          */
+         bool never() const
+            { return between(0, 0); }
+      };
 
       template <typename R>
-      struct dynamic_vfunction_base : dynamic_vfunction_polymorphic_destructor
+      struct dynamic_vfunction_action : dynamic_vfunction_base
       {
          typedef action<R>*             action_type;
          typedef std::list<action_type> action_queue_type;
 
          action_queue_type* ongoingMatch;
 
-         dynamic_vfunction_base& thenReturn(R value)
+         dynamic_vfunction_action& thenReturn(R value)
          {
             ongoingMatch->push_back(new returnable_action<R>(value));
             return *this;
          }
 
          template <typename T>
-         dynamic_vfunction_base& thenThrow(T throwable)
+         dynamic_vfunction_action& thenThrow(T throwable)
          {
             ongoingMatch->push_back(new throwable_action<R, T>(throwable));
             return *this;
@@ -43,21 +94,21 @@ namespace mockitopp
       };
 
       template <>
-      struct dynamic_vfunction_base<void> : dynamic_vfunction_polymorphic_destructor
+      struct dynamic_vfunction_action<void> : dynamic_vfunction_base
       {
          typedef action<void>*          action_type;
          typedef std::list<action_type> action_queue_type;
 
          action_queue_type* ongoingMatch;
 
-         dynamic_vfunction_base& thenReturn()
+         dynamic_vfunction_action& thenReturn()
          {
             ongoingMatch->push_back(new returnable_action<void>());
             return *this;
          }
 
          template <typename T>
-         dynamic_vfunction_base& thenThrow(T throwable)
+         dynamic_vfunction_action& thenThrow(T throwable)
          {
             ongoingMatch->push_back(new throwable_action<void, T>(throwable));
             return *this;
@@ -70,15 +121,38 @@ namespace mockitopp
          key_comparable_pair(const K& key, const V& pair)
             : std::pair<K, V>(key, pair)
             {}
+
+         template <typename KRHS, typename VRHS>
+         bool operator== (const key_comparable_pair<KRHS, VRHS>& rhs) const
+            { return this->first == rhs.first; }
+
+         template <typename RHS>
+         bool operator== (const RHS& rhs) const
+            { return this->first == rhs; }
       };
 
-      template <typename K1, typename V1, typename K2, typename V2>
-      bool operator== (const key_comparable_pair<K1, V1>& lhs, key_comparable_pair<K2, V2> rhs)
-         { return lhs.first == rhs.first; }
+      template <typename T>
+      struct matcher_element
+      {
+         matcher::Matcher<T>* matcher;
+  
+         matcher_element(const matcher::Matcher<T>& _matcher)
+            : matcher(_matcher.clone())
+            {}
 
-      template <typename K1, typename V1, typename K2>
-      bool operator== (const key_comparable_pair<K1, V1>& lhs, const K2& rhs)
-         { return lhs.first == rhs; }
+         matcher_element(const matcher_element& rhs)
+            : matcher(rhs.matcher->clone())
+            {}
+
+         ~matcher_element()
+            { delete matcher; }
+
+         bool operator== (typename tr1::add_reference<typename tr1::add_const<T>::type>::type rhs) const
+            { return (*matcher == rhs); }
+
+         bool operator== (const matcher_element& rhs) const
+            { return (matcher == rhs.matcher); }
+      };
 
       template <typename T> struct dynamic_vfunction;
 
@@ -89,20 +163,19 @@ namespace mockitopp
  
       // 0 arity template
       template <typename R, typename C>
-      struct dynamic_vfunction<R (C::*)()> : public dynamic_vfunction_base<R>, public Verifier
+      struct dynamic_vfunction<R (C::*)()> : public dynamic_vfunction_action<R>
       {
          typedef tr1::tuple<> raw_tuple_type;
          typedef tr1::tuple< > matcher_tuple_type;
 
-         typedef typename dynamic_vfunction_base<R>::action_type       action_type;
-         typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
+         typedef typename dynamic_vfunction_action<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
          std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
-            : dynamic_vfunction_base<R>()
-            , Verifier()
+            : dynamic_vfunction_action<R>()
             , raw_actions_map()
             , matcher_actions_map()
             {}
@@ -140,20 +213,19 @@ namespace mockitopp
  
       // 1 arity template
       template <typename R, typename C, typename A0>
-      struct dynamic_vfunction<R (C::*)(A0)> : public dynamic_vfunction_base<R>, public Verifier
+      struct dynamic_vfunction<R (C::*)(A0)> : public dynamic_vfunction_action<R>
       {
          typedef tr1::tuple<A0> raw_tuple_type;
-         typedef tr1::tuple<MatcherContainer<A0 > > matcher_tuple_type;
+         typedef tr1::tuple<matcher_element<A0 > > matcher_tuple_type;
 
-         typedef typename dynamic_vfunction_base<R>::action_type       action_type;
-         typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
+         typedef typename dynamic_vfunction_action<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
          std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
-            : dynamic_vfunction_base<R>()
-            , Verifier()
+            : dynamic_vfunction_action<R>()
             , raw_actions_map()
             , matcher_actions_map()
             {}
@@ -203,20 +275,19 @@ namespace mockitopp
  
       // 2 arity template
       template <typename R, typename C, typename A0, typename A1>
-      struct dynamic_vfunction<R (C::*)(A0, A1)> : public dynamic_vfunction_base<R>, public Verifier
+      struct dynamic_vfunction<R (C::*)(A0, A1)> : public dynamic_vfunction_action<R>
       {
          typedef tr1::tuple<A0, A1> raw_tuple_type;
-         typedef tr1::tuple<MatcherContainer<A0 >, MatcherContainer<A1 > > matcher_tuple_type;
+         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 > > matcher_tuple_type;
 
-         typedef typename dynamic_vfunction_base<R>::action_type       action_type;
-         typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
+         typedef typename dynamic_vfunction_action<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
          std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
-            : dynamic_vfunction_base<R>()
-            , Verifier()
+            : dynamic_vfunction_action<R>()
             , raw_actions_map()
             , matcher_actions_map()
             {}
@@ -266,20 +337,19 @@ namespace mockitopp
  
       // 3 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2)> : public dynamic_vfunction_base<R>, public Verifier
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2)> : public dynamic_vfunction_action<R>
       {
          typedef tr1::tuple<A0, A1, A2> raw_tuple_type;
-         typedef tr1::tuple<MatcherContainer<A0 >, MatcherContainer<A1 >, MatcherContainer<A2 > > matcher_tuple_type;
+         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 > > matcher_tuple_type;
 
-         typedef typename dynamic_vfunction_base<R>::action_type       action_type;
-         typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
+         typedef typename dynamic_vfunction_action<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
          std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
-            : dynamic_vfunction_base<R>()
-            , Verifier()
+            : dynamic_vfunction_action<R>()
             , raw_actions_map()
             , matcher_actions_map()
             {}
@@ -329,20 +399,19 @@ namespace mockitopp
  
       // 4 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3)> : public dynamic_vfunction_base<R>, public Verifier
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3)> : public dynamic_vfunction_action<R>
       {
          typedef tr1::tuple<A0, A1, A2, A3> raw_tuple_type;
-         typedef tr1::tuple<MatcherContainer<A0 >, MatcherContainer<A1 >, MatcherContainer<A2 >, MatcherContainer<A3 > > matcher_tuple_type;
+         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 > > matcher_tuple_type;
 
-         typedef typename dynamic_vfunction_base<R>::action_type       action_type;
-         typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
+         typedef typename dynamic_vfunction_action<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
          std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
-            : dynamic_vfunction_base<R>()
-            , Verifier()
+            : dynamic_vfunction_action<R>()
             , raw_actions_map()
             , matcher_actions_map()
             {}
@@ -392,20 +461,19 @@ namespace mockitopp
  
       // 5 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4)> : public dynamic_vfunction_base<R>, public Verifier
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4)> : public dynamic_vfunction_action<R>
       {
          typedef tr1::tuple<A0, A1, A2, A3, A4> raw_tuple_type;
-         typedef tr1::tuple<MatcherContainer<A0 >, MatcherContainer<A1 >, MatcherContainer<A2 >, MatcherContainer<A3 >, MatcherContainer<A4 > > matcher_tuple_type;
+         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 > > matcher_tuple_type;
 
-         typedef typename dynamic_vfunction_base<R>::action_type       action_type;
-         typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
+         typedef typename dynamic_vfunction_action<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
          std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
-            : dynamic_vfunction_base<R>()
-            , Verifier()
+            : dynamic_vfunction_action<R>()
             , raw_actions_map()
             , matcher_actions_map()
             {}
@@ -455,20 +523,19 @@ namespace mockitopp
  
       // 6 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5)> : public dynamic_vfunction_base<R>, public Verifier
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5)> : public dynamic_vfunction_action<R>
       {
          typedef tr1::tuple<A0, A1, A2, A3, A4, A5> raw_tuple_type;
-         typedef tr1::tuple<MatcherContainer<A0 >, MatcherContainer<A1 >, MatcherContainer<A2 >, MatcherContainer<A3 >, MatcherContainer<A4 >, MatcherContainer<A5 > > matcher_tuple_type;
+         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 >, matcher_element<A5 > > matcher_tuple_type;
 
-         typedef typename dynamic_vfunction_base<R>::action_type       action_type;
-         typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
+         typedef typename dynamic_vfunction_action<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
          std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
-            : dynamic_vfunction_base<R>()
-            , Verifier()
+            : dynamic_vfunction_action<R>()
             , raw_actions_map()
             , matcher_actions_map()
             {}
@@ -518,20 +585,19 @@ namespace mockitopp
  
       // 7 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6)> : public dynamic_vfunction_base<R>, public Verifier
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6)> : public dynamic_vfunction_action<R>
       {
          typedef tr1::tuple<A0, A1, A2, A3, A4, A5, A6> raw_tuple_type;
-         typedef tr1::tuple<MatcherContainer<A0 >, MatcherContainer<A1 >, MatcherContainer<A2 >, MatcherContainer<A3 >, MatcherContainer<A4 >, MatcherContainer<A5 >, MatcherContainer<A6 > > matcher_tuple_type;
+         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 >, matcher_element<A5 >, matcher_element<A6 > > matcher_tuple_type;
 
-         typedef typename dynamic_vfunction_base<R>::action_type       action_type;
-         typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
+         typedef typename dynamic_vfunction_action<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
          std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
-            : dynamic_vfunction_base<R>()
-            , Verifier()
+            : dynamic_vfunction_action<R>()
             , raw_actions_map()
             , matcher_actions_map()
             {}
@@ -581,20 +647,19 @@ namespace mockitopp
  
       // 8 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7)> : public dynamic_vfunction_base<R>, public Verifier
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7)> : public dynamic_vfunction_action<R>
       {
          typedef tr1::tuple<A0, A1, A2, A3, A4, A5, A6, A7> raw_tuple_type;
-         typedef tr1::tuple<MatcherContainer<A0 >, MatcherContainer<A1 >, MatcherContainer<A2 >, MatcherContainer<A3 >, MatcherContainer<A4 >, MatcherContainer<A5 >, MatcherContainer<A6 >, MatcherContainer<A7 > > matcher_tuple_type;
+         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 >, matcher_element<A5 >, matcher_element<A6 >, matcher_element<A7 > > matcher_tuple_type;
 
-         typedef typename dynamic_vfunction_base<R>::action_type       action_type;
-         typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
+         typedef typename dynamic_vfunction_action<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
          std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
-            : dynamic_vfunction_base<R>()
-            , Verifier()
+            : dynamic_vfunction_action<R>()
             , raw_actions_map()
             , matcher_actions_map()
             {}
@@ -644,20 +709,19 @@ namespace mockitopp
  
       // 9 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7, A8)> : public dynamic_vfunction_base<R>, public Verifier
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7, A8)> : public dynamic_vfunction_action<R>
       {
          typedef tr1::tuple<A0, A1, A2, A3, A4, A5, A6, A7, A8> raw_tuple_type;
-         typedef tr1::tuple<MatcherContainer<A0 >, MatcherContainer<A1 >, MatcherContainer<A2 >, MatcherContainer<A3 >, MatcherContainer<A4 >, MatcherContainer<A5 >, MatcherContainer<A6 >, MatcherContainer<A7 >, MatcherContainer<A8 > > matcher_tuple_type;
+         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 >, matcher_element<A5 >, matcher_element<A6 >, matcher_element<A7 >, matcher_element<A8 > > matcher_tuple_type;
 
-         typedef typename dynamic_vfunction_base<R>::action_type       action_type;
-         typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
+         typedef typename dynamic_vfunction_action<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
          std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
-            : dynamic_vfunction_base<R>()
-            , Verifier()
+            : dynamic_vfunction_action<R>()
             , raw_actions_map()
             , matcher_actions_map()
             {}
@@ -707,20 +771,19 @@ namespace mockitopp
  
       // 10 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9)> : public dynamic_vfunction_base<R>, public Verifier
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9)> : public dynamic_vfunction_action<R>
       {
          typedef tr1::tuple<A0, A1, A2, A3, A4, A5, A6, A7, A8, A9> raw_tuple_type;
-         typedef tr1::tuple<MatcherContainer<A0 >, MatcherContainer<A1 >, MatcherContainer<A2 >, MatcherContainer<A3 >, MatcherContainer<A4 >, MatcherContainer<A5 >, MatcherContainer<A6 >, MatcherContainer<A7 >, MatcherContainer<A8 >, MatcherContainer<A9 > > matcher_tuple_type;
+         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 >, matcher_element<A5 >, matcher_element<A6 >, matcher_element<A7 >, matcher_element<A8 >, matcher_element<A9 > > matcher_tuple_type;
 
-         typedef typename dynamic_vfunction_base<R>::action_type       action_type;
-         typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
+         typedef typename dynamic_vfunction_action<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
          std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
-            : dynamic_vfunction_base<R>()
-            , Verifier()
+            : dynamic_vfunction_action<R>()
             , raw_actions_map()
             , matcher_actions_map()
             {}

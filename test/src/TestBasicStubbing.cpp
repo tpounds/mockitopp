@@ -44,7 +44,8 @@ struct VoidStringRefInterface
 TEST(TestBasicStubbing, VoidStringRef)
 {
    mock_object<VoidStringRefInterface> mock;
-   mock(&VoidStringRefInterface::foo).when("bar").thenReturn();
+   std::string bar("bar");
+   mock(&VoidStringRefInterface::foo).when(bar).thenReturn();
    VoidStringRefInterface& i = mock.getInstance();
 
    i.foo("bar");

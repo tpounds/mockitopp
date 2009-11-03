@@ -43,6 +43,8 @@ M4_REPEAT(eval(MOCKITOPP_MAX_VIRTUAL_FUNCTION_ARITY + 1), `DEFINE_PROXY_VFUNCTIO
 define(`DEFINE_PROXY_VFUNCTION_FACTORY_OFFSET_FUNCTION', `        virtual void* offset$1() { return horrible_cast<void*>(&proxy_vfunction<$1, typename remove_member_function_pointer_cv<M>::type>::invoke); }
 ')dnl
 M4_REPEAT(MOCKITOPP_MAX_VIRTUAL_FUNCTIONS, `DEFINE_PROXY_VFUNCTION_FACTORY_OFFSET_FUNCTION')dnl
+
+         virtual ~proxy_vfunction_factory() {}
       };
    } // namespace detail
 } // namespace mockitopp

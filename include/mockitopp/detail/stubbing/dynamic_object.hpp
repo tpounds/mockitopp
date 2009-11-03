@@ -72,6 +72,8 @@ namespace mockitopp
          virtual int offset47() { return 47; }
          virtual int offset48() { return 48; }
          virtual int offset49() { return 49; }
+
+         virtual ~vtable_offset_helper() {}
       };
 
       /**
@@ -101,7 +103,7 @@ namespace mockitopp
             for(int i = 0; i < 50; i++)
             {
                if(__spys[i] != 0)
-                  { delete reinterpret_cast<dynamic_vfunction_polymorphic_destructor*>(__spys[i]); }
+                  { delete reinterpret_cast<dynamic_vfunction_base*>(__spys[i]); }
             }
          }
 
