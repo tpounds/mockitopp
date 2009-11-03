@@ -18,8 +18,10 @@ TEST(test_overloaded_functions, foo)
    mock(static_cast<int (overloaded_interface::*)(bool)>(&overloaded_interface::foo)).when(true).thenReturn(0);
    mock(static_cast<int (overloaded_interface::*)(char)>(&overloaded_interface::foo)).when('A').thenReturn(0);
    mock(static_cast<int (overloaded_interface::*)(char)>(&overloaded_interface::foo)).when('%').thenReturn(1);
-   mock(static_cast<int (overloaded_interface::*)(const std::string&)>(&overloaded_interface::foo)).when("bar").thenReturn(50);
-   mock(static_cast<int (overloaded_interface::*)(const std::string&)>(&overloaded_interface::foo)).when("hello").thenReturn(10);
+   std::string bar("bar");
+   mock(static_cast<int (overloaded_interface::*)(const std::string&)>(&overloaded_interface::foo)).when(bar).thenReturn(50);
+   std::string hello("hello");
+   mock(static_cast<int (overloaded_interface::*)(const std::string&)>(&overloaded_interface::foo)).when(hello).thenReturn(10);
    overloaded_interface& obj = mock.getInstance();
 
    ASSERT_EQ(0, obj.foo(true));

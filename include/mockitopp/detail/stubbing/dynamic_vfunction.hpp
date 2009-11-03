@@ -11,7 +11,6 @@
 #include <mockitopp/detail/stubbing/MatcherContainer.hpp>
 #include <mockitopp/detail/stubbing/Verifier.hpp>
 #include <mockitopp/detail/util/tr1_tuple.hpp>
-#include <mockitopp/detail/util/tr1_type_traits.hpp>
 
 // TODO: add documentation
 namespace mockitopp
@@ -93,7 +92,7 @@ namespace mockitopp
       struct dynamic_vfunction<R (C::*)()> : public dynamic_vfunction_base<R>, public Verifier
       {
          typedef tr1::tuple<> raw_tuple_type;
-         typedef tr1::tuple<> matcher_tuple_type;
+         typedef tr1::tuple< > matcher_tuple_type;
 
          typedef typename dynamic_vfunction_base<R>::action_type       action_type;
          typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
@@ -120,18 +119,21 @@ namespace mockitopp
          {
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type();
-            action_queue_type& actions = raw_actions_map[args];
-            if(actions.empty())
+            action_queue_type* actions = 0;
+            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            if(raw_actions_it != raw_actions_map.end())
+               { actions = &(raw_actions_it->second); }
+            if(actions == 0)
             {
                typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
                pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
                if(pair_it == matcher_actions_map.end())
                   { throw partial_implementation_exception(); }
-               actions = pair_it->second;
+               actions = &(pair_it->second);
             }
-            action_type action = actions.front();
-            if(actions.size() > 1)
-               { actions.pop_front(); }
+            action_type action = actions->front();
+            if(actions->size() > 1)
+               { actions->pop_front(); }
             return action->invoke();
          }
       };
@@ -140,8 +142,8 @@ namespace mockitopp
       template <typename R, typename C, typename A0>
       struct dynamic_vfunction<R (C::*)(A0)> : public dynamic_vfunction_base<R>, public Verifier
       {
-         typedef tr1::tuple<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type> raw_tuple_type;
-         typedef tr1::tuple<MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type> > matcher_tuple_type;
+         typedef tr1::tuple<A0> raw_tuple_type;
+         typedef tr1::tuple<MatcherContainer<A0 > > matcher_tuple_type;
 
          typedef typename dynamic_vfunction_base<R>::action_type       action_type;
          typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
@@ -156,7 +158,7 @@ namespace mockitopp
             , matcher_actions_map()
             {}
 
-         dynamic_vfunction& when(const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type>& a0)
+         dynamic_vfunction& when(const matcher::Matcher<A0 >& a0)
          {
             matcher_tuple_type args = matcher_tuple_type(a0);
             typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
@@ -180,18 +182,21 @@ namespace mockitopp
          {
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type(a0);
-            action_queue_type& actions = raw_actions_map[args];
-            if(actions.empty())
+            action_queue_type* actions = 0;
+            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            if(raw_actions_it != raw_actions_map.end())
+               { actions = &(raw_actions_it->second); }
+            if(actions == 0)
             {
                typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
                pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
                if(pair_it == matcher_actions_map.end())
                   { throw partial_implementation_exception(); }
-               actions = pair_it->second;
+               actions = &(pair_it->second);
             }
-            action_type action = actions.front();
-            if(actions.size() > 1)
-               { actions.pop_front(); }
+            action_type action = actions->front();
+            if(actions->size() > 1)
+               { actions->pop_front(); }
             return action->invoke();
          }
       };
@@ -200,8 +205,8 @@ namespace mockitopp
       template <typename R, typename C, typename A0, typename A1>
       struct dynamic_vfunction<R (C::*)(A0, A1)> : public dynamic_vfunction_base<R>, public Verifier
       {
-         typedef tr1::tuple<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type> raw_tuple_type;
-         typedef tr1::tuple<MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type> > matcher_tuple_type;
+         typedef tr1::tuple<A0, A1> raw_tuple_type;
+         typedef tr1::tuple<MatcherContainer<A0 >, MatcherContainer<A1 > > matcher_tuple_type;
 
          typedef typename dynamic_vfunction_base<R>::action_type       action_type;
          typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
@@ -216,7 +221,7 @@ namespace mockitopp
             , matcher_actions_map()
             {}
 
-         dynamic_vfunction& when(const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type>& a0, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type>& a1)
+         dynamic_vfunction& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1)
          {
             matcher_tuple_type args = matcher_tuple_type(a0, a1);
             typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
@@ -240,18 +245,21 @@ namespace mockitopp
          {
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type(a0, a1);
-            action_queue_type& actions = raw_actions_map[args];
-            if(actions.empty())
+            action_queue_type* actions = 0;
+            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            if(raw_actions_it != raw_actions_map.end())
+               { actions = &(raw_actions_it->second); }
+            if(actions == 0)
             {
                typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
                pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
                if(pair_it == matcher_actions_map.end())
                   { throw partial_implementation_exception(); }
-               actions = pair_it->second;
+               actions = &(pair_it->second);
             }
-            action_type action = actions.front();
-            if(actions.size() > 1)
-               { actions.pop_front(); }
+            action_type action = actions->front();
+            if(actions->size() > 1)
+               { actions->pop_front(); }
             return action->invoke();
          }
       };
@@ -260,8 +268,8 @@ namespace mockitopp
       template <typename R, typename C, typename A0, typename A1, typename A2>
       struct dynamic_vfunction<R (C::*)(A0, A1, A2)> : public dynamic_vfunction_base<R>, public Verifier
       {
-         typedef tr1::tuple<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type> raw_tuple_type;
-         typedef tr1::tuple<MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type> > matcher_tuple_type;
+         typedef tr1::tuple<A0, A1, A2> raw_tuple_type;
+         typedef tr1::tuple<MatcherContainer<A0 >, MatcherContainer<A1 >, MatcherContainer<A2 > > matcher_tuple_type;
 
          typedef typename dynamic_vfunction_base<R>::action_type       action_type;
          typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
@@ -276,7 +284,7 @@ namespace mockitopp
             , matcher_actions_map()
             {}
 
-         dynamic_vfunction& when(const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type>& a0, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type>& a1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type>& a2)
+         dynamic_vfunction& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2)
          {
             matcher_tuple_type args = matcher_tuple_type(a0, a1, a2);
             typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
@@ -300,18 +308,21 @@ namespace mockitopp
          {
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type(a0, a1, a2);
-            action_queue_type& actions = raw_actions_map[args];
-            if(actions.empty())
+            action_queue_type* actions = 0;
+            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            if(raw_actions_it != raw_actions_map.end())
+               { actions = &(raw_actions_it->second); }
+            if(actions == 0)
             {
                typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
                pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
                if(pair_it == matcher_actions_map.end())
                   { throw partial_implementation_exception(); }
-               actions = pair_it->second;
+               actions = &(pair_it->second);
             }
-            action_type action = actions.front();
-            if(actions.size() > 1)
-               { actions.pop_front(); }
+            action_type action = actions->front();
+            if(actions->size() > 1)
+               { actions->pop_front(); }
             return action->invoke();
          }
       };
@@ -320,8 +331,8 @@ namespace mockitopp
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3>
       struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3)> : public dynamic_vfunction_base<R>, public Verifier
       {
-         typedef tr1::tuple<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type> raw_tuple_type;
-         typedef tr1::tuple<MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type> > matcher_tuple_type;
+         typedef tr1::tuple<A0, A1, A2, A3> raw_tuple_type;
+         typedef tr1::tuple<MatcherContainer<A0 >, MatcherContainer<A1 >, MatcherContainer<A2 >, MatcherContainer<A3 > > matcher_tuple_type;
 
          typedef typename dynamic_vfunction_base<R>::action_type       action_type;
          typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
@@ -336,7 +347,7 @@ namespace mockitopp
             , matcher_actions_map()
             {}
 
-         dynamic_vfunction& when(const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type>& a0, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type>& a1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type>& a2, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type>& a3)
+         dynamic_vfunction& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3)
          {
             matcher_tuple_type args = matcher_tuple_type(a0, a1, a2, a3);
             typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
@@ -360,18 +371,21 @@ namespace mockitopp
          {
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type(a0, a1, a2, a3);
-            action_queue_type& actions = raw_actions_map[args];
-            if(actions.empty())
+            action_queue_type* actions = 0;
+            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            if(raw_actions_it != raw_actions_map.end())
+               { actions = &(raw_actions_it->second); }
+            if(actions == 0)
             {
                typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
                pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
                if(pair_it == matcher_actions_map.end())
                   { throw partial_implementation_exception(); }
-               actions = pair_it->second;
+               actions = &(pair_it->second);
             }
-            action_type action = actions.front();
-            if(actions.size() > 1)
-               { actions.pop_front(); }
+            action_type action = actions->front();
+            if(actions->size() > 1)
+               { actions->pop_front(); }
             return action->invoke();
          }
       };
@@ -380,8 +394,8 @@ namespace mockitopp
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4>
       struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4)> : public dynamic_vfunction_base<R>, public Verifier
       {
-         typedef tr1::tuple<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type> raw_tuple_type;
-         typedef tr1::tuple<MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type> > matcher_tuple_type;
+         typedef tr1::tuple<A0, A1, A2, A3, A4> raw_tuple_type;
+         typedef tr1::tuple<MatcherContainer<A0 >, MatcherContainer<A1 >, MatcherContainer<A2 >, MatcherContainer<A3 >, MatcherContainer<A4 > > matcher_tuple_type;
 
          typedef typename dynamic_vfunction_base<R>::action_type       action_type;
          typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
@@ -396,7 +410,7 @@ namespace mockitopp
             , matcher_actions_map()
             {}
 
-         dynamic_vfunction& when(const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type>& a0, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type>& a1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type>& a2, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type>& a3, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type>& a4)
+         dynamic_vfunction& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4)
          {
             matcher_tuple_type args = matcher_tuple_type(a0, a1, a2, a3, a4);
             typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
@@ -420,18 +434,21 @@ namespace mockitopp
          {
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type(a0, a1, a2, a3, a4);
-            action_queue_type& actions = raw_actions_map[args];
-            if(actions.empty())
+            action_queue_type* actions = 0;
+            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            if(raw_actions_it != raw_actions_map.end())
+               { actions = &(raw_actions_it->second); }
+            if(actions == 0)
             {
                typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
                pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
                if(pair_it == matcher_actions_map.end())
                   { throw partial_implementation_exception(); }
-               actions = pair_it->second;
+               actions = &(pair_it->second);
             }
-            action_type action = actions.front();
-            if(actions.size() > 1)
-               { actions.pop_front(); }
+            action_type action = actions->front();
+            if(actions->size() > 1)
+               { actions->pop_front(); }
             return action->invoke();
          }
       };
@@ -440,8 +457,8 @@ namespace mockitopp
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5>
       struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5)> : public dynamic_vfunction_base<R>, public Verifier
       {
-         typedef tr1::tuple<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type> raw_tuple_type;
-         typedef tr1::tuple<MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type> > matcher_tuple_type;
+         typedef tr1::tuple<A0, A1, A2, A3, A4, A5> raw_tuple_type;
+         typedef tr1::tuple<MatcherContainer<A0 >, MatcherContainer<A1 >, MatcherContainer<A2 >, MatcherContainer<A3 >, MatcherContainer<A4 >, MatcherContainer<A5 > > matcher_tuple_type;
 
          typedef typename dynamic_vfunction_base<R>::action_type       action_type;
          typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
@@ -456,7 +473,7 @@ namespace mockitopp
             , matcher_actions_map()
             {}
 
-         dynamic_vfunction& when(const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type>& a0, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type>& a1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type>& a2, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type>& a3, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type>& a4, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type>& a5)
+         dynamic_vfunction& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5)
          {
             matcher_tuple_type args = matcher_tuple_type(a0, a1, a2, a3, a4, a5);
             typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
@@ -480,18 +497,21 @@ namespace mockitopp
          {
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type(a0, a1, a2, a3, a4, a5);
-            action_queue_type& actions = raw_actions_map[args];
-            if(actions.empty())
+            action_queue_type* actions = 0;
+            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            if(raw_actions_it != raw_actions_map.end())
+               { actions = &(raw_actions_it->second); }
+            if(actions == 0)
             {
                typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
                pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
                if(pair_it == matcher_actions_map.end())
                   { throw partial_implementation_exception(); }
-               actions = pair_it->second;
+               actions = &(pair_it->second);
             }
-            action_type action = actions.front();
-            if(actions.size() > 1)
-               { actions.pop_front(); }
+            action_type action = actions->front();
+            if(actions->size() > 1)
+               { actions->pop_front(); }
             return action->invoke();
          }
       };
@@ -500,8 +520,8 @@ namespace mockitopp
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
       struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6)> : public dynamic_vfunction_base<R>, public Verifier
       {
-         typedef tr1::tuple<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type> raw_tuple_type;
-         typedef tr1::tuple<MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type> > matcher_tuple_type;
+         typedef tr1::tuple<A0, A1, A2, A3, A4, A5, A6> raw_tuple_type;
+         typedef tr1::tuple<MatcherContainer<A0 >, MatcherContainer<A1 >, MatcherContainer<A2 >, MatcherContainer<A3 >, MatcherContainer<A4 >, MatcherContainer<A5 >, MatcherContainer<A6 > > matcher_tuple_type;
 
          typedef typename dynamic_vfunction_base<R>::action_type       action_type;
          typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
@@ -516,7 +536,7 @@ namespace mockitopp
             , matcher_actions_map()
             {}
 
-         dynamic_vfunction& when(const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type>& a0, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type>& a1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type>& a2, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type>& a3, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type>& a4, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type>& a5, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type>& a6)
+         dynamic_vfunction& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5, const matcher::Matcher<A6 >& a6)
          {
             matcher_tuple_type args = matcher_tuple_type(a0, a1, a2, a3, a4, a5, a6);
             typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
@@ -540,18 +560,21 @@ namespace mockitopp
          {
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6);
-            action_queue_type& actions = raw_actions_map[args];
-            if(actions.empty())
+            action_queue_type* actions = 0;
+            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            if(raw_actions_it != raw_actions_map.end())
+               { actions = &(raw_actions_it->second); }
+            if(actions == 0)
             {
                typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
                pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
                if(pair_it == matcher_actions_map.end())
                   { throw partial_implementation_exception(); }
-               actions = pair_it->second;
+               actions = &(pair_it->second);
             }
-            action_type action = actions.front();
-            if(actions.size() > 1)
-               { actions.pop_front(); }
+            action_type action = actions->front();
+            if(actions->size() > 1)
+               { actions->pop_front(); }
             return action->invoke();
          }
       };
@@ -560,8 +583,8 @@ namespace mockitopp
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7>
       struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7)> : public dynamic_vfunction_base<R>, public Verifier
       {
-         typedef tr1::tuple<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A7 >::type>::type> raw_tuple_type;
-         typedef tr1::tuple<MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A7 >::type>::type> > matcher_tuple_type;
+         typedef tr1::tuple<A0, A1, A2, A3, A4, A5, A6, A7> raw_tuple_type;
+         typedef tr1::tuple<MatcherContainer<A0 >, MatcherContainer<A1 >, MatcherContainer<A2 >, MatcherContainer<A3 >, MatcherContainer<A4 >, MatcherContainer<A5 >, MatcherContainer<A6 >, MatcherContainer<A7 > > matcher_tuple_type;
 
          typedef typename dynamic_vfunction_base<R>::action_type       action_type;
          typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
@@ -576,7 +599,7 @@ namespace mockitopp
             , matcher_actions_map()
             {}
 
-         dynamic_vfunction& when(const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type>& a0, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type>& a1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type>& a2, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type>& a3, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type>& a4, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type>& a5, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type>& a6, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A7 >::type>::type>& a7)
+         dynamic_vfunction& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5, const matcher::Matcher<A6 >& a6, const matcher::Matcher<A7 >& a7)
          {
             matcher_tuple_type args = matcher_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7);
             typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
@@ -600,18 +623,21 @@ namespace mockitopp
          {
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7);
-            action_queue_type& actions = raw_actions_map[args];
-            if(actions.empty())
+            action_queue_type* actions = 0;
+            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            if(raw_actions_it != raw_actions_map.end())
+               { actions = &(raw_actions_it->second); }
+            if(actions == 0)
             {
                typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
                pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
                if(pair_it == matcher_actions_map.end())
                   { throw partial_implementation_exception(); }
-               actions = pair_it->second;
+               actions = &(pair_it->second);
             }
-            action_type action = actions.front();
-            if(actions.size() > 1)
-               { actions.pop_front(); }
+            action_type action = actions->front();
+            if(actions->size() > 1)
+               { actions->pop_front(); }
             return action->invoke();
          }
       };
@@ -620,8 +646,8 @@ namespace mockitopp
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8>
       struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7, A8)> : public dynamic_vfunction_base<R>, public Verifier
       {
-         typedef tr1::tuple<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A7 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A8 >::type>::type> raw_tuple_type;
-         typedef tr1::tuple<MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A7 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A8 >::type>::type> > matcher_tuple_type;
+         typedef tr1::tuple<A0, A1, A2, A3, A4, A5, A6, A7, A8> raw_tuple_type;
+         typedef tr1::tuple<MatcherContainer<A0 >, MatcherContainer<A1 >, MatcherContainer<A2 >, MatcherContainer<A3 >, MatcherContainer<A4 >, MatcherContainer<A5 >, MatcherContainer<A6 >, MatcherContainer<A7 >, MatcherContainer<A8 > > matcher_tuple_type;
 
          typedef typename dynamic_vfunction_base<R>::action_type       action_type;
          typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
@@ -636,7 +662,7 @@ namespace mockitopp
             , matcher_actions_map()
             {}
 
-         dynamic_vfunction& when(const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type>& a0, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type>& a1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type>& a2, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type>& a3, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type>& a4, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type>& a5, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type>& a6, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A7 >::type>::type>& a7, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A8 >::type>::type>& a8)
+         dynamic_vfunction& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5, const matcher::Matcher<A6 >& a6, const matcher::Matcher<A7 >& a7, const matcher::Matcher<A8 >& a8)
          {
             matcher_tuple_type args = matcher_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8);
             typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
@@ -660,18 +686,21 @@ namespace mockitopp
          {
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8);
-            action_queue_type& actions = raw_actions_map[args];
-            if(actions.empty())
+            action_queue_type* actions = 0;
+            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            if(raw_actions_it != raw_actions_map.end())
+               { actions = &(raw_actions_it->second); }
+            if(actions == 0)
             {
                typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
                pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
                if(pair_it == matcher_actions_map.end())
                   { throw partial_implementation_exception(); }
-               actions = pair_it->second;
+               actions = &(pair_it->second);
             }
-            action_type action = actions.front();
-            if(actions.size() > 1)
-               { actions.pop_front(); }
+            action_type action = actions->front();
+            if(actions->size() > 1)
+               { actions->pop_front(); }
             return action->invoke();
          }
       };
@@ -680,8 +709,8 @@ namespace mockitopp
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9>
       struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9)> : public dynamic_vfunction_base<R>, public Verifier
       {
-         typedef tr1::tuple<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A7 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A8 >::type>::type, typename tr1::remove_const<typename tr1::remove_reference<A9 >::type>::type> raw_tuple_type;
-         typedef tr1::tuple<MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A7 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A8 >::type>::type> , MatcherContainer<typename tr1::remove_const<typename tr1::remove_reference<A9 >::type>::type> > matcher_tuple_type;
+         typedef tr1::tuple<A0, A1, A2, A3, A4, A5, A6, A7, A8, A9> raw_tuple_type;
+         typedef tr1::tuple<MatcherContainer<A0 >, MatcherContainer<A1 >, MatcherContainer<A2 >, MatcherContainer<A3 >, MatcherContainer<A4 >, MatcherContainer<A5 >, MatcherContainer<A6 >, MatcherContainer<A7 >, MatcherContainer<A8 >, MatcherContainer<A9 > > matcher_tuple_type;
 
          typedef typename dynamic_vfunction_base<R>::action_type       action_type;
          typedef typename dynamic_vfunction_base<R>::action_queue_type action_queue_type;
@@ -696,7 +725,7 @@ namespace mockitopp
             , matcher_actions_map()
             {}
 
-         dynamic_vfunction& when(const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A0 >::type>::type>& a0, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A1 >::type>::type>& a1, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A2 >::type>::type>& a2, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A3 >::type>::type>& a3, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A4 >::type>::type>& a4, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A5 >::type>::type>& a5, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A6 >::type>::type>& a6, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A7 >::type>::type>& a7, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A8 >::type>::type>& a8, const matcher::Matcher<typename tr1::remove_const<typename tr1::remove_reference<A9 >::type>::type>& a9)
+         dynamic_vfunction& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5, const matcher::Matcher<A6 >& a6, const matcher::Matcher<A7 >& a7, const matcher::Matcher<A8 >& a8, const matcher::Matcher<A9 >& a9)
          {
             matcher_tuple_type args = matcher_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
             typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
@@ -720,18 +749,21 @@ namespace mockitopp
          {
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
-            action_queue_type& actions = raw_actions_map[args];
-            if(actions.empty())
+            action_queue_type* actions = 0;
+            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            if(raw_actions_it != raw_actions_map.end())
+               { actions = &(raw_actions_it->second); }
+            if(actions == 0)
             {
                typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
                pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
                if(pair_it == matcher_actions_map.end())
                   { throw partial_implementation_exception(); }
-               actions = pair_it->second;
+               actions = &(pair_it->second);
             }
-            action_type action = actions.front();
-            if(actions.size() > 1)
-               { actions.pop_front(); }
+            action_type action = actions->front();
+            if(actions->size() > 1)
+               { actions->pop_front(); }
             return action->invoke();
          }
       };

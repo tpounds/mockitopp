@@ -31,9 +31,9 @@ TEST(test_regex, const_char)
 TEST(test_regex, std_string)
 {
    mock_object<regex_interface> mock;
-   mock(&regex_interface::std_string).when(regex(std::string(".*foo.*"))).thenReturn("matches__.*foo.*");
-   mock(&regex_interface::std_string).when(regex(std::string(".*bar.*"))).thenReturn("matches__.*bar.*");
-   mock(&regex_interface::std_string).when(regex(std::string("[A-Z]*"))).thenReturn("matches__[A-Z]*");
+   mock(&regex_interface::std_string).when(regex<const std::string&>(".*foo.*")).thenReturn("matches__.*foo.*");
+   mock(&regex_interface::std_string).when(regex<const std::string&>(".*bar.*")).thenReturn("matches__.*bar.*");
+   mock(&regex_interface::std_string).when(regex<const std::string&>("[A-Z]*")).thenReturn("matches__[A-Z]*");
    regex_interface& obj = mock.getInstance();
 
    ASSERT_EQ("matches__.*foo.*", obj.std_string("foo"));
@@ -46,9 +46,9 @@ TEST(test_regex, std_string)
 TEST(test_regex, composite)
 {
    mock_object<regex_interface> mock;
-   mock(&regex_interface::composite).when(regex(".*foo.*"), regex(std::string(".*bar.*"))).thenReturn("matches__.*foo.*__.*bar.*");
-   mock(&regex_interface::composite).when(regex(".*FOO.*"), regex(std::string(".*BAR.*"))).thenReturn("matches__.*FOO.*__.*BAR.*");
-   mock(&regex_interface::composite).when(regex("[a-z]*"),  regex(std::string("[A-Z]*"))).thenReturn("matches__[a-z]*__[A-Z]*");
+   mock(&regex_interface::composite).when(regex(".*foo.*"), regex<const std::string&>(".*bar.*")).thenReturn("matches__.*foo.*__.*bar.*");
+   mock(&regex_interface::composite).when(regex(".*FOO.*"), regex<const std::string&>(".*BAR.*")).thenReturn("matches__.*FOO.*__.*BAR.*");
+   mock(&regex_interface::composite).when(regex("[a-z]*"),  regex<const std::string&>("[A-Z]*")).thenReturn("matches__[a-z]*__[A-Z]*");
    regex_interface& obj = mock.getInstance();
 
    ASSERT_EQ("matches__.*foo.*__.*bar.*", obj.composite("foo", "bar"));

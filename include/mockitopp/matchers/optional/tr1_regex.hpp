@@ -40,11 +40,9 @@ namespace mockitopp
          };
       } // namespace detail
 
-      inline detail::RegexT<std::string> regex(const std::string& expr)
-         { return detail::RegexT<std::string>(expr); }
-
-      inline detail::RegexT<const char*> regex(const char* expr)
-         { return detail::RegexT<const char*>(expr); }
+      template <typename T>
+      detail::RegexT<T> regex(T expr)
+         { return detail::RegexT<T>(expr); }
    } // namespace matcher
 } // namespace mockitopp
 
