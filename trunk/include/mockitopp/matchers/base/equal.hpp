@@ -13,14 +13,16 @@ namespace mockitopp
          template <typename T>
          struct EqualT : public Matcher<T>
          {
-            EqualT(const T& element)
+            EqualT(typename mockitopp::detail::tr1::add_reference<
+                     typename mockitopp::detail::tr1::add_const<T>::type>::type element)
                : element(element)
                {}
 
             virtual Matcher<T>* clone() const
                { return new EqualT(element); }
 
-            virtual bool operator== (typename mockitopp::detail::tr1::add_reference<typename mockitopp::detail::tr1::add_const<T>::type>::type rhs) const
+            virtual bool operator== (typename mockitopp::detail::tr1::add_reference<
+                                       typename mockitopp::detail::tr1::add_const<T>::type>::type rhs) const
                { return element == rhs; }
 
             private:
@@ -30,7 +32,8 @@ namespace mockitopp
       } // namespace detail
 
       template <typename T>
-      detail::EqualT<T> equal(const T& element)
+      detail::EqualT<T> equal(typename mockitopp::detail::tr1::add_reference<
+                                 typename mockitopp::detail::tr1::add_const<T>::type>::type element)
          { return detail::EqualT<T>(element); }
 
       inline detail::EqualT<std::string> equal(const char* element)
