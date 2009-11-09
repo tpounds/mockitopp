@@ -27,7 +27,7 @@ TEST(test_is_not, is_not_is_not_equal_ptr)
 {
    mock_object<is_not_test_interface> mock;
    void* void_ptr = new char;
-   mock(&is_not_test_interface::prim_void_ptr).when(is_not(is_not(equal(void_ptr)))).thenReturn("void* == new char");
+   mock(&is_not_test_interface::prim_void_ptr).when(is_not(is_not(equal<void*>(void_ptr)))).thenReturn("void* == new char");
    is_not_test_interface& obj = mock.getInstance();
 
    ASSERT_EQ("void* == new char", obj.prim_void_ptr(void_ptr));
