@@ -17,7 +17,7 @@ TEST(test_equal, equal_void_ptr)
    mock_object<equal_test_interface> mock;
    mock(&equal_test_interface::prim_void_ptr).when(equal<void*>(0)).thenReturn(0);
    void* void_ptr = new int;
-   mock(&equal_test_interface::prim_void_ptr).when(equal(void_ptr)).thenReturn(1);
+   mock(&equal_test_interface::prim_void_ptr).when(equal<void*>(void_ptr)).thenReturn(1);
    equal_test_interface& obj = mock.getInstance();
 
    ASSERT_EQ(0, obj.prim_void_ptr(0));
@@ -28,9 +28,9 @@ TEST(test_equal, equal_void_ptr)
 TEST(test_equal, equal_prim_char)
 {
    mock_object<equal_test_interface> mock;
-   mock(&equal_test_interface::prim_char).when(equal(' ')).thenReturn(32);
-   mock(&equal_test_interface::prim_char).when(equal('0')).thenReturn(48);
-   mock(&equal_test_interface::prim_char).when(equal('A')).thenReturn(65);
+   mock(&equal_test_interface::prim_char).when(equal<char>(' ')).thenReturn(32);
+   mock(&equal_test_interface::prim_char).when(equal<char>('0')).thenReturn(48);
+   mock(&equal_test_interface::prim_char).when(equal<char>('A')).thenReturn(65);
    equal_test_interface& obj = mock.getInstance();
 
    ASSERT_EQ(32, obj.prim_char(' '));
