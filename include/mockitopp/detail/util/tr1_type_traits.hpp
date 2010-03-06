@@ -32,7 +32,7 @@ namespace mockitopp
          template <typename T> struct remove_const<const T> { typedef T type; };
 
          // std::tr1::add_reference
-         template <typename T> struct add_reference { typedef T& type; };
+         template <typename T> struct add_reference { typedef T type; };
          template <typename T> struct add_reference<T&> { typedef T& type; };
 
          // std::tr1::remove_reference
