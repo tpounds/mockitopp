@@ -17,8 +17,8 @@ This library was primarily developed against GCC but should be portable across n
 
 == [http://msdn.microsoft.com/en-us/visualc Microsoft Visual C++] ==
 || *version* || *works* || *notes* ||
-||6.0||No?||cl.exe (12.00.8168), link.exe (6.00.8168), no template partial specialization^{{{<a href="#ref1">[1]</a>}}}^||
-||7.0 (.Net 2002)||No?||cl.exe (13.00.9466), link.exe (7.00.9466), no template partial specialization^{{{<a href="#ref1">[1]</a>}}}^||
+||6.0||No?||cl.exe (12.00.8168), link.exe (6.00.8168), no template partial specialization^<a href="#ref1">[1]</a>^||
+||7.0 (.Net 2002)||No?||cl.exe (13.00.9466), link.exe (7.00.9466), no template partial specialization^<a href="#ref1">[1]</a>^||
 ||7.1 (.Net 2003)||Yes||cl.exe (13.10.6030), link.exe (7.10.6030)||
 ||8.0 (2005)||Yes||cl.exe (14.00.50727.42), link.exe (8.00.50727.42)||
 ||9.0 (2008)||Yes||cl.exe (15.00.3072.01), link.exe (9.00.30727.01)||
@@ -28,4 +28,4 @@ This library was primarily developed against GCC but should be portable across n
 ||3.4.x||Yes||g++ (3.4.5 r3), w32api (3.13)||
 
 == References ==
-{{{[<a name="ref1">1</a>]}}} [http://support.microsoft.com/kb/240866 KB240866]
+<a name="ref1">[1]</a> [http://support.microsoft.com/kb/240866 KB240866]
