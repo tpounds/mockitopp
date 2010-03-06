@@ -28,4 +28,4 @@ This library was primarily developed against GCC but should be portable across n
 ||3.4.x||Yes||g++ (3.4.5 r3), w32api (3.13)||
 
 == References ==
- # <a name="ref1">[http://support.microsoft.com/kb/240866 KB240866]</a>
+ # <a name="ref1">[http://support.microsoft.com/kb/240866 BUG: ERROR C2989 and C2988 on Class Template Partial Specializations (KB240866)]</a>
