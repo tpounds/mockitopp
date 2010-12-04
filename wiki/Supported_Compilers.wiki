@@ -12,8 +12,9 @@ This library was primarily developed against GCC but should be portable across n
 ||4.0.x||Yes||g++ (4.0.4)||
 ||4.1.x||Yes||g++ (4.1.2)||
 ||4.2.x||Yes||g++ (4.2.4)||
-||4.3.x||Yes||g++ (4.3.3)||
-||4.4.x||Yes||g++ (4.4.0)||
+||4.3.x||Yes||g++ (4.3.3, 4.3.5)||
+||4.4.x||Yes||g++ (4.4.0, 4.4.5)||
+||4.5.x||Yes||g++ (4.5.1)||
 
 == [http://msdn.microsoft.com/en-us/visualc Microsoft Visual C++] ==
 || *version* || *works* || *notes* ||
