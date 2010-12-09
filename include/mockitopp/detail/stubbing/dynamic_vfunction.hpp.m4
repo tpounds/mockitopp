@@ -8,6 +8,7 @@
 
 #include <mockitopp/exceptions.hpp>
 #include <mockitopp/detail/stubbing/action.hpp>
+#include <mockitopp/detail/util/pointers.hpp>
 #include <mockitopp/detail/util/tr1_tuple.hpp>
 #include <mockitopp/matchers/Matcher.hpp>
 
@@ -79,21 +80,21 @@ namespace mockitopp
       template <typename R>
       struct dynamic_vfunction_action : dynamic_vfunction_base
       {
-         typedef action<R>*             action_type;
+         typedef shared_ptr<action<R> > action_type;
          typedef std::list<action_type> action_queue_type;
 
          action_queue_type* ongoingMatch;
 
          dynamic_vfunction_action& thenReturn(R value)
          {
-            ongoingMatch->push_back(new returnable_action<R>(value));
+            ongoingMatch->push_back(action_type(new returnable_action<R>(value)));
             return *this;
          }
 
          template <typename T>
          dynamic_vfunction_action& thenThrow(T throwable)
          {
-            ongoingMatch->push_back(new throwable_action<R, T>(throwable));
+            ongoingMatch->push_back(action_type(new throwable_action<R, T>(throwable)));
             return *this;
          }
       };
@@ -101,21 +102,21 @@ namespace mockitopp
       template <>
       struct dynamic_vfunction_action<void> : dynamic_vfunction_base
       {
-         typedef action<void>*          action_type;
-         typedef std::list<action_type> action_queue_type;
+         typedef shared_ptr<action<void> > action_type;
+         typedef std::list<action_type>    action_queue_type;
 
          action_queue_type* ongoingMatch;
 
          dynamic_vfunction_action& thenReturn()
          {
-            ongoingMatch->push_back(new returnable_action<void>());
+            ongoingMatch->push_back(action_type(new returnable_action<void>()));
             return *this;
          }
 
          template <typename T>
          dynamic_vfunction_action& thenThrow(T throwable)
          {
-            ongoingMatch->push_back(new throwable_action<void, T>(throwable));
+            ongoingMatch->push_back(action_type(new throwable_action<void, T>(throwable)));
             return *this;
          }
       };

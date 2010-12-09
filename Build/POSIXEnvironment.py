@@ -13,4 +13,4 @@ class Environment(BaseEnvironment.Environment):
       cxx_dir = os.path.dirname(cxx)
 
       if cxx_bin.startswith("g++"):
-         self.AppendUnique(CXXFLAGS=['-Wall'])
+         self.AppendUnique(CXXFLAGS=['-Wall', '-g'])
