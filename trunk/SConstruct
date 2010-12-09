@@ -1,5 +1,6 @@
-import Build.EnvironmentFactory, os, sys
-env = Build.EnvironmentFactory.GetInstance()
+import Build, os, sys
+
+env = Build.Environment()
 Export('env')
 
 if 'm4-generate' in COMMAND_LINE_TARGETS:
