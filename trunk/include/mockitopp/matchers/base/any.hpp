@@ -19,7 +19,10 @@ namespace mockitopp
                { return new AnyT(); }
 
             virtual bool operator== (typename mockitopp::detail::tr1::add_reference<typename mockitopp::detail::tr1::add_const<T>::type>::type rhs) const
-               { return true; }
+            { 
+               (void)rhs;
+               return true; 
+            }
          };
       } // namespace detail
 

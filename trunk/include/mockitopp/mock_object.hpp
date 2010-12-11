@@ -3,6 +3,12 @@
 
 #include <mockitopp/detail/stubbing/dynamic_object.hpp>
 
+/**
+* helper macro to make mocking of overloaded functions less verbose
+*/
+#define overloaded_method(return_type, type, method, ...) \
+   static_cast<return_type (type::*)(__VA_ARGS__)>(&type::method)
+
 namespace mockitopp
 {
    /**
@@ -27,8 +33,12 @@ namespace mockitopp
        * @param ptr2member method to be stubbed
        */
       template <typename M>
-      detail::dynamic_vfunction<typename detail::remove_member_function_pointer_cv<M>::type>& operator() (M ptr2member)
+      detail::dynamic_vfunction<typename detail::remove_member_function_pointer_cv<M>::type>& expect(M ptr2member)
          { return define_function(ptr2member); }
+
+      template <typename M>
+      detail::dynamic_vfunction<typename detail::remove_member_function_pointer_cv<M>::type>& operator() (M ptr2member)
+         { return expect(ptr2member); }
    };
 } // namespace mockitopp
 
