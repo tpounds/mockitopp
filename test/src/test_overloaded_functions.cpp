@@ -21,7 +21,7 @@ TEST(test_overloaded_functions, foo)
    std::string bar("bar");
    mock(static_cast<int (overloaded_interface::*)(const std::string&)>(&overloaded_interface::foo)).when(bar).thenReturn(50);
    std::string hello("hello");
-   mock(static_cast<int (overloaded_interface::*)(const std::string&)>(&overloaded_interface::foo)).when(hello).thenReturn(10);
+   mock(overloaded_method(int, overloaded_interface, foo, const std::string&)).when(hello).thenReturn(10);
    overloaded_interface& obj = mock.getInstance();
 
    ASSERT_EQ(0, obj.foo(true));
