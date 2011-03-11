@@ -1,5 +1,32 @@
 Import('env')
 testenv = env.Clone()
+
+if not testenv.GetOption('clean'):
+
+   def CheckRegex(context, re_type, re_header, re_lib = None):
+      context.Message('Checking for ' + re_type + '... ')
+      old_libs = None
+      if(re_lib != None):
+         old_libs = context.AppendLIBS(re_lib)
+      result = context.TryLink("""
+         #include """ + re_header + """
+         """ + re_type + """ __re;
+         int main() { return __re == __re; }
+      """, '.cpp')
+      context.Result(result)
+      if(not result and old_libs != None):
+         context.SetLIBS(old_libs)
+      return result
+
+   conf = Configure(testenv, custom_tests = {'CheckRegex': CheckRegex})
+   if conf.CheckRegex('::std::regex', '<regex>'):
+      conf.env.AppendUnique(CXXFLAGS = ['-DMOCKITOPP_STD_REGEX'])
+   elif conf.CheckRegex('::std::tr1::regex', '<tr1/regex>'):
+      conf.env.AppendUnique(CXXFLAGS = ['-DMOCKITOPP_STD_TR1_REGEX'])
+   elif conf.CheckRegex('::boost::regex', '<boost/regex.hpp>', 'boost_regex'):
+      conf.env.AppendUnique(CXXFLAGS = ['-DMOCKITOPP_BOOST_REGEX'])
+   testenv = conf.Finish()
+
 TEST_SRC = [
    # TODO: deprecate
    'src/TestArguments.cpp',
@@ -18,20 +45,15 @@ TEST_SRC = [
    'src/matchers/test_any.cpp',
    'src/matchers/test_custom.cpp',
    'src/matchers/test_equal.cpp',
-   'src/matchers/test_hamcrest.cpp',
    'src/matchers/test_is_not.cpp',
    'src/matchers/test_null.cpp',
    'src/matchers/test_string_literal.cpp',
-   'src/matchers/test_tr1_regex.cpp',
+   'src/matchers/test_regex.cpp',
 ]
 testenv.AppendUnique(CPPPATH = ['#include'])
-testenv.AppendUnique(CPPPATH = ['#3rdparty/boost_1_36_0/include'])
 testenv.AppendUnique(CPPPATH = ['#3rdparty/googletest-1.4.0/include'])
-testenv.AppendUnique(CPPPATH = ['#3rdparty/hamcrest-r389/core'])
 testenv.AppendUnique(LIBPATH = ['#3rdparty/build'])
-testenv.AppendUnique(LIBS = ['boost-regex'])
 testenv.AppendUnique(LIBS = ['googletest'])
-testenv.AppendUnique(LIBS = ['hamcrest'])
 test = testenv.Program('test', TEST_SRC)
 unitTest = testenv.Test('test')
 

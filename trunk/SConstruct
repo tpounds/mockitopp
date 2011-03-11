@@ -19,10 +19,10 @@ if 'm4-generate' in COMMAND_LINE_TARGETS:
       env.M4('include/mockitopp/detail/util/tr1_tuple.hpp.m4')
    ])
 
-test = SConscript('test/SConscript', build_dir='test/build', duplicate=0)
+test = SConscript('test/SConscript', variant_dir='test/build', duplicate=0)
 Clean('test', '#test/build')
 
-thirdparty = SConscript('#3rdparty/SConscript', build_dir='3rdparty/build', duplicate=0)
+thirdparty = SConscript('#3rdparty/SConscript', variant_dir='3rdparty/build', duplicate=0)
 Clean('3rdparty', '#3rdparty/build')
 
 # vim:ft=python:

@@ -1,29 +1,5 @@
 Import('env')
 
-BOOST_DIR = 'boost_1_36_0/'
-BOOST_REGEX_SRC = [
-   BOOST_DIR + 'src/regex/src/cpp_regex_traits.cpp',
-   BOOST_DIR + 'src/regex/src/cregex.cpp',
-   BOOST_DIR + 'src/regex/src/c_regex_traits.cpp',
-   BOOST_DIR + 'src/regex/src/fileiter.cpp',
-   BOOST_DIR + 'src/regex/src/icu.cpp',
-   BOOST_DIR + 'src/regex/src/instances.cpp',
-   BOOST_DIR + 'src/regex/src/posix_api.cpp',
-   BOOST_DIR + 'src/regex/src/regex.cpp',
-   BOOST_DIR + 'src/regex/src/regex_debug.cpp',
-   BOOST_DIR + 'src/regex/src/regex_raw_buffer.cpp',
-   BOOST_DIR + 'src/regex/src/regex_traits_defaults.cpp',
-   BOOST_DIR + 'src/regex/src/static_mutex.cpp',
-   BOOST_DIR + 'src/regex/src/usinstances.cpp',
-   BOOST_DIR + 'src/regex/src/w32_regex_traits.cpp',
-   BOOST_DIR + 'src/regex/src/wc_regex_traits.cpp',
-   BOOST_DIR + 'src/regex/src/wide_posix_api.cpp',
-   BOOST_DIR + 'src/regex/src/winstances.cpp',
-]
-boost_regex = env.Clone()
-boost_regex.AppendUnique(CPPPATH = [BOOST_DIR + 'include'])
-boost_regex.Library('boost-regex', BOOST_REGEX_SRC)
-
 GTEST_DIR = 'googletest-1.4.0/'
 GTEST_SRC = [
    GTEST_DIR + 'src/gtest-all.cc',
@@ -33,13 +9,3 @@ gtest = env.Clone()
 gtest.AppendUnique(CPPPATH = [GTEST_DIR])
 gtest.AppendUnique(CPPPATH = [GTEST_DIR + 'include'])
 gtest.Library('googletest', GTEST_SRC)
-
-HAMCREST_DIR = 'hamcrest-r389/'
-HAMCREST_SRC = [
-   HAMCREST_DIR + 'core/hc_description.cpp',
-   HAMCREST_DIR + 'core/hc_self_describing.cpp',
-]
-hamcrest = env.Clone()
-hamcrest.AppendUnique(CPPPATH = [HAMCREST_DIR + 'core'])
-hamcrest.Library('hamcrest', HAMCREST_SRC)
-# vim:ft=python:
