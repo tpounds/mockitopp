@@ -1,7 +1,17 @@
-#include <boost/regex.hpp>
+
+#if defined(MOCKITOPP_STD_REGEX)
+   #include <regex>
+#elif defined(MOCKITOPP_STD_TR1_REGEX)
+   #include <tr1/regex>
+#elif defined(MOCKITOPP_BOOST_REGEX)
+   #include <boost/regex.hpp>
+#endif
+
+#if defined(MOCKITOPP_STD_REGEX) || defined(MOCKITOPP_STD_TR1_REGEX) || defined(MOCKITOPP_BOOST_REGEX)
+
 #include <gtest/gtest.h>
 #include <mockitopp/mockitopp.hpp>
-#include <mockitopp/matchers/optional/tr1_regex.hpp>
+#include <mockitopp/matchers/regex.hpp>
 
 using mockitopp::mock_object;
 using mockitopp::matcher::regex;
@@ -59,3 +69,5 @@ TEST(test_regex, composite)
    ASSERT_THROW(obj.composite("foo", "abcdefghij"), mockitopp::partial_implementation_exception);
    ASSERT_THROW(obj.composite("1234567890", "bar"), mockitopp::partial_implementation_exception);
 }
+
+#endif // MOCKITOPP_REGEX_HEADER

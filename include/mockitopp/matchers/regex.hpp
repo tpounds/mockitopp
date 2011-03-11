@@ -1,5 +1,5 @@
-#ifndef __MOCKITOPP_MATCHER_TR1_REGEX_HPP__
-#define __MOCKITOPP_MATCHER_TR1_REGEX_HPP__
+#ifndef __MOCKITOPP_MATCHER_REGEX_HPP__
+#define __MOCKITOPP_MATCHER_REGEX_HPP__
 
 #include <mockitopp/matchers/Matcher.hpp>
 
@@ -46,4 +46,4 @@ namespace mockitopp
    } // namespace matcher
 } // namespace mockitopp
 
-#endif //__MOCKITOPP_MATCHER_TR1_REGEX_HPP__
+#endif //__MOCKITOPP_MATCHER_REGEX_HPP__
