@@ -21,21 +21,21 @@ namespace mockitopp
          struct RegexT : public Matcher<T>
          {
             RegexT(typename mockitopp::detail::tr1::add_reference<typename mockitopp::detail::tr1::add_const<T>::type>::type expr)
-               : expr(expr)
+               : expr_(expr)
                {}
 
             virtual Matcher<T>* clone() const
-               { return new RegexT(expr); }
+               { return new RegexT(expr_); }
 
             virtual bool operator== (typename mockitopp::detail::tr1::add_reference<typename mockitopp::detail::tr1::add_const<T>::type>::type rhs) const
-               { return __tr1::regex_match(rhs, expr); }
+               { return __tr1::regex_match(rhs, expr_); }
 
             private:
 
-               __tr1::regex expr;
+               __tr1::regex expr_;
 
                RegexT(const __tr1::regex& expr)
-                  : expr(expr)
+                  : expr_(expr)
                   {}
          };
       } // namespace detail

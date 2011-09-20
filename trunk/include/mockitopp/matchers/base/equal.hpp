@@ -15,19 +15,19 @@ namespace mockitopp
          {
             EqualT(typename mockitopp::detail::tr1::add_reference<
                      typename mockitopp::detail::tr1::add_const<T>::type>::type element)
-               : element(element)
+               : element_(element)
                {}
 
             virtual Matcher<T>* clone() const
-               { return new EqualT(element); }
+               { return new EqualT(element_); }
 
             virtual bool operator== (typename mockitopp::detail::tr1::add_reference<
                                        typename mockitopp::detail::tr1::add_const<T>::type>::type rhs) const
-               { return element == rhs; }
+               { return element_ == rhs; }
 
             private:
 
-               T element;
+               T element_;
          };
       } // namespace detail
 

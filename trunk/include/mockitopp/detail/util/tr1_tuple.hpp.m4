@@ -39,13 +39,13 @@ namespace mockitopp
          template <typename H, typename T>
          struct tuple_cons
          {
-            H head;
-            T tail;
+            H head_;
+            T tail_;
 
             tuple_cons(typename add_reference<typename add_const<H>::type>::type head,
                        typename add_reference<typename add_const<T>::type>::type tail)
-               : head(head)
-               , tail(tail)
+               : head_(head)
+               , tail_(tail)
                {}
          };
 
@@ -53,7 +53,7 @@ namespace mockitopp
 
          template <typename L0, typename L1, typename R0, typename R1>
          bool operator== (const tuple_cons<L0, L1>& lhs, const tuple_cons<R0, R1>& rhs)
-            { return (lhs.head == rhs.head) && (lhs.tail == rhs.tail); }
+            { return (lhs.head_ == rhs.head_) && (lhs.tail_ == rhs.tail_); }
 
          template <typename L0, typename L1, typename R0, typename R1>
          bool operator!= (const tuple_cons<L0, L1>& lhs, const tuple_cons<R0, R1>& rhs)
@@ -61,7 +61,7 @@ namespace mockitopp
 
          template <typename L0, typename L1, typename R0, typename R1>
          bool operator< (const tuple_cons<L0, L1>& lhs, const tuple_cons<R0, R1>& rhs)
-            { return (lhs.head < rhs.head) || (lhs.tail < rhs.tail); }
+            { return (lhs.head_ < rhs.head_) || (lhs.tail_ < rhs.tail_); }
 
          template <typename L0, typename L1, typename R0, typename R1>
          bool operator<= (const tuple_cons<L0, L1>& lhs, const tuple_cons<R0, R1>& rhs)
@@ -69,7 +69,7 @@ namespace mockitopp
 
          template <typename L0, typename L1, typename R0, typename R1>
          bool operator> (const tuple_cons<L0, L1>& lhs, const tuple_cons<R0, R1>& rhs)
-            { return (lhs.head > rhs.head) && (lhs.tail > rhs.tail); }
+            { return (lhs.head_ > rhs.head_) && (lhs.tail_ > rhs.tail_); }
 
          template <typename L0, typename L1, typename R0, typename R1>
          bool operator>= (const tuple_cons<L0, L1>& lhs, const tuple_cons<R0, R1>& rhs)

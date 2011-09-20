@@ -13,21 +13,21 @@ namespace mockitopp
          struct NotT : public Matcher<T>
          {
             NotT(const Matcher<T>& matcher)
-               : matcher(matcher.clone())
+               : matcher_(matcher.clone())
                {}
 
             virtual ~NotT()
-               { delete matcher; }
+               { delete matcher_; }
 
             virtual Matcher<T>* clone() const
-               { return new NotT(*matcher); }
+               { return new NotT(*matcher_); }
 
             virtual bool operator== (typename mockitopp::detail::tr1::add_reference<typename mockitopp::detail::tr1::add_const<T>::type>::type rhs) const
-               { return !(*matcher == rhs); }
+               { return !(*matcher_ == rhs); }
 
             private:
 
-               Matcher<T>* matcher;
+               Matcher<T>* matcher_;
          };
       } // namespace detail
 
