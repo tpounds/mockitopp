@@ -28,6 +28,7 @@ if not testenv.GetOption('clean'):
    testenv = conf.Finish()
 
 TEST_SRC = [
+   'src/tpunit++main.cpp',
    # TODO: deprecate
    'src/TestArguments.cpp',
    'src/TestBasicStubbing.cpp',
@@ -47,13 +48,11 @@ TEST_SRC = [
    'src/matchers/test_equal.cpp',
    'src/matchers/test_is_not.cpp',
    'src/matchers/test_null.cpp',
-   'src/matchers/test_string_literal.cpp',
    'src/matchers/test_regex.cpp',
+   'src/matchers/test_string_literal.cpp',
 ]
 testenv.AppendUnique(CPPPATH = ['#include'])
-testenv.AppendUnique(CPPPATH = ['#3rdparty/googletest-1.4.0/include'])
-testenv.AppendUnique(LIBPATH = ['#3rdparty/build'])
-testenv.AppendUnique(LIBS = ['googletest'])
+testenv.AppendUnique(CPPPATH = ['src'])
 test = testenv.Program('test', TEST_SRC)
 unitTest = testenv.Test('test')
 
