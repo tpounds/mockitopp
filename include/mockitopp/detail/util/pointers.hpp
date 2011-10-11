@@ -157,8 +157,8 @@ namespace mockitopp
                {}
 
             owned_ptr(const owned_ptr& rhs)
-               : _ptr(rhs._ptr)
-               { rhs.release(); } 
+               : _ptr((T*) ((size_t) rhs.release() | OWNER))
+               {}
 
             explicit owned_ptr(T* ptr)
                : _ptr((T*) ((size_t) ptr | OWNER))
@@ -178,7 +178,7 @@ namespace mockitopp
                return *this;
             }
 
-            bool is_owner() const { return ((size_t) _ptr & OWNER); }
+            bool is_owner() const { return ((size_t) _ptr & OWNER) == OWNER; }
 
             T* get()        const { return (T*) ((size_t) _ptr & POINTER); }
             T& operator*()  const { return *get(); }
