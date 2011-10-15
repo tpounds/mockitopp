@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <list>
-#include <map>
 #include <utility>
 
 #include <mockitopp/exceptions.hpp>
@@ -83,18 +82,18 @@ namespace mockitopp
          typedef shared_ptr<action<R> > action_type;
          typedef std::list<action_type> action_queue_type;
 
-         action_queue_type* ongoingMatch;
+         action_queue_type* transient_stubbing;
 
          dynamic_vfunction_action& thenReturn(R value)
          {
-            ongoingMatch->push_back(action_type(new returnable_action<R>(value)));
+            transient_stubbing->push_back(action_type(new returnable_action<R>(value)));
             return *this;
          }
 
          template <typename T>
          dynamic_vfunction_action& thenThrow(T throwable)
          {
-            ongoingMatch->push_back(action_type(new throwable_action<R, T>(throwable)));
+            transient_stubbing->push_back(action_type(new throwable_action<R, T>(throwable)));
             return *this;
          }
       };
@@ -105,18 +104,18 @@ namespace mockitopp
          typedef shared_ptr<action<void> > action_type;
          typedef std::list<action_type>    action_queue_type;
 
-         action_queue_type* ongoingMatch;
+         action_queue_type* transient_stubbing;
 
          dynamic_vfunction_action& thenReturn()
          {
-            ongoingMatch->push_back(action_type(new returnable_action<void>()));
+            transient_stubbing->push_back(action_type(new returnable_action<void>()));
             return *this;
          }
 
          template <typename T>
          dynamic_vfunction_action& thenThrow(T throwable)
          {
-            ongoingMatch->push_back(action_type(new throwable_action<void, T>(throwable)));
+            transient_stubbing->push_back(action_type(new throwable_action<void, T>(throwable)));
             return *this;
          }
       };
@@ -177,7 +176,7 @@ define(`DEFINE_DYNAMIC_VFUNCTION', `
          typedef typename dynamic_vfunction_action<R>::action_type       action_type;
          typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
-         std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
+         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
@@ -196,13 +195,21 @@ define(`DEFINE_DYNAMIC_VFUNCTION', `
                matcher_actions_map.push_back(key_comparable_pair<matcher_tuple_type, action_queue_type>(args, action_queue_type()));
                pair_it = --matcher_actions_map.end();
             }
-            this->ongoingMatch = &(pair_it->second);
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }',)
 
          dynamic_vfunction& when(M4_ENUM_BINARY_PARAMS($1, A, a))
          {
-            this->ongoingMatch = &(raw_actions_map[raw_tuple_type(M4_ENUM_PARAMS($1, a))]);
+            raw_tuple_type args = raw_tuple_type(M4_ENUM_PARAMS($1, a));
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
+            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
+            if(pair_it == raw_actions_map.end())
+            {
+               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
+               pair_it = --raw_actions_map.end();
+            }
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }
 
@@ -211,7 +218,8 @@ define(`DEFINE_DYNAMIC_VFUNCTION', `
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type(M4_ENUM_PARAMS($1, a));
             action_queue_type* actions = 0;
-            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
+               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
             if(raw_actions_it != raw_actions_map.end())
                { actions = &(raw_actions_it->second); }
             if(actions == 0)
