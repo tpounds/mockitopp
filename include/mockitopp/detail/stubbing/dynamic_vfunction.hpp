@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <list>
-#include <map>
 #include <utility>
 
 #include <mockitopp/exceptions.hpp>
@@ -78,18 +77,18 @@ namespace mockitopp
          typedef shared_ptr<action<R> > action_type;
          typedef std::list<action_type> action_queue_type;
 
-         action_queue_type* ongoingMatch;
+         action_queue_type* transient_stubbing;
 
          dynamic_vfunction_action& thenReturn(R value)
          {
-            ongoingMatch->push_back(action_type(new returnable_action<R>(value)));
+            transient_stubbing->push_back(action_type(new returnable_action<R>(value)));
             return *this;
          }
 
          template <typename T>
          dynamic_vfunction_action& thenThrow(T throwable)
          {
-            ongoingMatch->push_back(action_type(new throwable_action<R, T>(throwable)));
+            transient_stubbing->push_back(action_type(new throwable_action<R, T>(throwable)));
             return *this;
          }
       };
@@ -100,18 +99,18 @@ namespace mockitopp
          typedef shared_ptr<action<void> > action_type;
          typedef std::list<action_type>    action_queue_type;
 
-         action_queue_type* ongoingMatch;
+         action_queue_type* transient_stubbing;
 
          dynamic_vfunction_action& thenReturn()
          {
-            ongoingMatch->push_back(action_type(new returnable_action<void>()));
+            transient_stubbing->push_back(action_type(new returnable_action<void>()));
             return *this;
          }
 
          template <typename T>
          dynamic_vfunction_action& thenThrow(T throwable)
          {
-            ongoingMatch->push_back(action_type(new throwable_action<void, T>(throwable)));
+            transient_stubbing->push_back(action_type(new throwable_action<void, T>(throwable)));
             return *this;
          }
       };
@@ -172,7 +171,7 @@ namespace mockitopp
          typedef typename dynamic_vfunction_action<R>::action_type       action_type;
          typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
-         std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
+         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
@@ -185,7 +184,15 @@ namespace mockitopp
 
          dynamic_vfunction& when()
          {
-            this->ongoingMatch = &(raw_actions_map[raw_tuple_type()]);
+            raw_tuple_type args = raw_tuple_type();
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
+            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
+            if(pair_it == raw_actions_map.end())
+            {
+               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
+               pair_it = --raw_actions_map.end();
+            }
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }
 
@@ -194,7 +201,8 @@ namespace mockitopp
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type();
             action_queue_type* actions = 0;
-            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
+               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
             if(raw_actions_it != raw_actions_map.end())
                { actions = &(raw_actions_it->second); }
             if(actions == 0)
@@ -222,7 +230,7 @@ namespace mockitopp
          typedef typename dynamic_vfunction_action<R>::action_type       action_type;
          typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
-         std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
+         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
@@ -241,13 +249,21 @@ namespace mockitopp
                matcher_actions_map.push_back(key_comparable_pair<matcher_tuple_type, action_queue_type>(args, action_queue_type()));
                pair_it = --matcher_actions_map.end();
             }
-            this->ongoingMatch = &(pair_it->second);
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }
 
          dynamic_vfunction& when(A0 a0)
          {
-            this->ongoingMatch = &(raw_actions_map[raw_tuple_type(a0)]);
+            raw_tuple_type args = raw_tuple_type(a0);
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
+            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
+            if(pair_it == raw_actions_map.end())
+            {
+               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
+               pair_it = --raw_actions_map.end();
+            }
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }
 
@@ -256,7 +272,8 @@ namespace mockitopp
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type(a0);
             action_queue_type* actions = 0;
-            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
+               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
             if(raw_actions_it != raw_actions_map.end())
                { actions = &(raw_actions_it->second); }
             if(actions == 0)
@@ -284,7 +301,7 @@ namespace mockitopp
          typedef typename dynamic_vfunction_action<R>::action_type       action_type;
          typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
-         std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
+         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
@@ -303,13 +320,21 @@ namespace mockitopp
                matcher_actions_map.push_back(key_comparable_pair<matcher_tuple_type, action_queue_type>(args, action_queue_type()));
                pair_it = --matcher_actions_map.end();
             }
-            this->ongoingMatch = &(pair_it->second);
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }
 
          dynamic_vfunction& when(A0 a0, A1 a1)
          {
-            this->ongoingMatch = &(raw_actions_map[raw_tuple_type(a0, a1)]);
+            raw_tuple_type args = raw_tuple_type(a0, a1);
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
+            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
+            if(pair_it == raw_actions_map.end())
+            {
+               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
+               pair_it = --raw_actions_map.end();
+            }
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }
 
@@ -318,7 +343,8 @@ namespace mockitopp
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type(a0, a1);
             action_queue_type* actions = 0;
-            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
+               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
             if(raw_actions_it != raw_actions_map.end())
                { actions = &(raw_actions_it->second); }
             if(actions == 0)
@@ -346,7 +372,7 @@ namespace mockitopp
          typedef typename dynamic_vfunction_action<R>::action_type       action_type;
          typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
-         std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
+         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
@@ -365,13 +391,21 @@ namespace mockitopp
                matcher_actions_map.push_back(key_comparable_pair<matcher_tuple_type, action_queue_type>(args, action_queue_type()));
                pair_it = --matcher_actions_map.end();
             }
-            this->ongoingMatch = &(pair_it->second);
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }
 
          dynamic_vfunction& when(A0 a0, A1 a1, A2 a2)
          {
-            this->ongoingMatch = &(raw_actions_map[raw_tuple_type(a0, a1, a2)]);
+            raw_tuple_type args = raw_tuple_type(a0, a1, a2);
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
+            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
+            if(pair_it == raw_actions_map.end())
+            {
+               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
+               pair_it = --raw_actions_map.end();
+            }
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }
 
@@ -380,7 +414,8 @@ namespace mockitopp
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type(a0, a1, a2);
             action_queue_type* actions = 0;
-            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
+               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
             if(raw_actions_it != raw_actions_map.end())
                { actions = &(raw_actions_it->second); }
             if(actions == 0)
@@ -408,7 +443,7 @@ namespace mockitopp
          typedef typename dynamic_vfunction_action<R>::action_type       action_type;
          typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
-         std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
+         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
@@ -427,13 +462,21 @@ namespace mockitopp
                matcher_actions_map.push_back(key_comparable_pair<matcher_tuple_type, action_queue_type>(args, action_queue_type()));
                pair_it = --matcher_actions_map.end();
             }
-            this->ongoingMatch = &(pair_it->second);
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }
 
          dynamic_vfunction& when(A0 a0, A1 a1, A2 a2, A3 a3)
          {
-            this->ongoingMatch = &(raw_actions_map[raw_tuple_type(a0, a1, a2, a3)]);
+            raw_tuple_type args = raw_tuple_type(a0, a1, a2, a3);
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
+            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
+            if(pair_it == raw_actions_map.end())
+            {
+               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
+               pair_it = --raw_actions_map.end();
+            }
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }
 
@@ -442,7 +485,8 @@ namespace mockitopp
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type(a0, a1, a2, a3);
             action_queue_type* actions = 0;
-            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
+               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
             if(raw_actions_it != raw_actions_map.end())
                { actions = &(raw_actions_it->second); }
             if(actions == 0)
@@ -470,7 +514,7 @@ namespace mockitopp
          typedef typename dynamic_vfunction_action<R>::action_type       action_type;
          typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
-         std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
+         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
@@ -489,13 +533,21 @@ namespace mockitopp
                matcher_actions_map.push_back(key_comparable_pair<matcher_tuple_type, action_queue_type>(args, action_queue_type()));
                pair_it = --matcher_actions_map.end();
             }
-            this->ongoingMatch = &(pair_it->second);
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }
 
          dynamic_vfunction& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4)
          {
-            this->ongoingMatch = &(raw_actions_map[raw_tuple_type(a0, a1, a2, a3, a4)]);
+            raw_tuple_type args = raw_tuple_type(a0, a1, a2, a3, a4);
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
+            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
+            if(pair_it == raw_actions_map.end())
+            {
+               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
+               pair_it = --raw_actions_map.end();
+            }
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }
 
@@ -504,7 +556,8 @@ namespace mockitopp
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type(a0, a1, a2, a3, a4);
             action_queue_type* actions = 0;
-            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
+               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
             if(raw_actions_it != raw_actions_map.end())
                { actions = &(raw_actions_it->second); }
             if(actions == 0)
@@ -532,7 +585,7 @@ namespace mockitopp
          typedef typename dynamic_vfunction_action<R>::action_type       action_type;
          typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
-         std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
+         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
@@ -551,13 +604,21 @@ namespace mockitopp
                matcher_actions_map.push_back(key_comparable_pair<matcher_tuple_type, action_queue_type>(args, action_queue_type()));
                pair_it = --matcher_actions_map.end();
             }
-            this->ongoingMatch = &(pair_it->second);
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }
 
          dynamic_vfunction& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5)
          {
-            this->ongoingMatch = &(raw_actions_map[raw_tuple_type(a0, a1, a2, a3, a4, a5)]);
+            raw_tuple_type args = raw_tuple_type(a0, a1, a2, a3, a4, a5);
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
+            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
+            if(pair_it == raw_actions_map.end())
+            {
+               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
+               pair_it = --raw_actions_map.end();
+            }
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }
 
@@ -566,7 +627,8 @@ namespace mockitopp
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type(a0, a1, a2, a3, a4, a5);
             action_queue_type* actions = 0;
-            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
+               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
             if(raw_actions_it != raw_actions_map.end())
                { actions = &(raw_actions_it->second); }
             if(actions == 0)
@@ -594,7 +656,7 @@ namespace mockitopp
          typedef typename dynamic_vfunction_action<R>::action_type       action_type;
          typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
-         std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
+         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
@@ -613,13 +675,21 @@ namespace mockitopp
                matcher_actions_map.push_back(key_comparable_pair<matcher_tuple_type, action_queue_type>(args, action_queue_type()));
                pair_it = --matcher_actions_map.end();
             }
-            this->ongoingMatch = &(pair_it->second);
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }
 
          dynamic_vfunction& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6)
          {
-            this->ongoingMatch = &(raw_actions_map[raw_tuple_type(a0, a1, a2, a3, a4, a5, a6)]);
+            raw_tuple_type args = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6);
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
+            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
+            if(pair_it == raw_actions_map.end())
+            {
+               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
+               pair_it = --raw_actions_map.end();
+            }
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }
 
@@ -628,7 +698,8 @@ namespace mockitopp
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6);
             action_queue_type* actions = 0;
-            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
+               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
             if(raw_actions_it != raw_actions_map.end())
                { actions = &(raw_actions_it->second); }
             if(actions == 0)
@@ -656,7 +727,7 @@ namespace mockitopp
          typedef typename dynamic_vfunction_action<R>::action_type       action_type;
          typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
-         std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
+         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
@@ -675,13 +746,21 @@ namespace mockitopp
                matcher_actions_map.push_back(key_comparable_pair<matcher_tuple_type, action_queue_type>(args, action_queue_type()));
                pair_it = --matcher_actions_map.end();
             }
-            this->ongoingMatch = &(pair_it->second);
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }
 
          dynamic_vfunction& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7)
          {
-            this->ongoingMatch = &(raw_actions_map[raw_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7)]);
+            raw_tuple_type args = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7);
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
+            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
+            if(pair_it == raw_actions_map.end())
+            {
+               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
+               pair_it = --raw_actions_map.end();
+            }
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }
 
@@ -690,7 +769,8 @@ namespace mockitopp
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7);
             action_queue_type* actions = 0;
-            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
+               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
             if(raw_actions_it != raw_actions_map.end())
                { actions = &(raw_actions_it->second); }
             if(actions == 0)
@@ -718,7 +798,7 @@ namespace mockitopp
          typedef typename dynamic_vfunction_action<R>::action_type       action_type;
          typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
-         std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
+         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
@@ -737,13 +817,21 @@ namespace mockitopp
                matcher_actions_map.push_back(key_comparable_pair<matcher_tuple_type, action_queue_type>(args, action_queue_type()));
                pair_it = --matcher_actions_map.end();
             }
-            this->ongoingMatch = &(pair_it->second);
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }
 
          dynamic_vfunction& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8)
          {
-            this->ongoingMatch = &(raw_actions_map[raw_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8)]);
+            raw_tuple_type args = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8);
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
+            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
+            if(pair_it == raw_actions_map.end())
+            {
+               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
+               pair_it = --raw_actions_map.end();
+            }
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }
 
@@ -752,7 +840,8 @@ namespace mockitopp
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8);
             action_queue_type* actions = 0;
-            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
+               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
             if(raw_actions_it != raw_actions_map.end())
                { actions = &(raw_actions_it->second); }
             if(actions == 0)
@@ -780,7 +869,7 @@ namespace mockitopp
          typedef typename dynamic_vfunction_action<R>::action_type       action_type;
          typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
 
-         std::map<raw_tuple_type, action_queue_type>                raw_actions_map;
+         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
          std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
 
          dynamic_vfunction()
@@ -799,13 +888,21 @@ namespace mockitopp
                matcher_actions_map.push_back(key_comparable_pair<matcher_tuple_type, action_queue_type>(args, action_queue_type()));
                pair_it = --matcher_actions_map.end();
             }
-            this->ongoingMatch = &(pair_it->second);
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }
 
          dynamic_vfunction& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8, A9 a9)
          {
-            this->ongoingMatch = &(raw_actions_map[raw_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9)]);
+            raw_tuple_type args = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
+            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
+            if(pair_it == raw_actions_map.end())
+            {
+               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
+               pair_it = --raw_actions_map.end();
+            }
+            this->transient_stubbing = &(pair_it->second);
             return *this;
          }
 
@@ -814,7 +911,8 @@ namespace mockitopp
             this->calls++;
             raw_tuple_type     args    = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
             action_queue_type* actions = 0;
-            typename std::map<raw_tuple_type, action_queue_type>::iterator raw_actions_it = raw_actions_map.find(args);
+            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
+               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
             if(raw_actions_it != raw_actions_map.end())
                { actions = &(raw_actions_it->second); }
             if(actions == 0)
