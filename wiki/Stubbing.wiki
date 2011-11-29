@@ -2,7 +2,8 @@
 <wiki:toc max_depth="3" />
 
 = Simple Example =
-This example is trivial but shows the basics for constructing a simple mock of an interface and stubbing its only virtual function.
+This example is trivial but shows the basics for constructing a simple mock of an interface and stubbing its only virtual function. Note that even methods returning void *require* a .thenReturn() to punctuate the mock expectation. If you don't, you'll experience a crash or other sub-optimal behavior. (In VC++, you'll get a crash in the bowels of std::list, for instance.)
+
 {{{
 #include <gtest/gtest.h>
 #include <mockitopp/mockitopp.hpp>
@@ -17,7 +18,7 @@ struct Foo
 TEST(MyTestCase, Foo)
 {
    mockitopp::mock_object<Foo> mock;
-   mock(&Foo::bar);
+   mock(&Foo::bar).thenReturn();
    Foo& fooImpl = mock.getInstance();
 
    ASSERT_NO_THROW(fooImpl.bar());
