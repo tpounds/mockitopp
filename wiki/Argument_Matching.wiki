@@ -1,15 +1,15 @@
 #labels Featured
 == Argument Matching ==
-Usually, test cases are required to cover a large permutation of user inputs. This can be troublesome in cases where the system under test has several underlying dependencies. Usually, when using a mock framework to provide the dependencies for the system under test, each dependency will have to stubbed with 1:1 mappings of the user inputs. Overtime this makes test cases quite brittle and becomes a maintenance liability. To help reduce this overhead generic argument matchers are available ({{{<mockitopp/matchers>}}}) to use when stubbing method invocations.  There are also several optional argument matchers available ({{{<mockitopp/matchers/optional>}}}) that support popular frameworks such as *[http://code.google.com/p/hamcrest/ Hamcrest]* and *[http://www.boost.org/doc/libs/1_36_0/libs/regex/doc/html/index.html TR1 <regex>]*.
+Usually, test cases are required to cover a large permutation of user inputs. This can be troublesome in cases where the system under test has several underlying dependencies. Usually, when using a mock framework to provide the dependencies for the system under test, each dependency will have to stubbed with 1:1 mappings of the user inputs. Overtime this makes test cases quite brittle and becomes a maintenance liability. To help reduce this overhead generic argument matchers are available ({{{<mockitopp/matchers>}}}) to use when stubbing method invocations. These matchers work with all primitive types, but do note that complex types (classes, etc) *must* implement operator==() correctly in order to be used. If your complex types do not implement operator==, you will get a somewhat messy compile error with lots of template expansion to sift through.
+
+There are also several optional argument matchers available ({{{<mockitopp/matchers/optional>}}}) that support popular frameworks such as *[http://code.google.com/p/hamcrest/ Hamcrest]* and *[http://www.boost.org/doc/libs/1_36_0/libs/regex/doc/html/index.html TR1 <regex>]*.
 
 === Built-in ===
 {{{
 #include <gtest/gtest.h>
 #include <mockitopp/mockitopp.hpp>
 
-using mockitopp::matcher::eq;
-using mockitopp::matcher::not_;
-using mockitopp::matcher::null;
+using mockitopp::matcher;
 
 struct interface
 {
@@ -20,11 +20,24 @@ struct interface
 TEST(test, built_in)
 {
    mockitopp::mock_object<interface> mock;
-   mock(&interface::func1).when(null<int*>()).thenReturn(true);
-   mock(&interface::func2).when(not_(eq(std::string("foo")))).thenReturn(true);
+
+   mock(&interface::func1)
+      .when(null<int*>())
+      .thenReturn(true);
+
+   mock(&interface::func1)
+      .when(any<int*>())
+      .thenReturn(false);
+
+   mock(&interface::func2)
+      .when(not_(equal<std::string>(std::string("foo"))))
+      .thenReturn(true);
+
    interface& obj = mock.getInstance();
 
-   ASSERT_TRUE(obj.func1(0));
+   int value = 31337;
+   ASSERT_TRUE(obj.func1(NULL));
+   ASSERT_FALSE(obj.func1(&value));
    ASSERT_TRUE(obj.func2("hello world!"));
    ASSERT_TRUE(obj.func2("bar"));
    ASSERT_THROW(obj.func1(new int), mockitopp::detail::IncompleteImplementationException);
