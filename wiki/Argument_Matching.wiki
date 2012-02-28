@@ -45,34 +45,6 @@ TEST(test, built_in)
 }
 }}}
 
-=== [http://code.google.com/p/hamcrest/ Hamcrest] ===
-{{{
-#include <gtest/gtest.h>
-#include <matchers/hc_any_of.h>
-#include <matchers/hc_equal_to.h>
-
-using hamcrest::any_of;
-using hamcrest::equal_to;
-using mockitopp::matcher::hc;
-
-struct interface
-{
-   virtual bool func(const char*) = 0;
-};
-
-TEST(test, hamcrest)
-{
-   mockitopp::mock_object<interface> mock;
-   mock(&interface::func).when(hc(any_of(is("foo"), is("bar")))).thenReturn(true);
-   interface& obj = mock.getInstance();
-
-   ASSERT_TRUE(obj.func("foo"));
-   ASSERT_TRUE(obj.func("bar"));
-   ASSERT_THROW(obj.func("FOO"), mockitopp::detail::IncompleteImplementationException);
-
-}
-}}}
-
 === [http://www.boost.org/doc/libs/1_36_0/libs/regex/doc/html/index.html TR1 <regex>] ===
 {{{
 #include <regex> // or <boost/regex.hpp>
