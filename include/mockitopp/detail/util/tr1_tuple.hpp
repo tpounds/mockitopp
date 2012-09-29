@@ -21,15 +21,7 @@ namespace mockitopp
    {
       namespace tr1
       {
-         struct tuple_null_type
-         {
-            bool operator== (const tuple_null_type&) const { return true; }
-            bool operator!= (const tuple_null_type&) const { return false; }
-            bool operator<  (const tuple_null_type&) const { return false; }
-            bool operator<= (const tuple_null_type&) const { return true; }
-            bool operator>  (const tuple_null_type&) const { return false; }
-            bool operator>= (const tuple_null_type&) const { return true; }
-         };
+         struct tuple_null_type {};
 
          template <typename H, typename T>
          struct tuple_cons
@@ -43,32 +35,6 @@ namespace mockitopp
                , tail_(tail)
                {}
          };
-
-         // TODO: fix comparison ops?
-
-         template <typename L0, typename L1, typename R0, typename R1>
-         bool operator== (const tuple_cons<L0, L1>& lhs, const tuple_cons<R0, R1>& rhs)
-            { return (lhs.head_ == rhs.head_) && (lhs.tail_ == rhs.tail_); }
-
-         template <typename L0, typename L1, typename R0, typename R1>
-         bool operator!= (const tuple_cons<L0, L1>& lhs, const tuple_cons<R0, R1>& rhs)
-            { return !(lhs == rhs); }
-
-         template <typename L0, typename L1, typename R0, typename R1>
-         bool operator< (const tuple_cons<L0, L1>& lhs, const tuple_cons<R0, R1>& rhs)
-            { return (lhs.head_ < rhs.head_) || (lhs.tail_ < rhs.tail_); }
-
-         template <typename L0, typename L1, typename R0, typename R1>
-         bool operator<= (const tuple_cons<L0, L1>& lhs, const tuple_cons<R0, R1>& rhs)
-            { return (lhs == rhs) || (lhs < rhs); }
-
-         template <typename L0, typename L1, typename R0, typename R1>
-         bool operator> (const tuple_cons<L0, L1>& lhs, const tuple_cons<R0, R1>& rhs)
-            { return (lhs.head_ > rhs.head_) && (lhs.tail_ > rhs.tail_); }
-
-         template <typename L0, typename L1, typename R0, typename R1>
-         bool operator>= (const tuple_cons<L0, L1>& lhs, const tuple_cons<R0, R1>& rhs)
-            { return (lhs == rhs) || (lhs > rhs); }
 
          // 10 element template
          template <typename T0 = tuple_null_type, typename T1 = tuple_null_type, typename T2 = tuple_null_type, typename T3 = tuple_null_type, typename T4 = tuple_null_type, typename T5 = tuple_null_type, typename T6 = tuple_null_type, typename T7 = tuple_null_type, typename T8 = tuple_null_type, typename T9 = tuple_null_type>
@@ -204,5 +170,36 @@ namespace mockitopp
       } // namespace tr1
    } // namespace detail
 } // namespace mockitopp
+
+inline bool operator== (const mockitopp::detail::tr1::tuple_null_type&, const mockitopp::detail::tr1::tuple_null_type&) { return true;  }
+inline bool operator!= (const mockitopp::detail::tr1::tuple_null_type&, const mockitopp::detail::tr1::tuple_null_type&) { return false; }
+inline bool operator<  (const mockitopp::detail::tr1::tuple_null_type&, const mockitopp::detail::tr1::tuple_null_type&) { return false; }
+inline bool operator<= (const mockitopp::detail::tr1::tuple_null_type&, const mockitopp::detail::tr1::tuple_null_type&) { return true;  }
+inline bool operator>  (const mockitopp::detail::tr1::tuple_null_type&, const mockitopp::detail::tr1::tuple_null_type&) { return false; }
+inline bool operator>= (const mockitopp::detail::tr1::tuple_null_type&, const mockitopp::detail::tr1::tuple_null_type&) { return true;  }
+
+template <typename L0, typename L1, typename R0, typename R1>
+inline bool operator== (const mockitopp::detail::tr1::tuple_cons<L0, L1>& lhs, const mockitopp::detail::tr1::tuple_cons<R0, R1>& rhs)
+   { return (lhs.head_ == rhs.head_) && (lhs.tail_ == rhs.tail_); }
+
+template <typename L0, typename L1, typename R0, typename R1>
+inline bool operator!= (const mockitopp::detail::tr1::tuple_cons<L0, L1>& lhs, const mockitopp::detail::tr1::tuple_cons<R0, R1>& rhs)
+   { return !(lhs == rhs); }
+
+template <typename L0, typename L1, typename R0, typename R1>
+inline bool operator< (const mockitopp::detail::tr1::tuple_cons<L0, L1>& lhs, const mockitopp::detail::tr1::tuple_cons<R0, R1>& rhs)
+   { return (lhs.head_ < rhs.head_) || (lhs.tail_ < rhs.tail_); }
+
+template <typename L0, typename L1, typename R0, typename R1>
+inline bool operator<= (const mockitopp::detail::tr1::tuple_cons<L0, L1>& lhs, const mockitopp::detail::tr1::tuple_cons<R0, R1>& rhs)
+   { return (lhs == rhs) || (lhs < rhs); }
+
+template <typename L0, typename L1, typename R0, typename R1>
+inline bool operator> (const mockitopp::detail::tr1::tuple_cons<L0, L1>& lhs, const mockitopp::detail::tr1::tuple_cons<R0, R1>& rhs)
+   { return (lhs.head_ > rhs.head_) && (lhs.tail_ > rhs.tail_); }
+
+template <typename L0, typename L1, typename R0, typename R1>
+inline bool operator>= (const mockitopp::detail::tr1::tuple_cons<L0, L1>& lhs, const mockitopp::detail::tr1::tuple_cons<R0, R1>& rhs)
+   { return (lhs == rhs) || (lhs > rhs); }
 
 #endif //__MOCKITOPP_TR1_TUPLE_HPP__

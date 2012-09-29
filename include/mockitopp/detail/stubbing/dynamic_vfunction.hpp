@@ -46,7 +46,7 @@ namespace mockitopp
           * @param times minimum number of times method should be called
           */
          bool atLeast(int times) const
-            { return between(times, 0x7FFF); }
+            { return calls >= times; }
 
          /**
           * verify method is called at most (n) times
@@ -54,7 +54,7 @@ namespace mockitopp
           * @param times maximum number of times method should be called
           */
          bool atMost(int times) const
-            { return between(0, times); }
+            { return calls <= times; }
 
          /**
           * verify method is called exactly (n) times
@@ -62,17 +62,17 @@ namespace mockitopp
           * @param times exact number of times method should be called
           */
          bool exactly(int times) const
-            { return between(times, times); }
+            { return calls == times; }
 
          /**
           * verify method is never called
           */
          bool never() const
-            { return between(0, 0); }
+            { return calls == 0; }
       };
 
       template <typename R>
-      struct dynamic_vfunction_action : dynamic_vfunction_base
+      struct dynamic_vfunction_action
       {
          typedef shared_ptr<action<R> > action_type;
          typedef std::list<action_type> action_queue_type;
@@ -94,7 +94,7 @@ namespace mockitopp
       };
 
       template <>
-      struct dynamic_vfunction_action<void> : dynamic_vfunction_base
+      struct dynamic_vfunction_action<void>
       {
          typedef shared_ptr<action<void> > action_type;
          typedef std::list<action_type>    action_queue_type;
@@ -159,11 +159,13 @@ namespace mockitopp
       // TODO: clean up impl
       // TODO: add sequence matcher
 
-      //TODO: clean up typedef nomenclature
+      // TODO: clean up typedef nomenclature
  
       // 0 arity template
       template <typename R, typename C>
-      struct dynamic_vfunction<R (C::*)()> : public dynamic_vfunction_action<R>
+      struct dynamic_vfunction<R (C::*)()>
+         : private dynamic_vfunction_action<R>
+         , public  dynamic_vfunction_base
       {
          typedef tr1::tuple<> raw_tuple_type;
          typedef tr1::tuple< > matcher_tuple_type;
@@ -176,13 +178,14 @@ namespace mockitopp
 
          dynamic_vfunction()
             : dynamic_vfunction_action<R>()
+            , dynamic_vfunction_base()
             , raw_actions_map()
             , matcher_actions_map()
             {}
 
          
 
-         dynamic_vfunction& when()
+         dynamic_vfunction_action<R>& when()
          {
             raw_tuple_type args = raw_tuple_type();
             typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
@@ -222,7 +225,9 @@ namespace mockitopp
  
       // 1 arity template
       template <typename R, typename C, typename A0>
-      struct dynamic_vfunction<R (C::*)(A0)> : public dynamic_vfunction_action<R>
+      struct dynamic_vfunction<R (C::*)(A0)>
+         : private dynamic_vfunction_action<R>
+         , public  dynamic_vfunction_base
       {
          typedef tr1::tuple<A0> raw_tuple_type;
          typedef tr1::tuple<matcher_element<A0 > > matcher_tuple_type;
@@ -235,11 +240,12 @@ namespace mockitopp
 
          dynamic_vfunction()
             : dynamic_vfunction_action<R>()
+            , dynamic_vfunction_base()
             , raw_actions_map()
             , matcher_actions_map()
             {}
 
-         dynamic_vfunction& when(const matcher::Matcher<A0 >& a0)
+         dynamic_vfunction_action<R>& when(const matcher::Matcher<A0 >& a0)
          {
             matcher_tuple_type args = matcher_tuple_type(a0);
             typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
@@ -253,7 +259,7 @@ namespace mockitopp
             return *this;
          }
 
-         dynamic_vfunction& when(A0 a0)
+         dynamic_vfunction_action<R>& when(A0 a0)
          {
             raw_tuple_type args = raw_tuple_type(a0);
             typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
@@ -293,7 +299,9 @@ namespace mockitopp
  
       // 2 arity template
       template <typename R, typename C, typename A0, typename A1>
-      struct dynamic_vfunction<R (C::*)(A0, A1)> : public dynamic_vfunction_action<R>
+      struct dynamic_vfunction<R (C::*)(A0, A1)>
+         : private dynamic_vfunction_action<R>
+         , public  dynamic_vfunction_base
       {
          typedef tr1::tuple<A0, A1> raw_tuple_type;
          typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 > > matcher_tuple_type;
@@ -306,11 +314,12 @@ namespace mockitopp
 
          dynamic_vfunction()
             : dynamic_vfunction_action<R>()
+            , dynamic_vfunction_base()
             , raw_actions_map()
             , matcher_actions_map()
             {}
 
-         dynamic_vfunction& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1)
+         dynamic_vfunction_action<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1)
          {
             matcher_tuple_type args = matcher_tuple_type(a0, a1);
             typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
@@ -324,7 +333,7 @@ namespace mockitopp
             return *this;
          }
 
-         dynamic_vfunction& when(A0 a0, A1 a1)
+         dynamic_vfunction_action<R>& when(A0 a0, A1 a1)
          {
             raw_tuple_type args = raw_tuple_type(a0, a1);
             typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
@@ -364,7 +373,9 @@ namespace mockitopp
  
       // 3 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2)> : public dynamic_vfunction_action<R>
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2)>
+         : private dynamic_vfunction_action<R>
+         , public  dynamic_vfunction_base
       {
          typedef tr1::tuple<A0, A1, A2> raw_tuple_type;
          typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 > > matcher_tuple_type;
@@ -377,11 +388,12 @@ namespace mockitopp
 
          dynamic_vfunction()
             : dynamic_vfunction_action<R>()
+            , dynamic_vfunction_base()
             , raw_actions_map()
             , matcher_actions_map()
             {}
 
-         dynamic_vfunction& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2)
+         dynamic_vfunction_action<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2)
          {
             matcher_tuple_type args = matcher_tuple_type(a0, a1, a2);
             typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
@@ -395,7 +407,7 @@ namespace mockitopp
             return *this;
          }
 
-         dynamic_vfunction& when(A0 a0, A1 a1, A2 a2)
+         dynamic_vfunction_action<R>& when(A0 a0, A1 a1, A2 a2)
          {
             raw_tuple_type args = raw_tuple_type(a0, a1, a2);
             typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
@@ -435,7 +447,9 @@ namespace mockitopp
  
       // 4 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3)> : public dynamic_vfunction_action<R>
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3)>
+         : private dynamic_vfunction_action<R>
+         , public  dynamic_vfunction_base
       {
          typedef tr1::tuple<A0, A1, A2, A3> raw_tuple_type;
          typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 > > matcher_tuple_type;
@@ -448,11 +462,12 @@ namespace mockitopp
 
          dynamic_vfunction()
             : dynamic_vfunction_action<R>()
+            , dynamic_vfunction_base()
             , raw_actions_map()
             , matcher_actions_map()
             {}
 
-         dynamic_vfunction& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3)
+         dynamic_vfunction_action<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3)
          {
             matcher_tuple_type args = matcher_tuple_type(a0, a1, a2, a3);
             typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
@@ -466,7 +481,7 @@ namespace mockitopp
             return *this;
          }
 
-         dynamic_vfunction& when(A0 a0, A1 a1, A2 a2, A3 a3)
+         dynamic_vfunction_action<R>& when(A0 a0, A1 a1, A2 a2, A3 a3)
          {
             raw_tuple_type args = raw_tuple_type(a0, a1, a2, a3);
             typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
@@ -506,7 +521,9 @@ namespace mockitopp
  
       // 5 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4)> : public dynamic_vfunction_action<R>
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4)>
+         : private dynamic_vfunction_action<R>
+         , public  dynamic_vfunction_base
       {
          typedef tr1::tuple<A0, A1, A2, A3, A4> raw_tuple_type;
          typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 > > matcher_tuple_type;
@@ -519,11 +536,12 @@ namespace mockitopp
 
          dynamic_vfunction()
             : dynamic_vfunction_action<R>()
+            , dynamic_vfunction_base()
             , raw_actions_map()
             , matcher_actions_map()
             {}
 
-         dynamic_vfunction& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4)
+         dynamic_vfunction_action<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4)
          {
             matcher_tuple_type args = matcher_tuple_type(a0, a1, a2, a3, a4);
             typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
@@ -537,7 +555,7 @@ namespace mockitopp
             return *this;
          }
 
-         dynamic_vfunction& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4)
+         dynamic_vfunction_action<R>& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4)
          {
             raw_tuple_type args = raw_tuple_type(a0, a1, a2, a3, a4);
             typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
@@ -577,7 +595,9 @@ namespace mockitopp
  
       // 6 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5)> : public dynamic_vfunction_action<R>
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5)>
+         : private dynamic_vfunction_action<R>
+         , public  dynamic_vfunction_base
       {
          typedef tr1::tuple<A0, A1, A2, A3, A4, A5> raw_tuple_type;
          typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 >, matcher_element<A5 > > matcher_tuple_type;
@@ -590,11 +610,12 @@ namespace mockitopp
 
          dynamic_vfunction()
             : dynamic_vfunction_action<R>()
+            , dynamic_vfunction_base()
             , raw_actions_map()
             , matcher_actions_map()
             {}
 
-         dynamic_vfunction& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5)
+         dynamic_vfunction_action<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5)
          {
             matcher_tuple_type args = matcher_tuple_type(a0, a1, a2, a3, a4, a5);
             typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
@@ -608,7 +629,7 @@ namespace mockitopp
             return *this;
          }
 
-         dynamic_vfunction& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5)
+         dynamic_vfunction_action<R>& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5)
          {
             raw_tuple_type args = raw_tuple_type(a0, a1, a2, a3, a4, a5);
             typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
@@ -648,7 +669,9 @@ namespace mockitopp
  
       // 7 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6)> : public dynamic_vfunction_action<R>
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6)>
+         : private dynamic_vfunction_action<R>
+         , public  dynamic_vfunction_base
       {
          typedef tr1::tuple<A0, A1, A2, A3, A4, A5, A6> raw_tuple_type;
          typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 >, matcher_element<A5 >, matcher_element<A6 > > matcher_tuple_type;
@@ -661,11 +684,12 @@ namespace mockitopp
 
          dynamic_vfunction()
             : dynamic_vfunction_action<R>()
+            , dynamic_vfunction_base()
             , raw_actions_map()
             , matcher_actions_map()
             {}
 
-         dynamic_vfunction& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5, const matcher::Matcher<A6 >& a6)
+         dynamic_vfunction_action<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5, const matcher::Matcher<A6 >& a6)
          {
             matcher_tuple_type args = matcher_tuple_type(a0, a1, a2, a3, a4, a5, a6);
             typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
@@ -679,7 +703,7 @@ namespace mockitopp
             return *this;
          }
 
-         dynamic_vfunction& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6)
+         dynamic_vfunction_action<R>& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6)
          {
             raw_tuple_type args = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6);
             typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
@@ -719,7 +743,9 @@ namespace mockitopp
  
       // 8 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7)> : public dynamic_vfunction_action<R>
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7)>
+         : private dynamic_vfunction_action<R>
+         , public  dynamic_vfunction_base
       {
          typedef tr1::tuple<A0, A1, A2, A3, A4, A5, A6, A7> raw_tuple_type;
          typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 >, matcher_element<A5 >, matcher_element<A6 >, matcher_element<A7 > > matcher_tuple_type;
@@ -732,11 +758,12 @@ namespace mockitopp
 
          dynamic_vfunction()
             : dynamic_vfunction_action<R>()
+            , dynamic_vfunction_base()
             , raw_actions_map()
             , matcher_actions_map()
             {}
 
-         dynamic_vfunction& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5, const matcher::Matcher<A6 >& a6, const matcher::Matcher<A7 >& a7)
+         dynamic_vfunction_action<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5, const matcher::Matcher<A6 >& a6, const matcher::Matcher<A7 >& a7)
          {
             matcher_tuple_type args = matcher_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7);
             typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
@@ -750,7 +777,7 @@ namespace mockitopp
             return *this;
          }
 
-         dynamic_vfunction& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7)
+         dynamic_vfunction_action<R>& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7)
          {
             raw_tuple_type args = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7);
             typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
@@ -790,7 +817,9 @@ namespace mockitopp
  
       // 9 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7, A8)> : public dynamic_vfunction_action<R>
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7, A8)>
+         : private dynamic_vfunction_action<R>
+         , public  dynamic_vfunction_base
       {
          typedef tr1::tuple<A0, A1, A2, A3, A4, A5, A6, A7, A8> raw_tuple_type;
          typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 >, matcher_element<A5 >, matcher_element<A6 >, matcher_element<A7 >, matcher_element<A8 > > matcher_tuple_type;
@@ -803,11 +832,12 @@ namespace mockitopp
 
          dynamic_vfunction()
             : dynamic_vfunction_action<R>()
+            , dynamic_vfunction_base()
             , raw_actions_map()
             , matcher_actions_map()
             {}
 
-         dynamic_vfunction& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5, const matcher::Matcher<A6 >& a6, const matcher::Matcher<A7 >& a7, const matcher::Matcher<A8 >& a8)
+         dynamic_vfunction_action<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5, const matcher::Matcher<A6 >& a6, const matcher::Matcher<A7 >& a7, const matcher::Matcher<A8 >& a8)
          {
             matcher_tuple_type args = matcher_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8);
             typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
@@ -821,7 +851,7 @@ namespace mockitopp
             return *this;
          }
 
-         dynamic_vfunction& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8)
+         dynamic_vfunction_action<R>& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8)
          {
             raw_tuple_type args = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8);
             typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
@@ -861,7 +891,9 @@ namespace mockitopp
  
       // 10 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9)> : public dynamic_vfunction_action<R>
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9)>
+         : private dynamic_vfunction_action<R>
+         , public  dynamic_vfunction_base
       {
          typedef tr1::tuple<A0, A1, A2, A3, A4, A5, A6, A7, A8, A9> raw_tuple_type;
          typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 >, matcher_element<A5 >, matcher_element<A6 >, matcher_element<A7 >, matcher_element<A8 >, matcher_element<A9 > > matcher_tuple_type;
@@ -874,11 +906,12 @@ namespace mockitopp
 
          dynamic_vfunction()
             : dynamic_vfunction_action<R>()
+            , dynamic_vfunction_base()
             , raw_actions_map()
             , matcher_actions_map()
             {}
 
-         dynamic_vfunction& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5, const matcher::Matcher<A6 >& a6, const matcher::Matcher<A7 >& a7, const matcher::Matcher<A8 >& a8, const matcher::Matcher<A9 >& a9)
+         dynamic_vfunction_action<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5, const matcher::Matcher<A6 >& a6, const matcher::Matcher<A7 >& a7, const matcher::Matcher<A8 >& a8, const matcher::Matcher<A9 >& a9)
          {
             matcher_tuple_type args = matcher_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
             typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
@@ -892,7 +925,7 @@ namespace mockitopp
             return *this;
          }
 
-         dynamic_vfunction& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8, A9 a9)
+         dynamic_vfunction_action<R>& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8, A9 a9)
          {
             raw_tuple_type args = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
             typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;

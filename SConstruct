@@ -3,7 +3,7 @@ import Build, os, sys
 env = Build.Environment()
 Export('env')
 
-if 'm4-generate' in COMMAND_LINE_TARGETS:
+if 'm4' in COMMAND_LINE_TARGETS:
    env.AppendUnique(M4FLAGS = [
       '-I' + os.path.abspath(sys.path[0]) + '/include',
       # maximum supported virtual functions, increase for classes with large vtables
@@ -11,7 +11,7 @@ if 'm4-generate' in COMMAND_LINE_TARGETS:
       # maximum supported arity, increase for function signatures with more arguments
       '-DMOCKITOPP_MAX_VIRTUAL_FUNCTION_ARITY=10',
    ])
-   Alias('m4-generate', [
+   Alias('m4', [
       env.M4('include/mockitopp/detail/stubbing/dynamic_object.hpp.m4'),
       env.M4('include/mockitopp/detail/stubbing/dynamic_vfunction.hpp.m4'),
       env.M4('include/mockitopp/detail/stubbing/proxy_vfunction.hpp.m4'),
