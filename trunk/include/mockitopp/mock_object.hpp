@@ -25,7 +25,10 @@ namespace mockitopp
        * @return mock object
        */
       T& getInstance()
-        { return reinterpret_cast<T&>(*this); }
+      {
+         vtable_ptr = (vtable*) (((char*) vtable_ptr) + sizeof(void*) * 4);
+         return reinterpret_cast<T&>(*this);
+      }
 
       /**
        * stub functionality for a given method

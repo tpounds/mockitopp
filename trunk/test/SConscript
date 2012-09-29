@@ -41,6 +41,8 @@ TEST_SRC = [
    'src/test_multiple_inheritance.cpp',
    'src/test_overloaded_functions.cpp',
    'src/test_verify.cpp',
+   'src/bugs/issue_7.cpp',
+   'src/bugs/issue_8.cpp',
    'src/compiler/alignment.cpp',
    'src/compiler/pointer_size.cpp',
    'src/matchers/test_any.cpp',

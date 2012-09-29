@@ -51,7 +51,7 @@ namespace mockitopp
           * @param times minimum number of times method should be called
           */
          bool atLeast(int times) const
-            { return between(times, 0x7FFF); }
+            { return calls >= times; }
 
          /**
           * verify method is called at most (n) times
@@ -59,7 +59,7 @@ namespace mockitopp
           * @param times maximum number of times method should be called
           */
          bool atMost(int times) const
-            { return between(0, times); }
+            { return calls <= times; }
 
          /**
           * verify method is called exactly (n) times
@@ -67,17 +67,17 @@ namespace mockitopp
           * @param times exact number of times method should be called
           */
          bool exactly(int times) const
-            { return between(times, times); }
+            { return calls == times; }
 
          /**
           * verify method is never called
           */
          bool never() const
-            { return between(0, 0); }
+            { return calls == 0; }
       };
 
       template <typename R>
-      struct dynamic_vfunction_action : dynamic_vfunction_base
+      struct dynamic_vfunction_action
       {
          typedef shared_ptr<action<R> > action_type;
          typedef std::list<action_type> action_queue_type;
@@ -99,7 +99,7 @@ namespace mockitopp
       };
 
       template <>
-      struct dynamic_vfunction_action<void> : dynamic_vfunction_base
+      struct dynamic_vfunction_action<void>
       {
          typedef shared_ptr<action<void> > action_type;
          typedef std::list<action_type>    action_queue_type;
@@ -164,11 +164,13 @@ namespace mockitopp
       // TODO: clean up impl
       // TODO: add sequence matcher
 
-      //TODO: clean up typedef nomenclature
+      // TODO: clean up typedef nomenclature
 define(`DEFINE_DYNAMIC_VFUNCTION', `
       // $1 arity template
       template <typename R, typename C`'M4_ENUM_TRAILING_PARAMS($1, typename A)>
-      struct dynamic_vfunction<R (C::*)(M4_ENUM_PARAMS($1, A))> : public dynamic_vfunction_action<R>
+      struct dynamic_vfunction<R (C::*)(M4_ENUM_PARAMS($1, A))>
+         : private dynamic_vfunction_action<R>
+         , public  dynamic_vfunction_base
       {
          typedef tr1::tuple<M4_ENUM_PARAMS($1, A)> raw_tuple_type;
          typedef tr1::tuple<M4_ENUM_BINARY_PARAMS($1, matcher_element<A, >, M4_INTERCEPT) > matcher_tuple_type;
@@ -181,11 +183,12 @@ define(`DEFINE_DYNAMIC_VFUNCTION', `
 
          dynamic_vfunction()
             : dynamic_vfunction_action<R>()
+            , dynamic_vfunction_base()
             , raw_actions_map()
             , matcher_actions_map()
             {}
 
-         M4_IF($1, `dynamic_vfunction& when(M4_ENUM_BINARY_PARAMS($1, const matcher::Matcher<A, >& a))
+         M4_IF($1, `dynamic_vfunction_action<R>& when(M4_ENUM_BINARY_PARAMS($1, const matcher::Matcher<A, >& a))
          {
             matcher_tuple_type args = matcher_tuple_type(M4_ENUM_PARAMS($1, a));
             typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
@@ -199,7 +202,7 @@ define(`DEFINE_DYNAMIC_VFUNCTION', `
             return *this;
          }',)
 
-         dynamic_vfunction& when(M4_ENUM_BINARY_PARAMS($1, A, a))
+         dynamic_vfunction_action<R>& when(M4_ENUM_BINARY_PARAMS($1, A, a))
          {
             raw_tuple_type args = raw_tuple_type(M4_ENUM_PARAMS($1, a));
             typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;

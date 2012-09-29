@@ -83,10 +83,7 @@ namespace mockitopp
                   {}
 
                ~shared_ptr_impl()
-               {
-                  static D DELETER;
-                  DELETER(_raw_ptr);
-               }
+                  { D()(_raw_ptr); }
             }* _ptr_impl;
 
             void __decrement()
@@ -196,8 +193,7 @@ namespace mockitopp
             {
                if(is_owner())
                {
-                  static D DELETER = D();
-                  DELETER(get());
+                  D()(get());
                   _ptr = 0;
                }
             }

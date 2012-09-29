@@ -24,6 +24,7 @@ class Environment(SConsEnvironment):
       apply(SConsEnvironment.__init__, (self,), kw)
       self['CXX'] = os.getenv('CXX', self['CXX'])
       self['CXXFLAGS'] = os.getenv('CXXFLAGS', self['CXXFLAGS'])
+      self['LINKFLAGS'] = os.getenv('LDFLAGS', self['LINKFLAGS'])
       self['BUILDERS']['Test'] = self.Builder(action = self.Action(Test, TestString),
                                               suffix = '.dummy',
                                               src_suffix = self['PROGSUFFIX'])
