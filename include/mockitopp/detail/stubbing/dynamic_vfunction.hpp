@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <list>
-#include <utility>
 
 #include <mockitopp/exceptions.hpp>
 #include <mockitopp/detail/stubbing/action.hpp>
@@ -19,10 +18,6 @@ namespace mockitopp
       struct dynamic_vfunction_base
       {
          int calls;
-
-         dynamic_vfunction_base()
-            : calls(0)
-            {}
 
          // allow polymorphic desctruction with unknown subtype
          virtual ~dynamic_vfunction_base() {}
@@ -72,63 +67,64 @@ namespace mockitopp
       };
 
       template <typename R>
-      struct dynamic_vfunction_action
+      struct dynamic_vfunction_progress : dynamic_vfunction_base
       {
          typedef shared_ptr<action<R> > action_type;
          typedef std::list<action_type> action_queue_type;
 
-         action_queue_type* transient_stubbing;
+         action_queue_type* stubbing_progress;
 
-         dynamic_vfunction_action& thenReturn(R value)
+         dynamic_vfunction_progress& thenReturn(R value)
          {
-            transient_stubbing->push_back(action_type(new returnable_action<R>(value)));
+            stubbing_progress->push_back(action_type(new returnable_action<R>(value)));
             return *this;
          }
 
          template <typename T>
-         dynamic_vfunction_action& thenThrow(T throwable)
+         dynamic_vfunction_progress& thenThrow(T throwable)
          {
-            transient_stubbing->push_back(action_type(new throwable_action<R, T>(throwable)));
+            stubbing_progress->push_back(action_type(new throwable_action<R, T>(throwable)));
             return *this;
          }
       };
 
       template <>
-      struct dynamic_vfunction_action<void>
+      struct dynamic_vfunction_progress<void> : dynamic_vfunction_base
       {
          typedef shared_ptr<action<void> > action_type;
          typedef std::list<action_type>    action_queue_type;
 
-         action_queue_type* transient_stubbing;
+         action_queue_type* stubbing_progress;
 
-         dynamic_vfunction_action& thenReturn()
+         dynamic_vfunction_progress& thenReturn()
          {
-            transient_stubbing->push_back(action_type(new returnable_action<void>()));
+            stubbing_progress->push_back(action_type(new returnable_action<void>()));
             return *this;
          }
 
          template <typename T>
-         dynamic_vfunction_action& thenThrow(T throwable)
+         dynamic_vfunction_progress& thenThrow(T throwable)
          {
-            transient_stubbing->push_back(action_type(new throwable_action<void, T>(throwable)));
+            stubbing_progress->push_back(action_type(new throwable_action<void, T>(throwable)));
             return *this;
          }
       };
 
       template <typename K, typename V>
-      struct key_comparable_pair : public std::pair<K, V>
+      struct map_entry
       {
-         key_comparable_pair(const K& key, const V& pair)
-            : std::pair<K, V>(key, pair)
-            {}
+         K key;
+         V val;
 
-         template <typename KRHS, typename VRHS>
-         bool operator== (const key_comparable_pair<KRHS, VRHS>& rhs) const
-            { return this->first == rhs.first; }
+         map_entry(const K& k, const V& v) : key(k), val(v) {}
 
-         template <typename RHS>
-         bool operator== (const RHS& rhs) const
-            { return this->first == rhs; }
+         template <typename K2, typename V2>
+            bool operator== (const map_entry<K2, V2>& rhs) const
+            { return key == rhs.key; }
+
+         template <typename T>
+            bool operator== (const T& rhs) const
+            { return key == rhs; }
       };
 
       template <typename T>
@@ -163,58 +159,78 @@ namespace mockitopp
  
       // 0 arity template
       template <typename R, typename C>
-      struct dynamic_vfunction<R (C::*)()>
-         : private dynamic_vfunction_action<R>
-         , public  dynamic_vfunction_base
+      struct dynamic_vfunction<R (C::*)()> : private dynamic_vfunction_progress<R>
       {
-         typedef tr1::tuple<> raw_tuple_type;
-         typedef tr1::tuple< > matcher_tuple_type;
+         typedef tr1::tuple<> exact_tuple_type;
+         typedef tr1::tuple< > fuzzy_tuple_type;
 
-         typedef typename dynamic_vfunction_action<R>::action_type       action_type;
-         typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
+         typedef typename dynamic_vfunction_progress<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_progress<R>::action_queue_type action_queue_type;
 
-         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
-         std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
+         std::list<map_entry<exact_tuple_type, action_queue_type> > exact_matches;
+         std::list<map_entry<fuzzy_tuple_type, action_queue_type> > fuzzy_matches;
+         std::list<map_entry<exact_tuple_type, int> >               args_to_calls;
 
          dynamic_vfunction()
-            : dynamic_vfunction_action<R>()
-            , dynamic_vfunction_base()
-            , raw_actions_map()
-            , matcher_actions_map()
+            : dynamic_vfunction_progress<R>()
+            , exact_matches()
+            , fuzzy_matches()
             {}
+
+         template <typename T>
+         int calculate_calls_for_arguments(const T args) {
+            int calls = 0;
+            typename std::list<map_entry<exact_tuple_type, int> >::iterator calls_it
+               = args_to_calls.begin();
+            for(; calls_it != args_to_calls.end(); calls_it++) {
+               if(args == calls_it->key) {
+                  calls += calls_it->val;
+               }
+            }
+            return calls;
+         }
 
          
 
-         dynamic_vfunction_action<R>& when()
+         dynamic_vfunction_progress<R>& when()
          {
-            raw_tuple_type args = raw_tuple_type();
-            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
-            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
-            if(pair_it == raw_actions_map.end())
+            const exact_tuple_type args = exact_tuple_type();
+            typename std::list<map_entry<exact_tuple_type, action_queue_type> >::iterator match
+               = std::find(exact_matches.begin(), exact_matches.end(), args);
+            if(match == exact_matches.end())
             {
-               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
-               pair_it = --raw_actions_map.end();
+               exact_matches.push_back(map_entry<exact_tuple_type, action_queue_type>(args, action_queue_type()));
+               match = --exact_matches.end();
             }
-            this->transient_stubbing = &(pair_it->second);
+            this->calls = calculate_calls_for_arguments(args);
+            this->stubbing_progress = &(match->val);
             return *this;
          }
 
          R invoke()
          {
-            this->calls++;
-            raw_tuple_type     args    = raw_tuple_type();
+            const exact_tuple_type args = exact_tuple_type();
+
+            typename std::list<map_entry<exact_tuple_type, int> >::iterator calls_it
+               = std::find(args_to_calls.begin(), args_to_calls.end(), args);
+            if(calls_it == args_to_calls.end()) {
+               args_to_calls.push_back(map_entry<exact_tuple_type, int>(args, 1));
+            } else {
+               (calls_it->val)++;
+            }
+
             action_queue_type* actions = 0;
-            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
-               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
-            if(raw_actions_it != raw_actions_map.end())
-               { actions = &(raw_actions_it->second); }
-            if(actions == 0)
+            typename std::list<map_entry<exact_tuple_type, action_queue_type> >::iterator exact_match
+               = std::find(exact_matches.begin(), exact_matches.end(), args);
+            if(exact_match != exact_matches.end())
+               { actions = &(exact_match->val); }
+            if(!actions)
             {
-               typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
-               pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
-               if(pair_it == matcher_actions_map.end())
-                  { throw partial_implementation_exception(); }
-               actions = &(pair_it->second);
+               typename std::list<map_entry<fuzzy_tuple_type, action_queue_type> >::iterator fuzzy_match
+                  = std::find(fuzzy_matches.begin(), fuzzy_matches.end(), args);
+               if(fuzzy_match == fuzzy_matches.end())
+                   { throw partial_implementation_exception(); }
+               actions = &(fuzzy_match->val);
             }
             action_type action = actions->front();
             if(actions->size() > 1)
@@ -225,70 +241,91 @@ namespace mockitopp
  
       // 1 arity template
       template <typename R, typename C, typename A0>
-      struct dynamic_vfunction<R (C::*)(A0)>
-         : private dynamic_vfunction_action<R>
-         , public  dynamic_vfunction_base
+      struct dynamic_vfunction<R (C::*)(A0)> : private dynamic_vfunction_progress<R>
       {
-         typedef tr1::tuple<A0> raw_tuple_type;
-         typedef tr1::tuple<matcher_element<A0 > > matcher_tuple_type;
+         typedef tr1::tuple<A0> exact_tuple_type;
+         typedef tr1::tuple<matcher_element<A0 > > fuzzy_tuple_type;
 
-         typedef typename dynamic_vfunction_action<R>::action_type       action_type;
-         typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
+         typedef typename dynamic_vfunction_progress<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_progress<R>::action_queue_type action_queue_type;
 
-         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
-         std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
+         std::list<map_entry<exact_tuple_type, action_queue_type> > exact_matches;
+         std::list<map_entry<fuzzy_tuple_type, action_queue_type> > fuzzy_matches;
+         std::list<map_entry<exact_tuple_type, int> >               args_to_calls;
 
          dynamic_vfunction()
-            : dynamic_vfunction_action<R>()
-            , dynamic_vfunction_base()
-            , raw_actions_map()
-            , matcher_actions_map()
+            : dynamic_vfunction_progress<R>()
+            , exact_matches()
+            , fuzzy_matches()
             {}
 
-         dynamic_vfunction_action<R>& when(const matcher::Matcher<A0 >& a0)
-         {
-            matcher_tuple_type args = matcher_tuple_type(a0);
-            typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
-            pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
-            if(pair_it == matcher_actions_map.end())
-            {
-               matcher_actions_map.push_back(key_comparable_pair<matcher_tuple_type, action_queue_type>(args, action_queue_type()));
-               pair_it = --matcher_actions_map.end();
+         template <typename T>
+         int calculate_calls_for_arguments(const T args) {
+            int calls = 0;
+            typename std::list<map_entry<exact_tuple_type, int> >::iterator calls_it
+               = args_to_calls.begin();
+            for(; calls_it != args_to_calls.end(); calls_it++) {
+               if(args == calls_it->key) {
+                  calls += calls_it->val;
+               }
             }
-            this->transient_stubbing = &(pair_it->second);
+            return calls;
+         }
+
+         dynamic_vfunction_progress<R>& when(const matcher::Matcher<A0 >& a0)
+         {
+            const fuzzy_tuple_type args = fuzzy_tuple_type(a0);
+            typename std::list<map_entry<fuzzy_tuple_type, action_queue_type> >::iterator match
+               = std::find(fuzzy_matches.begin(), fuzzy_matches.end(), args);
+            if(match == fuzzy_matches.end())
+            {
+               fuzzy_matches.push_back(map_entry<fuzzy_tuple_type, action_queue_type>(args, action_queue_type()));
+               match = --fuzzy_matches.end();
+            }
+            this->calls = calculate_calls_for_arguments(args);
+            this->stubbing_progress = &(match->val);
             return *this;
          }
 
-         dynamic_vfunction_action<R>& when(A0 a0)
+         dynamic_vfunction_progress<R>& when(A0 a0)
          {
-            raw_tuple_type args = raw_tuple_type(a0);
-            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
-            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
-            if(pair_it == raw_actions_map.end())
+            const exact_tuple_type args = exact_tuple_type(a0);
+            typename std::list<map_entry<exact_tuple_type, action_queue_type> >::iterator match
+               = std::find(exact_matches.begin(), exact_matches.end(), args);
+            if(match == exact_matches.end())
             {
-               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
-               pair_it = --raw_actions_map.end();
+               exact_matches.push_back(map_entry<exact_tuple_type, action_queue_type>(args, action_queue_type()));
+               match = --exact_matches.end();
             }
-            this->transient_stubbing = &(pair_it->second);
+            this->calls = calculate_calls_for_arguments(args);
+            this->stubbing_progress = &(match->val);
             return *this;
          }
 
          R invoke(A0 a0)
          {
-            this->calls++;
-            raw_tuple_type     args    = raw_tuple_type(a0);
+            const exact_tuple_type args = exact_tuple_type(a0);
+
+            typename std::list<map_entry<exact_tuple_type, int> >::iterator calls_it
+               = std::find(args_to_calls.begin(), args_to_calls.end(), args);
+            if(calls_it == args_to_calls.end()) {
+               args_to_calls.push_back(map_entry<exact_tuple_type, int>(args, 1));
+            } else {
+               (calls_it->val)++;
+            }
+
             action_queue_type* actions = 0;
-            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
-               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
-            if(raw_actions_it != raw_actions_map.end())
-               { actions = &(raw_actions_it->second); }
-            if(actions == 0)
+            typename std::list<map_entry<exact_tuple_type, action_queue_type> >::iterator exact_match
+               = std::find(exact_matches.begin(), exact_matches.end(), args);
+            if(exact_match != exact_matches.end())
+               { actions = &(exact_match->val); }
+            if(!actions)
             {
-               typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
-               pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
-               if(pair_it == matcher_actions_map.end())
-                  { throw partial_implementation_exception(); }
-               actions = &(pair_it->second);
+               typename std::list<map_entry<fuzzy_tuple_type, action_queue_type> >::iterator fuzzy_match
+                  = std::find(fuzzy_matches.begin(), fuzzy_matches.end(), args);
+               if(fuzzy_match == fuzzy_matches.end())
+                   { throw partial_implementation_exception(); }
+               actions = &(fuzzy_match->val);
             }
             action_type action = actions->front();
             if(actions->size() > 1)
@@ -299,70 +336,91 @@ namespace mockitopp
  
       // 2 arity template
       template <typename R, typename C, typename A0, typename A1>
-      struct dynamic_vfunction<R (C::*)(A0, A1)>
-         : private dynamic_vfunction_action<R>
-         , public  dynamic_vfunction_base
+      struct dynamic_vfunction<R (C::*)(A0, A1)> : private dynamic_vfunction_progress<R>
       {
-         typedef tr1::tuple<A0, A1> raw_tuple_type;
-         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 > > matcher_tuple_type;
+         typedef tr1::tuple<A0, A1> exact_tuple_type;
+         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 > > fuzzy_tuple_type;
 
-         typedef typename dynamic_vfunction_action<R>::action_type       action_type;
-         typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
+         typedef typename dynamic_vfunction_progress<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_progress<R>::action_queue_type action_queue_type;
 
-         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
-         std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
+         std::list<map_entry<exact_tuple_type, action_queue_type> > exact_matches;
+         std::list<map_entry<fuzzy_tuple_type, action_queue_type> > fuzzy_matches;
+         std::list<map_entry<exact_tuple_type, int> >               args_to_calls;
 
          dynamic_vfunction()
-            : dynamic_vfunction_action<R>()
-            , dynamic_vfunction_base()
-            , raw_actions_map()
-            , matcher_actions_map()
+            : dynamic_vfunction_progress<R>()
+            , exact_matches()
+            , fuzzy_matches()
             {}
 
-         dynamic_vfunction_action<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1)
-         {
-            matcher_tuple_type args = matcher_tuple_type(a0, a1);
-            typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
-            pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
-            if(pair_it == matcher_actions_map.end())
-            {
-               matcher_actions_map.push_back(key_comparable_pair<matcher_tuple_type, action_queue_type>(args, action_queue_type()));
-               pair_it = --matcher_actions_map.end();
+         template <typename T>
+         int calculate_calls_for_arguments(const T args) {
+            int calls = 0;
+            typename std::list<map_entry<exact_tuple_type, int> >::iterator calls_it
+               = args_to_calls.begin();
+            for(; calls_it != args_to_calls.end(); calls_it++) {
+               if(args == calls_it->key) {
+                  calls += calls_it->val;
+               }
             }
-            this->transient_stubbing = &(pair_it->second);
+            return calls;
+         }
+
+         dynamic_vfunction_progress<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1)
+         {
+            const fuzzy_tuple_type args = fuzzy_tuple_type(a0, a1);
+            typename std::list<map_entry<fuzzy_tuple_type, action_queue_type> >::iterator match
+               = std::find(fuzzy_matches.begin(), fuzzy_matches.end(), args);
+            if(match == fuzzy_matches.end())
+            {
+               fuzzy_matches.push_back(map_entry<fuzzy_tuple_type, action_queue_type>(args, action_queue_type()));
+               match = --fuzzy_matches.end();
+            }
+            this->calls = calculate_calls_for_arguments(args);
+            this->stubbing_progress = &(match->val);
             return *this;
          }
 
-         dynamic_vfunction_action<R>& when(A0 a0, A1 a1)
+         dynamic_vfunction_progress<R>& when(A0 a0, A1 a1)
          {
-            raw_tuple_type args = raw_tuple_type(a0, a1);
-            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
-            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
-            if(pair_it == raw_actions_map.end())
+            const exact_tuple_type args = exact_tuple_type(a0, a1);
+            typename std::list<map_entry<exact_tuple_type, action_queue_type> >::iterator match
+               = std::find(exact_matches.begin(), exact_matches.end(), args);
+            if(match == exact_matches.end())
             {
-               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
-               pair_it = --raw_actions_map.end();
+               exact_matches.push_back(map_entry<exact_tuple_type, action_queue_type>(args, action_queue_type()));
+               match = --exact_matches.end();
             }
-            this->transient_stubbing = &(pair_it->second);
+            this->calls = calculate_calls_for_arguments(args);
+            this->stubbing_progress = &(match->val);
             return *this;
          }
 
          R invoke(A0 a0, A1 a1)
          {
-            this->calls++;
-            raw_tuple_type     args    = raw_tuple_type(a0, a1);
+            const exact_tuple_type args = exact_tuple_type(a0, a1);
+
+            typename std::list<map_entry<exact_tuple_type, int> >::iterator calls_it
+               = std::find(args_to_calls.begin(), args_to_calls.end(), args);
+            if(calls_it == args_to_calls.end()) {
+               args_to_calls.push_back(map_entry<exact_tuple_type, int>(args, 1));
+            } else {
+               (calls_it->val)++;
+            }
+
             action_queue_type* actions = 0;
-            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
-               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
-            if(raw_actions_it != raw_actions_map.end())
-               { actions = &(raw_actions_it->second); }
-            if(actions == 0)
+            typename std::list<map_entry<exact_tuple_type, action_queue_type> >::iterator exact_match
+               = std::find(exact_matches.begin(), exact_matches.end(), args);
+            if(exact_match != exact_matches.end())
+               { actions = &(exact_match->val); }
+            if(!actions)
             {
-               typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
-               pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
-               if(pair_it == matcher_actions_map.end())
-                  { throw partial_implementation_exception(); }
-               actions = &(pair_it->second);
+               typename std::list<map_entry<fuzzy_tuple_type, action_queue_type> >::iterator fuzzy_match
+                  = std::find(fuzzy_matches.begin(), fuzzy_matches.end(), args);
+               if(fuzzy_match == fuzzy_matches.end())
+                   { throw partial_implementation_exception(); }
+               actions = &(fuzzy_match->val);
             }
             action_type action = actions->front();
             if(actions->size() > 1)
@@ -373,70 +431,91 @@ namespace mockitopp
  
       // 3 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2)>
-         : private dynamic_vfunction_action<R>
-         , public  dynamic_vfunction_base
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2)> : private dynamic_vfunction_progress<R>
       {
-         typedef tr1::tuple<A0, A1, A2> raw_tuple_type;
-         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 > > matcher_tuple_type;
+         typedef tr1::tuple<A0, A1, A2> exact_tuple_type;
+         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 > > fuzzy_tuple_type;
 
-         typedef typename dynamic_vfunction_action<R>::action_type       action_type;
-         typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
+         typedef typename dynamic_vfunction_progress<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_progress<R>::action_queue_type action_queue_type;
 
-         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
-         std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
+         std::list<map_entry<exact_tuple_type, action_queue_type> > exact_matches;
+         std::list<map_entry<fuzzy_tuple_type, action_queue_type> > fuzzy_matches;
+         std::list<map_entry<exact_tuple_type, int> >               args_to_calls;
 
          dynamic_vfunction()
-            : dynamic_vfunction_action<R>()
-            , dynamic_vfunction_base()
-            , raw_actions_map()
-            , matcher_actions_map()
+            : dynamic_vfunction_progress<R>()
+            , exact_matches()
+            , fuzzy_matches()
             {}
 
-         dynamic_vfunction_action<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2)
-         {
-            matcher_tuple_type args = matcher_tuple_type(a0, a1, a2);
-            typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
-            pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
-            if(pair_it == matcher_actions_map.end())
-            {
-               matcher_actions_map.push_back(key_comparable_pair<matcher_tuple_type, action_queue_type>(args, action_queue_type()));
-               pair_it = --matcher_actions_map.end();
+         template <typename T>
+         int calculate_calls_for_arguments(const T args) {
+            int calls = 0;
+            typename std::list<map_entry<exact_tuple_type, int> >::iterator calls_it
+               = args_to_calls.begin();
+            for(; calls_it != args_to_calls.end(); calls_it++) {
+               if(args == calls_it->key) {
+                  calls += calls_it->val;
+               }
             }
-            this->transient_stubbing = &(pair_it->second);
+            return calls;
+         }
+
+         dynamic_vfunction_progress<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2)
+         {
+            const fuzzy_tuple_type args = fuzzy_tuple_type(a0, a1, a2);
+            typename std::list<map_entry<fuzzy_tuple_type, action_queue_type> >::iterator match
+               = std::find(fuzzy_matches.begin(), fuzzy_matches.end(), args);
+            if(match == fuzzy_matches.end())
+            {
+               fuzzy_matches.push_back(map_entry<fuzzy_tuple_type, action_queue_type>(args, action_queue_type()));
+               match = --fuzzy_matches.end();
+            }
+            this->calls = calculate_calls_for_arguments(args);
+            this->stubbing_progress = &(match->val);
             return *this;
          }
 
-         dynamic_vfunction_action<R>& when(A0 a0, A1 a1, A2 a2)
+         dynamic_vfunction_progress<R>& when(A0 a0, A1 a1, A2 a2)
          {
-            raw_tuple_type args = raw_tuple_type(a0, a1, a2);
-            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
-            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
-            if(pair_it == raw_actions_map.end())
+            const exact_tuple_type args = exact_tuple_type(a0, a1, a2);
+            typename std::list<map_entry<exact_tuple_type, action_queue_type> >::iterator match
+               = std::find(exact_matches.begin(), exact_matches.end(), args);
+            if(match == exact_matches.end())
             {
-               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
-               pair_it = --raw_actions_map.end();
+               exact_matches.push_back(map_entry<exact_tuple_type, action_queue_type>(args, action_queue_type()));
+               match = --exact_matches.end();
             }
-            this->transient_stubbing = &(pair_it->second);
+            this->calls = calculate_calls_for_arguments(args);
+            this->stubbing_progress = &(match->val);
             return *this;
          }
 
          R invoke(A0 a0, A1 a1, A2 a2)
          {
-            this->calls++;
-            raw_tuple_type     args    = raw_tuple_type(a0, a1, a2);
+            const exact_tuple_type args = exact_tuple_type(a0, a1, a2);
+
+            typename std::list<map_entry<exact_tuple_type, int> >::iterator calls_it
+               = std::find(args_to_calls.begin(), args_to_calls.end(), args);
+            if(calls_it == args_to_calls.end()) {
+               args_to_calls.push_back(map_entry<exact_tuple_type, int>(args, 1));
+            } else {
+               (calls_it->val)++;
+            }
+
             action_queue_type* actions = 0;
-            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
-               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
-            if(raw_actions_it != raw_actions_map.end())
-               { actions = &(raw_actions_it->second); }
-            if(actions == 0)
+            typename std::list<map_entry<exact_tuple_type, action_queue_type> >::iterator exact_match
+               = std::find(exact_matches.begin(), exact_matches.end(), args);
+            if(exact_match != exact_matches.end())
+               { actions = &(exact_match->val); }
+            if(!actions)
             {
-               typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
-               pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
-               if(pair_it == matcher_actions_map.end())
-                  { throw partial_implementation_exception(); }
-               actions = &(pair_it->second);
+               typename std::list<map_entry<fuzzy_tuple_type, action_queue_type> >::iterator fuzzy_match
+                  = std::find(fuzzy_matches.begin(), fuzzy_matches.end(), args);
+               if(fuzzy_match == fuzzy_matches.end())
+                   { throw partial_implementation_exception(); }
+               actions = &(fuzzy_match->val);
             }
             action_type action = actions->front();
             if(actions->size() > 1)
@@ -447,70 +526,91 @@ namespace mockitopp
  
       // 4 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3)>
-         : private dynamic_vfunction_action<R>
-         , public  dynamic_vfunction_base
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3)> : private dynamic_vfunction_progress<R>
       {
-         typedef tr1::tuple<A0, A1, A2, A3> raw_tuple_type;
-         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 > > matcher_tuple_type;
+         typedef tr1::tuple<A0, A1, A2, A3> exact_tuple_type;
+         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 > > fuzzy_tuple_type;
 
-         typedef typename dynamic_vfunction_action<R>::action_type       action_type;
-         typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
+         typedef typename dynamic_vfunction_progress<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_progress<R>::action_queue_type action_queue_type;
 
-         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
-         std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
+         std::list<map_entry<exact_tuple_type, action_queue_type> > exact_matches;
+         std::list<map_entry<fuzzy_tuple_type, action_queue_type> > fuzzy_matches;
+         std::list<map_entry<exact_tuple_type, int> >               args_to_calls;
 
          dynamic_vfunction()
-            : dynamic_vfunction_action<R>()
-            , dynamic_vfunction_base()
-            , raw_actions_map()
-            , matcher_actions_map()
+            : dynamic_vfunction_progress<R>()
+            , exact_matches()
+            , fuzzy_matches()
             {}
 
-         dynamic_vfunction_action<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3)
-         {
-            matcher_tuple_type args = matcher_tuple_type(a0, a1, a2, a3);
-            typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
-            pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
-            if(pair_it == matcher_actions_map.end())
-            {
-               matcher_actions_map.push_back(key_comparable_pair<matcher_tuple_type, action_queue_type>(args, action_queue_type()));
-               pair_it = --matcher_actions_map.end();
+         template <typename T>
+         int calculate_calls_for_arguments(const T args) {
+            int calls = 0;
+            typename std::list<map_entry<exact_tuple_type, int> >::iterator calls_it
+               = args_to_calls.begin();
+            for(; calls_it != args_to_calls.end(); calls_it++) {
+               if(args == calls_it->key) {
+                  calls += calls_it->val;
+               }
             }
-            this->transient_stubbing = &(pair_it->second);
+            return calls;
+         }
+
+         dynamic_vfunction_progress<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3)
+         {
+            const fuzzy_tuple_type args = fuzzy_tuple_type(a0, a1, a2, a3);
+            typename std::list<map_entry<fuzzy_tuple_type, action_queue_type> >::iterator match
+               = std::find(fuzzy_matches.begin(), fuzzy_matches.end(), args);
+            if(match == fuzzy_matches.end())
+            {
+               fuzzy_matches.push_back(map_entry<fuzzy_tuple_type, action_queue_type>(args, action_queue_type()));
+               match = --fuzzy_matches.end();
+            }
+            this->calls = calculate_calls_for_arguments(args);
+            this->stubbing_progress = &(match->val);
             return *this;
          }
 
-         dynamic_vfunction_action<R>& when(A0 a0, A1 a1, A2 a2, A3 a3)
+         dynamic_vfunction_progress<R>& when(A0 a0, A1 a1, A2 a2, A3 a3)
          {
-            raw_tuple_type args = raw_tuple_type(a0, a1, a2, a3);
-            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
-            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
-            if(pair_it == raw_actions_map.end())
+            const exact_tuple_type args = exact_tuple_type(a0, a1, a2, a3);
+            typename std::list<map_entry<exact_tuple_type, action_queue_type> >::iterator match
+               = std::find(exact_matches.begin(), exact_matches.end(), args);
+            if(match == exact_matches.end())
             {
-               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
-               pair_it = --raw_actions_map.end();
+               exact_matches.push_back(map_entry<exact_tuple_type, action_queue_type>(args, action_queue_type()));
+               match = --exact_matches.end();
             }
-            this->transient_stubbing = &(pair_it->second);
+            this->calls = calculate_calls_for_arguments(args);
+            this->stubbing_progress = &(match->val);
             return *this;
          }
 
          R invoke(A0 a0, A1 a1, A2 a2, A3 a3)
          {
-            this->calls++;
-            raw_tuple_type     args    = raw_tuple_type(a0, a1, a2, a3);
+            const exact_tuple_type args = exact_tuple_type(a0, a1, a2, a3);
+
+            typename std::list<map_entry<exact_tuple_type, int> >::iterator calls_it
+               = std::find(args_to_calls.begin(), args_to_calls.end(), args);
+            if(calls_it == args_to_calls.end()) {
+               args_to_calls.push_back(map_entry<exact_tuple_type, int>(args, 1));
+            } else {
+               (calls_it->val)++;
+            }
+
             action_queue_type* actions = 0;
-            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
-               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
-            if(raw_actions_it != raw_actions_map.end())
-               { actions = &(raw_actions_it->second); }
-            if(actions == 0)
+            typename std::list<map_entry<exact_tuple_type, action_queue_type> >::iterator exact_match
+               = std::find(exact_matches.begin(), exact_matches.end(), args);
+            if(exact_match != exact_matches.end())
+               { actions = &(exact_match->val); }
+            if(!actions)
             {
-               typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
-               pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
-               if(pair_it == matcher_actions_map.end())
-                  { throw partial_implementation_exception(); }
-               actions = &(pair_it->second);
+               typename std::list<map_entry<fuzzy_tuple_type, action_queue_type> >::iterator fuzzy_match
+                  = std::find(fuzzy_matches.begin(), fuzzy_matches.end(), args);
+               if(fuzzy_match == fuzzy_matches.end())
+                   { throw partial_implementation_exception(); }
+               actions = &(fuzzy_match->val);
             }
             action_type action = actions->front();
             if(actions->size() > 1)
@@ -521,70 +621,91 @@ namespace mockitopp
  
       // 5 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4)>
-         : private dynamic_vfunction_action<R>
-         , public  dynamic_vfunction_base
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4)> : private dynamic_vfunction_progress<R>
       {
-         typedef tr1::tuple<A0, A1, A2, A3, A4> raw_tuple_type;
-         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 > > matcher_tuple_type;
+         typedef tr1::tuple<A0, A1, A2, A3, A4> exact_tuple_type;
+         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 > > fuzzy_tuple_type;
 
-         typedef typename dynamic_vfunction_action<R>::action_type       action_type;
-         typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
+         typedef typename dynamic_vfunction_progress<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_progress<R>::action_queue_type action_queue_type;
 
-         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
-         std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
+         std::list<map_entry<exact_tuple_type, action_queue_type> > exact_matches;
+         std::list<map_entry<fuzzy_tuple_type, action_queue_type> > fuzzy_matches;
+         std::list<map_entry<exact_tuple_type, int> >               args_to_calls;
 
          dynamic_vfunction()
-            : dynamic_vfunction_action<R>()
-            , dynamic_vfunction_base()
-            , raw_actions_map()
-            , matcher_actions_map()
+            : dynamic_vfunction_progress<R>()
+            , exact_matches()
+            , fuzzy_matches()
             {}
 
-         dynamic_vfunction_action<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4)
-         {
-            matcher_tuple_type args = matcher_tuple_type(a0, a1, a2, a3, a4);
-            typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
-            pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
-            if(pair_it == matcher_actions_map.end())
-            {
-               matcher_actions_map.push_back(key_comparable_pair<matcher_tuple_type, action_queue_type>(args, action_queue_type()));
-               pair_it = --matcher_actions_map.end();
+         template <typename T>
+         int calculate_calls_for_arguments(const T args) {
+            int calls = 0;
+            typename std::list<map_entry<exact_tuple_type, int> >::iterator calls_it
+               = args_to_calls.begin();
+            for(; calls_it != args_to_calls.end(); calls_it++) {
+               if(args == calls_it->key) {
+                  calls += calls_it->val;
+               }
             }
-            this->transient_stubbing = &(pair_it->second);
+            return calls;
+         }
+
+         dynamic_vfunction_progress<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4)
+         {
+            const fuzzy_tuple_type args = fuzzy_tuple_type(a0, a1, a2, a3, a4);
+            typename std::list<map_entry<fuzzy_tuple_type, action_queue_type> >::iterator match
+               = std::find(fuzzy_matches.begin(), fuzzy_matches.end(), args);
+            if(match == fuzzy_matches.end())
+            {
+               fuzzy_matches.push_back(map_entry<fuzzy_tuple_type, action_queue_type>(args, action_queue_type()));
+               match = --fuzzy_matches.end();
+            }
+            this->calls = calculate_calls_for_arguments(args);
+            this->stubbing_progress = &(match->val);
             return *this;
          }
 
-         dynamic_vfunction_action<R>& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4)
+         dynamic_vfunction_progress<R>& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4)
          {
-            raw_tuple_type args = raw_tuple_type(a0, a1, a2, a3, a4);
-            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
-            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
-            if(pair_it == raw_actions_map.end())
+            const exact_tuple_type args = exact_tuple_type(a0, a1, a2, a3, a4);
+            typename std::list<map_entry<exact_tuple_type, action_queue_type> >::iterator match
+               = std::find(exact_matches.begin(), exact_matches.end(), args);
+            if(match == exact_matches.end())
             {
-               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
-               pair_it = --raw_actions_map.end();
+               exact_matches.push_back(map_entry<exact_tuple_type, action_queue_type>(args, action_queue_type()));
+               match = --exact_matches.end();
             }
-            this->transient_stubbing = &(pair_it->second);
+            this->calls = calculate_calls_for_arguments(args);
+            this->stubbing_progress = &(match->val);
             return *this;
          }
 
          R invoke(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4)
          {
-            this->calls++;
-            raw_tuple_type     args    = raw_tuple_type(a0, a1, a2, a3, a4);
+            const exact_tuple_type args = exact_tuple_type(a0, a1, a2, a3, a4);
+
+            typename std::list<map_entry<exact_tuple_type, int> >::iterator calls_it
+               = std::find(args_to_calls.begin(), args_to_calls.end(), args);
+            if(calls_it == args_to_calls.end()) {
+               args_to_calls.push_back(map_entry<exact_tuple_type, int>(args, 1));
+            } else {
+               (calls_it->val)++;
+            }
+
             action_queue_type* actions = 0;
-            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
-               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
-            if(raw_actions_it != raw_actions_map.end())
-               { actions = &(raw_actions_it->second); }
-            if(actions == 0)
+            typename std::list<map_entry<exact_tuple_type, action_queue_type> >::iterator exact_match
+               = std::find(exact_matches.begin(), exact_matches.end(), args);
+            if(exact_match != exact_matches.end())
+               { actions = &(exact_match->val); }
+            if(!actions)
             {
-               typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
-               pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
-               if(pair_it == matcher_actions_map.end())
-                  { throw partial_implementation_exception(); }
-               actions = &(pair_it->second);
+               typename std::list<map_entry<fuzzy_tuple_type, action_queue_type> >::iterator fuzzy_match
+                  = std::find(fuzzy_matches.begin(), fuzzy_matches.end(), args);
+               if(fuzzy_match == fuzzy_matches.end())
+                   { throw partial_implementation_exception(); }
+               actions = &(fuzzy_match->val);
             }
             action_type action = actions->front();
             if(actions->size() > 1)
@@ -595,70 +716,91 @@ namespace mockitopp
  
       // 6 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5)>
-         : private dynamic_vfunction_action<R>
-         , public  dynamic_vfunction_base
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5)> : private dynamic_vfunction_progress<R>
       {
-         typedef tr1::tuple<A0, A1, A2, A3, A4, A5> raw_tuple_type;
-         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 >, matcher_element<A5 > > matcher_tuple_type;
+         typedef tr1::tuple<A0, A1, A2, A3, A4, A5> exact_tuple_type;
+         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 >, matcher_element<A5 > > fuzzy_tuple_type;
 
-         typedef typename dynamic_vfunction_action<R>::action_type       action_type;
-         typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
+         typedef typename dynamic_vfunction_progress<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_progress<R>::action_queue_type action_queue_type;
 
-         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
-         std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
+         std::list<map_entry<exact_tuple_type, action_queue_type> > exact_matches;
+         std::list<map_entry<fuzzy_tuple_type, action_queue_type> > fuzzy_matches;
+         std::list<map_entry<exact_tuple_type, int> >               args_to_calls;
 
          dynamic_vfunction()
-            : dynamic_vfunction_action<R>()
-            , dynamic_vfunction_base()
-            , raw_actions_map()
-            , matcher_actions_map()
+            : dynamic_vfunction_progress<R>()
+            , exact_matches()
+            , fuzzy_matches()
             {}
 
-         dynamic_vfunction_action<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5)
-         {
-            matcher_tuple_type args = matcher_tuple_type(a0, a1, a2, a3, a4, a5);
-            typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
-            pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
-            if(pair_it == matcher_actions_map.end())
-            {
-               matcher_actions_map.push_back(key_comparable_pair<matcher_tuple_type, action_queue_type>(args, action_queue_type()));
-               pair_it = --matcher_actions_map.end();
+         template <typename T>
+         int calculate_calls_for_arguments(const T args) {
+            int calls = 0;
+            typename std::list<map_entry<exact_tuple_type, int> >::iterator calls_it
+               = args_to_calls.begin();
+            for(; calls_it != args_to_calls.end(); calls_it++) {
+               if(args == calls_it->key) {
+                  calls += calls_it->val;
+               }
             }
-            this->transient_stubbing = &(pair_it->second);
+            return calls;
+         }
+
+         dynamic_vfunction_progress<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5)
+         {
+            const fuzzy_tuple_type args = fuzzy_tuple_type(a0, a1, a2, a3, a4, a5);
+            typename std::list<map_entry<fuzzy_tuple_type, action_queue_type> >::iterator match
+               = std::find(fuzzy_matches.begin(), fuzzy_matches.end(), args);
+            if(match == fuzzy_matches.end())
+            {
+               fuzzy_matches.push_back(map_entry<fuzzy_tuple_type, action_queue_type>(args, action_queue_type()));
+               match = --fuzzy_matches.end();
+            }
+            this->calls = calculate_calls_for_arguments(args);
+            this->stubbing_progress = &(match->val);
             return *this;
          }
 
-         dynamic_vfunction_action<R>& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5)
+         dynamic_vfunction_progress<R>& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5)
          {
-            raw_tuple_type args = raw_tuple_type(a0, a1, a2, a3, a4, a5);
-            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
-            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
-            if(pair_it == raw_actions_map.end())
+            const exact_tuple_type args = exact_tuple_type(a0, a1, a2, a3, a4, a5);
+            typename std::list<map_entry<exact_tuple_type, action_queue_type> >::iterator match
+               = std::find(exact_matches.begin(), exact_matches.end(), args);
+            if(match == exact_matches.end())
             {
-               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
-               pair_it = --raw_actions_map.end();
+               exact_matches.push_back(map_entry<exact_tuple_type, action_queue_type>(args, action_queue_type()));
+               match = --exact_matches.end();
             }
-            this->transient_stubbing = &(pair_it->second);
+            this->calls = calculate_calls_for_arguments(args);
+            this->stubbing_progress = &(match->val);
             return *this;
          }
 
          R invoke(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5)
          {
-            this->calls++;
-            raw_tuple_type     args    = raw_tuple_type(a0, a1, a2, a3, a4, a5);
+            const exact_tuple_type args = exact_tuple_type(a0, a1, a2, a3, a4, a5);
+
+            typename std::list<map_entry<exact_tuple_type, int> >::iterator calls_it
+               = std::find(args_to_calls.begin(), args_to_calls.end(), args);
+            if(calls_it == args_to_calls.end()) {
+               args_to_calls.push_back(map_entry<exact_tuple_type, int>(args, 1));
+            } else {
+               (calls_it->val)++;
+            }
+
             action_queue_type* actions = 0;
-            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
-               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
-            if(raw_actions_it != raw_actions_map.end())
-               { actions = &(raw_actions_it->second); }
-            if(actions == 0)
+            typename std::list<map_entry<exact_tuple_type, action_queue_type> >::iterator exact_match
+               = std::find(exact_matches.begin(), exact_matches.end(), args);
+            if(exact_match != exact_matches.end())
+               { actions = &(exact_match->val); }
+            if(!actions)
             {
-               typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
-               pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
-               if(pair_it == matcher_actions_map.end())
-                  { throw partial_implementation_exception(); }
-               actions = &(pair_it->second);
+               typename std::list<map_entry<fuzzy_tuple_type, action_queue_type> >::iterator fuzzy_match
+                  = std::find(fuzzy_matches.begin(), fuzzy_matches.end(), args);
+               if(fuzzy_match == fuzzy_matches.end())
+                   { throw partial_implementation_exception(); }
+               actions = &(fuzzy_match->val);
             }
             action_type action = actions->front();
             if(actions->size() > 1)
@@ -669,70 +811,91 @@ namespace mockitopp
  
       // 7 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6)>
-         : private dynamic_vfunction_action<R>
-         , public  dynamic_vfunction_base
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6)> : private dynamic_vfunction_progress<R>
       {
-         typedef tr1::tuple<A0, A1, A2, A3, A4, A5, A6> raw_tuple_type;
-         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 >, matcher_element<A5 >, matcher_element<A6 > > matcher_tuple_type;
+         typedef tr1::tuple<A0, A1, A2, A3, A4, A5, A6> exact_tuple_type;
+         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 >, matcher_element<A5 >, matcher_element<A6 > > fuzzy_tuple_type;
 
-         typedef typename dynamic_vfunction_action<R>::action_type       action_type;
-         typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
+         typedef typename dynamic_vfunction_progress<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_progress<R>::action_queue_type action_queue_type;
 
-         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
-         std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
+         std::list<map_entry<exact_tuple_type, action_queue_type> > exact_matches;
+         std::list<map_entry<fuzzy_tuple_type, action_queue_type> > fuzzy_matches;
+         std::list<map_entry<exact_tuple_type, int> >               args_to_calls;
 
          dynamic_vfunction()
-            : dynamic_vfunction_action<R>()
-            , dynamic_vfunction_base()
-            , raw_actions_map()
-            , matcher_actions_map()
+            : dynamic_vfunction_progress<R>()
+            , exact_matches()
+            , fuzzy_matches()
             {}
 
-         dynamic_vfunction_action<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5, const matcher::Matcher<A6 >& a6)
-         {
-            matcher_tuple_type args = matcher_tuple_type(a0, a1, a2, a3, a4, a5, a6);
-            typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
-            pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
-            if(pair_it == matcher_actions_map.end())
-            {
-               matcher_actions_map.push_back(key_comparable_pair<matcher_tuple_type, action_queue_type>(args, action_queue_type()));
-               pair_it = --matcher_actions_map.end();
+         template <typename T>
+         int calculate_calls_for_arguments(const T args) {
+            int calls = 0;
+            typename std::list<map_entry<exact_tuple_type, int> >::iterator calls_it
+               = args_to_calls.begin();
+            for(; calls_it != args_to_calls.end(); calls_it++) {
+               if(args == calls_it->key) {
+                  calls += calls_it->val;
+               }
             }
-            this->transient_stubbing = &(pair_it->second);
+            return calls;
+         }
+
+         dynamic_vfunction_progress<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5, const matcher::Matcher<A6 >& a6)
+         {
+            const fuzzy_tuple_type args = fuzzy_tuple_type(a0, a1, a2, a3, a4, a5, a6);
+            typename std::list<map_entry<fuzzy_tuple_type, action_queue_type> >::iterator match
+               = std::find(fuzzy_matches.begin(), fuzzy_matches.end(), args);
+            if(match == fuzzy_matches.end())
+            {
+               fuzzy_matches.push_back(map_entry<fuzzy_tuple_type, action_queue_type>(args, action_queue_type()));
+               match = --fuzzy_matches.end();
+            }
+            this->calls = calculate_calls_for_arguments(args);
+            this->stubbing_progress = &(match->val);
             return *this;
          }
 
-         dynamic_vfunction_action<R>& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6)
+         dynamic_vfunction_progress<R>& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6)
          {
-            raw_tuple_type args = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6);
-            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
-            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
-            if(pair_it == raw_actions_map.end())
+            const exact_tuple_type args = exact_tuple_type(a0, a1, a2, a3, a4, a5, a6);
+            typename std::list<map_entry<exact_tuple_type, action_queue_type> >::iterator match
+               = std::find(exact_matches.begin(), exact_matches.end(), args);
+            if(match == exact_matches.end())
             {
-               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
-               pair_it = --raw_actions_map.end();
+               exact_matches.push_back(map_entry<exact_tuple_type, action_queue_type>(args, action_queue_type()));
+               match = --exact_matches.end();
             }
-            this->transient_stubbing = &(pair_it->second);
+            this->calls = calculate_calls_for_arguments(args);
+            this->stubbing_progress = &(match->val);
             return *this;
          }
 
          R invoke(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6)
          {
-            this->calls++;
-            raw_tuple_type     args    = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6);
+            const exact_tuple_type args = exact_tuple_type(a0, a1, a2, a3, a4, a5, a6);
+
+            typename std::list<map_entry<exact_tuple_type, int> >::iterator calls_it
+               = std::find(args_to_calls.begin(), args_to_calls.end(), args);
+            if(calls_it == args_to_calls.end()) {
+               args_to_calls.push_back(map_entry<exact_tuple_type, int>(args, 1));
+            } else {
+               (calls_it->val)++;
+            }
+
             action_queue_type* actions = 0;
-            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
-               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
-            if(raw_actions_it != raw_actions_map.end())
-               { actions = &(raw_actions_it->second); }
-            if(actions == 0)
+            typename std::list<map_entry<exact_tuple_type, action_queue_type> >::iterator exact_match
+               = std::find(exact_matches.begin(), exact_matches.end(), args);
+            if(exact_match != exact_matches.end())
+               { actions = &(exact_match->val); }
+            if(!actions)
             {
-               typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
-               pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
-               if(pair_it == matcher_actions_map.end())
-                  { throw partial_implementation_exception(); }
-               actions = &(pair_it->second);
+               typename std::list<map_entry<fuzzy_tuple_type, action_queue_type> >::iterator fuzzy_match
+                  = std::find(fuzzy_matches.begin(), fuzzy_matches.end(), args);
+               if(fuzzy_match == fuzzy_matches.end())
+                   { throw partial_implementation_exception(); }
+               actions = &(fuzzy_match->val);
             }
             action_type action = actions->front();
             if(actions->size() > 1)
@@ -743,70 +906,91 @@ namespace mockitopp
  
       // 8 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7)>
-         : private dynamic_vfunction_action<R>
-         , public  dynamic_vfunction_base
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7)> : private dynamic_vfunction_progress<R>
       {
-         typedef tr1::tuple<A0, A1, A2, A3, A4, A5, A6, A7> raw_tuple_type;
-         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 >, matcher_element<A5 >, matcher_element<A6 >, matcher_element<A7 > > matcher_tuple_type;
+         typedef tr1::tuple<A0, A1, A2, A3, A4, A5, A6, A7> exact_tuple_type;
+         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 >, matcher_element<A5 >, matcher_element<A6 >, matcher_element<A7 > > fuzzy_tuple_type;
 
-         typedef typename dynamic_vfunction_action<R>::action_type       action_type;
-         typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
+         typedef typename dynamic_vfunction_progress<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_progress<R>::action_queue_type action_queue_type;
 
-         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
-         std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
+         std::list<map_entry<exact_tuple_type, action_queue_type> > exact_matches;
+         std::list<map_entry<fuzzy_tuple_type, action_queue_type> > fuzzy_matches;
+         std::list<map_entry<exact_tuple_type, int> >               args_to_calls;
 
          dynamic_vfunction()
-            : dynamic_vfunction_action<R>()
-            , dynamic_vfunction_base()
-            , raw_actions_map()
-            , matcher_actions_map()
+            : dynamic_vfunction_progress<R>()
+            , exact_matches()
+            , fuzzy_matches()
             {}
 
-         dynamic_vfunction_action<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5, const matcher::Matcher<A6 >& a6, const matcher::Matcher<A7 >& a7)
-         {
-            matcher_tuple_type args = matcher_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7);
-            typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
-            pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
-            if(pair_it == matcher_actions_map.end())
-            {
-               matcher_actions_map.push_back(key_comparable_pair<matcher_tuple_type, action_queue_type>(args, action_queue_type()));
-               pair_it = --matcher_actions_map.end();
+         template <typename T>
+         int calculate_calls_for_arguments(const T args) {
+            int calls = 0;
+            typename std::list<map_entry<exact_tuple_type, int> >::iterator calls_it
+               = args_to_calls.begin();
+            for(; calls_it != args_to_calls.end(); calls_it++) {
+               if(args == calls_it->key) {
+                  calls += calls_it->val;
+               }
             }
-            this->transient_stubbing = &(pair_it->second);
+            return calls;
+         }
+
+         dynamic_vfunction_progress<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5, const matcher::Matcher<A6 >& a6, const matcher::Matcher<A7 >& a7)
+         {
+            const fuzzy_tuple_type args = fuzzy_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7);
+            typename std::list<map_entry<fuzzy_tuple_type, action_queue_type> >::iterator match
+               = std::find(fuzzy_matches.begin(), fuzzy_matches.end(), args);
+            if(match == fuzzy_matches.end())
+            {
+               fuzzy_matches.push_back(map_entry<fuzzy_tuple_type, action_queue_type>(args, action_queue_type()));
+               match = --fuzzy_matches.end();
+            }
+            this->calls = calculate_calls_for_arguments(args);
+            this->stubbing_progress = &(match->val);
             return *this;
          }
 
-         dynamic_vfunction_action<R>& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7)
+         dynamic_vfunction_progress<R>& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7)
          {
-            raw_tuple_type args = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7);
-            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
-            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
-            if(pair_it == raw_actions_map.end())
+            const exact_tuple_type args = exact_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7);
+            typename std::list<map_entry<exact_tuple_type, action_queue_type> >::iterator match
+               = std::find(exact_matches.begin(), exact_matches.end(), args);
+            if(match == exact_matches.end())
             {
-               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
-               pair_it = --raw_actions_map.end();
+               exact_matches.push_back(map_entry<exact_tuple_type, action_queue_type>(args, action_queue_type()));
+               match = --exact_matches.end();
             }
-            this->transient_stubbing = &(pair_it->second);
+            this->calls = calculate_calls_for_arguments(args);
+            this->stubbing_progress = &(match->val);
             return *this;
          }
 
          R invoke(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7)
          {
-            this->calls++;
-            raw_tuple_type     args    = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7);
+            const exact_tuple_type args = exact_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7);
+
+            typename std::list<map_entry<exact_tuple_type, int> >::iterator calls_it
+               = std::find(args_to_calls.begin(), args_to_calls.end(), args);
+            if(calls_it == args_to_calls.end()) {
+               args_to_calls.push_back(map_entry<exact_tuple_type, int>(args, 1));
+            } else {
+               (calls_it->val)++;
+            }
+
             action_queue_type* actions = 0;
-            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
-               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
-            if(raw_actions_it != raw_actions_map.end())
-               { actions = &(raw_actions_it->second); }
-            if(actions == 0)
+            typename std::list<map_entry<exact_tuple_type, action_queue_type> >::iterator exact_match
+               = std::find(exact_matches.begin(), exact_matches.end(), args);
+            if(exact_match != exact_matches.end())
+               { actions = &(exact_match->val); }
+            if(!actions)
             {
-               typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
-               pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
-               if(pair_it == matcher_actions_map.end())
-                  { throw partial_implementation_exception(); }
-               actions = &(pair_it->second);
+               typename std::list<map_entry<fuzzy_tuple_type, action_queue_type> >::iterator fuzzy_match
+                  = std::find(fuzzy_matches.begin(), fuzzy_matches.end(), args);
+               if(fuzzy_match == fuzzy_matches.end())
+                   { throw partial_implementation_exception(); }
+               actions = &(fuzzy_match->val);
             }
             action_type action = actions->front();
             if(actions->size() > 1)
@@ -817,70 +1001,91 @@ namespace mockitopp
  
       // 9 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7, A8)>
-         : private dynamic_vfunction_action<R>
-         , public  dynamic_vfunction_base
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7, A8)> : private dynamic_vfunction_progress<R>
       {
-         typedef tr1::tuple<A0, A1, A2, A3, A4, A5, A6, A7, A8> raw_tuple_type;
-         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 >, matcher_element<A5 >, matcher_element<A6 >, matcher_element<A7 >, matcher_element<A8 > > matcher_tuple_type;
+         typedef tr1::tuple<A0, A1, A2, A3, A4, A5, A6, A7, A8> exact_tuple_type;
+         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 >, matcher_element<A5 >, matcher_element<A6 >, matcher_element<A7 >, matcher_element<A8 > > fuzzy_tuple_type;
 
-         typedef typename dynamic_vfunction_action<R>::action_type       action_type;
-         typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
+         typedef typename dynamic_vfunction_progress<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_progress<R>::action_queue_type action_queue_type;
 
-         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
-         std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
+         std::list<map_entry<exact_tuple_type, action_queue_type> > exact_matches;
+         std::list<map_entry<fuzzy_tuple_type, action_queue_type> > fuzzy_matches;
+         std::list<map_entry<exact_tuple_type, int> >               args_to_calls;
 
          dynamic_vfunction()
-            : dynamic_vfunction_action<R>()
-            , dynamic_vfunction_base()
-            , raw_actions_map()
-            , matcher_actions_map()
+            : dynamic_vfunction_progress<R>()
+            , exact_matches()
+            , fuzzy_matches()
             {}
 
-         dynamic_vfunction_action<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5, const matcher::Matcher<A6 >& a6, const matcher::Matcher<A7 >& a7, const matcher::Matcher<A8 >& a8)
-         {
-            matcher_tuple_type args = matcher_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8);
-            typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
-            pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
-            if(pair_it == matcher_actions_map.end())
-            {
-               matcher_actions_map.push_back(key_comparable_pair<matcher_tuple_type, action_queue_type>(args, action_queue_type()));
-               pair_it = --matcher_actions_map.end();
+         template <typename T>
+         int calculate_calls_for_arguments(const T args) {
+            int calls = 0;
+            typename std::list<map_entry<exact_tuple_type, int> >::iterator calls_it
+               = args_to_calls.begin();
+            for(; calls_it != args_to_calls.end(); calls_it++) {
+               if(args == calls_it->key) {
+                  calls += calls_it->val;
+               }
             }
-            this->transient_stubbing = &(pair_it->second);
+            return calls;
+         }
+
+         dynamic_vfunction_progress<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5, const matcher::Matcher<A6 >& a6, const matcher::Matcher<A7 >& a7, const matcher::Matcher<A8 >& a8)
+         {
+            const fuzzy_tuple_type args = fuzzy_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8);
+            typename std::list<map_entry<fuzzy_tuple_type, action_queue_type> >::iterator match
+               = std::find(fuzzy_matches.begin(), fuzzy_matches.end(), args);
+            if(match == fuzzy_matches.end())
+            {
+               fuzzy_matches.push_back(map_entry<fuzzy_tuple_type, action_queue_type>(args, action_queue_type()));
+               match = --fuzzy_matches.end();
+            }
+            this->calls = calculate_calls_for_arguments(args);
+            this->stubbing_progress = &(match->val);
             return *this;
          }
 
-         dynamic_vfunction_action<R>& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8)
+         dynamic_vfunction_progress<R>& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8)
          {
-            raw_tuple_type args = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8);
-            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
-            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
-            if(pair_it == raw_actions_map.end())
+            const exact_tuple_type args = exact_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8);
+            typename std::list<map_entry<exact_tuple_type, action_queue_type> >::iterator match
+               = std::find(exact_matches.begin(), exact_matches.end(), args);
+            if(match == exact_matches.end())
             {
-               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
-               pair_it = --raw_actions_map.end();
+               exact_matches.push_back(map_entry<exact_tuple_type, action_queue_type>(args, action_queue_type()));
+               match = --exact_matches.end();
             }
-            this->transient_stubbing = &(pair_it->second);
+            this->calls = calculate_calls_for_arguments(args);
+            this->stubbing_progress = &(match->val);
             return *this;
          }
 
          R invoke(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8)
          {
-            this->calls++;
-            raw_tuple_type     args    = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8);
+            const exact_tuple_type args = exact_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8);
+
+            typename std::list<map_entry<exact_tuple_type, int> >::iterator calls_it
+               = std::find(args_to_calls.begin(), args_to_calls.end(), args);
+            if(calls_it == args_to_calls.end()) {
+               args_to_calls.push_back(map_entry<exact_tuple_type, int>(args, 1));
+            } else {
+               (calls_it->val)++;
+            }
+
             action_queue_type* actions = 0;
-            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
-               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
-            if(raw_actions_it != raw_actions_map.end())
-               { actions = &(raw_actions_it->second); }
-            if(actions == 0)
+            typename std::list<map_entry<exact_tuple_type, action_queue_type> >::iterator exact_match
+               = std::find(exact_matches.begin(), exact_matches.end(), args);
+            if(exact_match != exact_matches.end())
+               { actions = &(exact_match->val); }
+            if(!actions)
             {
-               typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
-               pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
-               if(pair_it == matcher_actions_map.end())
-                  { throw partial_implementation_exception(); }
-               actions = &(pair_it->second);
+               typename std::list<map_entry<fuzzy_tuple_type, action_queue_type> >::iterator fuzzy_match
+                  = std::find(fuzzy_matches.begin(), fuzzy_matches.end(), args);
+               if(fuzzy_match == fuzzy_matches.end())
+                   { throw partial_implementation_exception(); }
+               actions = &(fuzzy_match->val);
             }
             action_type action = actions->front();
             if(actions->size() > 1)
@@ -891,70 +1096,91 @@ namespace mockitopp
  
       // 10 arity template
       template <typename R, typename C, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9>
-      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9)>
-         : private dynamic_vfunction_action<R>
-         , public  dynamic_vfunction_base
+      struct dynamic_vfunction<R (C::*)(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9)> : private dynamic_vfunction_progress<R>
       {
-         typedef tr1::tuple<A0, A1, A2, A3, A4, A5, A6, A7, A8, A9> raw_tuple_type;
-         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 >, matcher_element<A5 >, matcher_element<A6 >, matcher_element<A7 >, matcher_element<A8 >, matcher_element<A9 > > matcher_tuple_type;
+         typedef tr1::tuple<A0, A1, A2, A3, A4, A5, A6, A7, A8, A9> exact_tuple_type;
+         typedef tr1::tuple<matcher_element<A0 >, matcher_element<A1 >, matcher_element<A2 >, matcher_element<A3 >, matcher_element<A4 >, matcher_element<A5 >, matcher_element<A6 >, matcher_element<A7 >, matcher_element<A8 >, matcher_element<A9 > > fuzzy_tuple_type;
 
-         typedef typename dynamic_vfunction_action<R>::action_type       action_type;
-         typedef typename dynamic_vfunction_action<R>::action_queue_type action_queue_type;
+         typedef typename dynamic_vfunction_progress<R>::action_type       action_type;
+         typedef typename dynamic_vfunction_progress<R>::action_queue_type action_queue_type;
 
-         std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >     raw_actions_map;
-         std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> > matcher_actions_map;
+         std::list<map_entry<exact_tuple_type, action_queue_type> > exact_matches;
+         std::list<map_entry<fuzzy_tuple_type, action_queue_type> > fuzzy_matches;
+         std::list<map_entry<exact_tuple_type, int> >               args_to_calls;
 
          dynamic_vfunction()
-            : dynamic_vfunction_action<R>()
-            , dynamic_vfunction_base()
-            , raw_actions_map()
-            , matcher_actions_map()
+            : dynamic_vfunction_progress<R>()
+            , exact_matches()
+            , fuzzy_matches()
             {}
 
-         dynamic_vfunction_action<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5, const matcher::Matcher<A6 >& a6, const matcher::Matcher<A7 >& a7, const matcher::Matcher<A8 >& a8, const matcher::Matcher<A9 >& a9)
-         {
-            matcher_tuple_type args = matcher_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
-            typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
-            pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
-            if(pair_it == matcher_actions_map.end())
-            {
-               matcher_actions_map.push_back(key_comparable_pair<matcher_tuple_type, action_queue_type>(args, action_queue_type()));
-               pair_it = --matcher_actions_map.end();
+         template <typename T>
+         int calculate_calls_for_arguments(const T args) {
+            int calls = 0;
+            typename std::list<map_entry<exact_tuple_type, int> >::iterator calls_it
+               = args_to_calls.begin();
+            for(; calls_it != args_to_calls.end(); calls_it++) {
+               if(args == calls_it->key) {
+                  calls += calls_it->val;
+               }
             }
-            this->transient_stubbing = &(pair_it->second);
+            return calls;
+         }
+
+         dynamic_vfunction_progress<R>& when(const matcher::Matcher<A0 >& a0, const matcher::Matcher<A1 >& a1, const matcher::Matcher<A2 >& a2, const matcher::Matcher<A3 >& a3, const matcher::Matcher<A4 >& a4, const matcher::Matcher<A5 >& a5, const matcher::Matcher<A6 >& a6, const matcher::Matcher<A7 >& a7, const matcher::Matcher<A8 >& a8, const matcher::Matcher<A9 >& a9)
+         {
+            const fuzzy_tuple_type args = fuzzy_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
+            typename std::list<map_entry<fuzzy_tuple_type, action_queue_type> >::iterator match
+               = std::find(fuzzy_matches.begin(), fuzzy_matches.end(), args);
+            if(match == fuzzy_matches.end())
+            {
+               fuzzy_matches.push_back(map_entry<fuzzy_tuple_type, action_queue_type>(args, action_queue_type()));
+               match = --fuzzy_matches.end();
+            }
+            this->calls = calculate_calls_for_arguments(args);
+            this->stubbing_progress = &(match->val);
             return *this;
          }
 
-         dynamic_vfunction_action<R>& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8, A9 a9)
+         dynamic_vfunction_progress<R>& when(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8, A9 a9)
          {
-            raw_tuple_type args = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
-            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator pair_it;
-            pair_it = std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
-            if(pair_it == raw_actions_map.end())
+            const exact_tuple_type args = exact_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
+            typename std::list<map_entry<exact_tuple_type, action_queue_type> >::iterator match
+               = std::find(exact_matches.begin(), exact_matches.end(), args);
+            if(match == exact_matches.end())
             {
-               raw_actions_map.push_back(key_comparable_pair<raw_tuple_type, action_queue_type>(args, action_queue_type()));
-               pair_it = --raw_actions_map.end();
+               exact_matches.push_back(map_entry<exact_tuple_type, action_queue_type>(args, action_queue_type()));
+               match = --exact_matches.end();
             }
-            this->transient_stubbing = &(pair_it->second);
+            this->calls = calculate_calls_for_arguments(args);
+            this->stubbing_progress = &(match->val);
             return *this;
          }
 
          R invoke(A0 a0, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8, A9 a9)
          {
-            this->calls++;
-            raw_tuple_type     args    = raw_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
+            const exact_tuple_type args = exact_tuple_type(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
+
+            typename std::list<map_entry<exact_tuple_type, int> >::iterator calls_it
+               = std::find(args_to_calls.begin(), args_to_calls.end(), args);
+            if(calls_it == args_to_calls.end()) {
+               args_to_calls.push_back(map_entry<exact_tuple_type, int>(args, 1));
+            } else {
+               (calls_it->val)++;
+            }
+
             action_queue_type* actions = 0;
-            typename std::list<key_comparable_pair<raw_tuple_type, action_queue_type> >::iterator raw_actions_it =
-               std::find(raw_actions_map.begin(), raw_actions_map.end(), args);
-            if(raw_actions_it != raw_actions_map.end())
-               { actions = &(raw_actions_it->second); }
-            if(actions == 0)
+            typename std::list<map_entry<exact_tuple_type, action_queue_type> >::iterator exact_match
+               = std::find(exact_matches.begin(), exact_matches.end(), args);
+            if(exact_match != exact_matches.end())
+               { actions = &(exact_match->val); }
+            if(!actions)
             {
-               typename std::list<key_comparable_pair<matcher_tuple_type, action_queue_type> >::iterator pair_it;
-               pair_it = std::find(matcher_actions_map.begin(), matcher_actions_map.end(), args);
-               if(pair_it == matcher_actions_map.end())
-                  { throw partial_implementation_exception(); }
-               actions = &(pair_it->second);
+               typename std::list<map_entry<fuzzy_tuple_type, action_queue_type> >::iterator fuzzy_match
+                  = std::find(fuzzy_matches.begin(), fuzzy_matches.end(), args);
+               if(fuzzy_match == fuzzy_matches.end())
+                   { throw partial_implementation_exception(); }
+               actions = &(fuzzy_match->val);
             }
             action_type action = actions->front();
             if(actions->size() > 1)

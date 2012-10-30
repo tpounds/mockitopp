@@ -55,8 +55,8 @@ struct TestSimpleComposite : tpunit::TestFixture
       SimpleComposite c = SimpleComposite(i1, i2);
 
       ASSERT_EQUAL(12, c.simpleAdd());
-      ASSERT_TRUE(mock1(&Interface1::foo).exactly(1));
-      ASSERT_TRUE(mock2(&Interface2::bar).exactly(1));
+      ASSERT_TRUE(mock1(&Interface1::foo).when().exactly(1));
+      ASSERT_TRUE(mock2(&Interface2::bar).when().exactly(1));
    }
 
    void Multiply()
@@ -72,8 +72,8 @@ struct TestSimpleComposite : tpunit::TestFixture
       SimpleComposite c = SimpleComposite(i1, i2);
 
       ASSERT_EQUAL(100, c.simpleMultiply());
-      ASSERT_TRUE(mock1(&Interface1::foo).exactly(1));
-      ASSERT_TRUE(mock2(&Interface2::bar).exactly(1));
+      ASSERT_TRUE(mock1(&Interface1::foo).when().exactly(1));
+      ASSERT_TRUE(mock2(&Interface2::bar).when().exactly(1));
    }
 
    void Add_and_Multiply()
@@ -90,7 +90,7 @@ struct TestSimpleComposite : tpunit::TestFixture
 
       ASSERT_EQUAL(20,  c.simpleAdd());
       ASSERT_EQUAL(100, c.simpleMultiply());
-      ASSERT_TRUE(mock1(&Interface1::foo).exactly(2));
-      ASSERT_TRUE(mock2(&Interface2::bar).exactly(2));
+      ASSERT_TRUE(mock1(&Interface1::foo).when().exactly(2));
+      ASSERT_TRUE(mock2(&Interface2::bar).when().exactly(2));
    }
 } __TestSimpleComposite;

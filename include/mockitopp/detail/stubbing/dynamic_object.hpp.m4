@@ -43,33 +43,33 @@ M4_REPEAT(MOCKITOPP_MAX_VIRTUAL_FUNCTIONS, `DEFINE_VTABLE_OFFSET_HELPER_FUNCTION
             void* functions[MOCKITOPP_MAX_VIRTUAL_FUNCTIONS];
          };
 
-         vtable* vtable_ptr;
+         void*   vtable_object_ptr;
          void*   vtable_mocks[MOCKITOPP_MAX_VIRTUAL_FUNCTIONS];
+         vtable* vtable_actual_ptr;
 
          dynamic_object()
-            : vtable_ptr(new vtable)
+            : vtable_actual_ptr(new vtable)
          {
-            vtable_ptr->vbase_offset  = 0;
-            vtable_ptr->vcall_offset  = 0;
-            vtable_ptr->offset_to_top = 0;
-            vtable_ptr->type_info     = 0;
+            vtable_actual_ptr->vbase_offset  = 0;
+            vtable_actual_ptr->vcall_offset  = 0;
+            vtable_actual_ptr->offset_to_top = 0;
+            vtable_actual_ptr->type_info     = 0;
             for(int i = 0; i < MOCKITOPP_MAX_VIRTUAL_FUNCTIONS; i++)
             {
-               vtable_ptr->functions[i] = horrible_cast<void*>(&dynamic_object::missing_vfunction);
+               vtable_actual_ptr->functions[i] = horrible_cast<void*>(&dynamic_object::missing_vfunction);
                vtable_mocks[i] = 0;
             }
+            vtable_object_ptr = vtable_actual_ptr->functions;
          }
 
          ~dynamic_object()
          {
-            // delete vtable_ptr->functions[i] not necessary, entries point to statically defined functions
-            vtable_ptr = (vtable*) (((char*) vtable_ptr) - sizeof(void*) * 4);
-            delete vtable_ptr;
             for(int i = 0; i < MOCKITOPP_MAX_VIRTUAL_FUNCTIONS; i++)
             {
                if(vtable_mocks[i] != 0)
                   { delete reinterpret_cast<dynamic_vfunction_base*>(vtable_mocks[i]); }
             }
+            delete vtable_actual_ptr;
          }
 
          template <typename M>
@@ -78,7 +78,7 @@ M4_REPEAT(MOCKITOPP_MAX_VIRTUAL_FUNCTIONS, `DEFINE_VTABLE_OFFSET_HELPER_FUNCTION
             int offset = vtable_offset_helper::get(ptr2member);
             if(vtable_mocks[offset] == 0)
             {
-               vtable_ptr->functions[offset] = proxy_vfunction_factory<M>::get(ptr2member);
+               vtable_actual_ptr->functions[offset] = proxy_vfunction_factory<M>::get(ptr2member);
                vtable_mocks[offset] = new dynamic_vfunction<typename remove_member_function_pointer_cv<M>::type>();
             }
             return *reinterpret_cast<dynamic_vfunction<typename remove_member_function_pointer_cv<M>::type>*>(vtable_mocks[offset]);

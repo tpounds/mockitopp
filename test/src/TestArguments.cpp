@@ -35,15 +35,20 @@ struct PlainOleDataTypesTest : tpunit::TestFixture
       ASSERT_EQUAL(2, i.__int(0));
       ASSERT_EQUAL(2, i.__int(0));
       ASSERT_THROW(i.__int(999), mockitopp::partial_implementation_exception);
-      ASSERT_TRUE(m(&PlainOleDataTypes::__int).exactly(10));
+      ASSERT_TRUE(m(&PlainOleDataTypes::__int).when(0).exactly(5));
+      ASSERT_TRUE(m(&PlainOleDataTypes::__int).when(100).exactly(4));
+      ASSERT_TRUE(m(&PlainOleDataTypes::__int).when(999).exactly(1));
 
       ASSERT_EQUAL(false, i.__bool(true));
       ASSERT_EQUAL(true, i.__bool(false));
-      ASSERT_TRUE(m(&PlainOleDataTypes::__bool).exactly(2));
+      ASSERT_TRUE(m(&PlainOleDataTypes::__bool).when(true).exactly(1));
+      ASSERT_TRUE(m(&PlainOleDataTypes::__bool).when(false).exactly(1));
 
       ASSERT_EQUAL('Z', i.__char('A'));
       ASSERT_EQUAL('0', i.__char('Z'));
       ASSERT_THROW(i.__char('B'), mockitopp::partial_implementation_exception);
-      ASSERT_TRUE(m(&PlainOleDataTypes::__char).exactly(3));
+      ASSERT_TRUE(m(&PlainOleDataTypes::__char).when('A').exactly(1));
+      ASSERT_TRUE(m(&PlainOleDataTypes::__char).when('B').exactly(1));
+      ASSERT_TRUE(m(&PlainOleDataTypes::__char).when('Z').exactly(1));
    }
 } __PlainOleDataTypesTest;

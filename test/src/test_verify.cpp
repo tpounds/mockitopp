@@ -31,46 +31,46 @@ struct test_verify : tpunit::TestFixture
    {
       VERIFY_MOCK_DEFINITION
 
-      ASSERT_TRUE(mock(&verify_interface::func).atLeast(1));
-      ASSERT_TRUE(mock(&verify_interface::func).atLeast(2));
-      ASSERT_TRUE(mock(&verify_interface::func).atLeast(3));
-      ASSERT_FALSE(mock(&verify_interface::func).atLeast(4));
+      ASSERT_TRUE(mock(&verify_interface::func).when().atLeast(1));
+      ASSERT_TRUE(mock(&verify_interface::func).when().atLeast(2));
+      ASSERT_TRUE(mock(&verify_interface::func).when().atLeast(3));
+      ASSERT_FALSE(mock(&verify_interface::func).when().atLeast(4));
    }
 
    void atMost()
    {
       VERIFY_MOCK_DEFINITION
 
-      ASSERT_FALSE(mock(&verify_interface::func).atMost(1));
-      ASSERT_FALSE(mock(&verify_interface::func).atMost(2));
-      ASSERT_TRUE(mock(&verify_interface::func).atMost(3));
-      ASSERT_TRUE(mock(&verify_interface::func).atMost(4));
+      ASSERT_FALSE(mock(&verify_interface::func).when().atMost(1));
+      ASSERT_FALSE(mock(&verify_interface::func).when().atMost(2));
+      ASSERT_TRUE(mock(&verify_interface::func).when().atMost(3));
+      ASSERT_TRUE(mock(&verify_interface::func).when().atMost(4));
    }
 
    void between()
    {
       VERIFY_MOCK_DEFINITION
 
-      ASSERT_FALSE(mock(&verify_interface::func).between(0, 2));
-      ASSERT_FALSE(mock(&verify_interface::func).between(4, 9));
-      ASSERT_TRUE(mock(&verify_interface::func).between(1, 5));
-      ASSERT_TRUE(mock(&verify_interface::func).between(3, 3));
+      ASSERT_FALSE(mock(&verify_interface::func).when().between(0, 2));
+      ASSERT_FALSE(mock(&verify_interface::func).when().between(4, 9));
+      ASSERT_TRUE(mock(&verify_interface::func).when().between(1, 5));
+      ASSERT_TRUE(mock(&verify_interface::func).when().between(3, 3));
    }
 
    void exactly()
    {
       VERIFY_MOCK_DEFINITION
 
-      ASSERT_FALSE(mock(&verify_interface::func).exactly(1));
-      ASSERT_FALSE(mock(&verify_interface::func).exactly(2));
-      ASSERT_TRUE(mock(&verify_interface::func).exactly(3));
-      ASSERT_FALSE(mock(&verify_interface::func).exactly(4));
+      ASSERT_FALSE(mock(&verify_interface::func).when().exactly(1));
+      ASSERT_FALSE(mock(&verify_interface::func).when().exactly(2));
+      ASSERT_TRUE(mock(&verify_interface::func).when().exactly(3));
+      ASSERT_FALSE(mock(&verify_interface::func).when().exactly(4));
    }
 
    void never()
    {
       VERIFY_MOCK_DEFINITION
 
-      ASSERT_FALSE(mock(&verify_interface::func).never());
+      ASSERT_FALSE(mock(&verify_interface::func).when().never());
    }
 } __test_verify;
