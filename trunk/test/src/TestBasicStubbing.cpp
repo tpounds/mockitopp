@@ -20,7 +20,7 @@ struct TestBasicStubbing : tpunit::TestFixture
       VoidVoidInterface& i = mock.getInstance();
 
       i.foo();
-      ASSERT_TRUE(mock(&VoidVoidInterface::foo).exactly(1));
+      ASSERT_TRUE(mock(&VoidVoidInterface::foo).when().exactly(1));
 
       ASSERT_THROW(i.foo(), std::string);
    }
@@ -34,7 +34,7 @@ struct TestBasicStubbing : tpunit::TestFixture
       CharVoidInterface& i = mock.getInstance();
 
       ASSERT_EQUAL('A', i.foo());
-      ASSERT_TRUE(mock(&CharVoidInterface::foo).exactly(1));
+      ASSERT_TRUE(mock(&CharVoidInterface::foo).when().exactly(1));
 
       ASSERT_THROW(i.foo(), std::string);
    }
@@ -48,6 +48,6 @@ struct TestBasicStubbing : tpunit::TestFixture
       VoidStringRefInterface& i = mock.getInstance();
 
       i.foo("bar");
-      ASSERT_TRUE(mock(&VoidStringRefInterface::foo).exactly(1));
+      ASSERT_TRUE(mock(&VoidStringRefInterface::foo).when("bar").exactly(1));
    }
 } __TestBasicStubbing;

@@ -39,8 +39,8 @@ struct test_overloaded_functions : tpunit::TestFixture
       ASSERT_EQUAL(10, obj.foo(std::string("hello")));
       ASSERT_THROW(obj.foo(std::string("!@#$%")), mockitopp::partial_implementation_exception);
 
-      ASSERT_TRUE(mock(static_cast<int (overloaded_interface::*)(bool)>(&overloaded_interface::foo)).exactly(2));
-      ASSERT_TRUE(mock(static_cast<int (overloaded_interface::*)(char)>(&overloaded_interface::foo)).exactly(3));
-      ASSERT_TRUE(mock(static_cast<int (overloaded_interface::*)(const std::string&)>(&overloaded_interface::foo)).exactly(3));
+      ASSERT_TRUE(mock(static_cast<int (overloaded_interface::*)(bool)>(&overloaded_interface::foo)).when(true).exactly(1));
+      ASSERT_TRUE(mock(static_cast<int (overloaded_interface::*)(char)>(&overloaded_interface::foo)).when('A').exactly(1));
+      // ASSERT_TRUE(mock(static_cast<int (overloaded_interface::*)(const std::string&)>(&overloaded_interface::foo)).when(hello).exactly(1));
    }
 } __test_overloaded_functions;
