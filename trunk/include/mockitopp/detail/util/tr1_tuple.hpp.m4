@@ -67,7 +67,18 @@ define(`TUPLE_TEMPLATE',
          };
 
 ')dnl
-M4_REPEAT_FROM_TO(1, eval(MOCKITOPP_MAX_VIRTUAL_FUNCTION_ARITY), `TUPLE_TEMPLATE')
+M4_REPEAT_FROM_TO(2, eval(MOCKITOPP_MAX_VIRTUAL_FUNCTION_ARITY), `TUPLE_TEMPLATE')
+
+         // 1 element template
+         template <M4_ENUM_PARAMS(1, typename T)>
+         struct tuple<M4_ENUM_PARAMS(1, T)M4_REPEAT(eval(MOCKITOPP_MAX_VIRTUAL_FUNCTION_ARITY - 1), `TUPLE_NULL_TYPE_TRAILING_PARAM')>
+            : tuple_cons<T0, tuple_null_type>
+         {
+            tuple(M4_ENUM_BINARY_PARAMS(1, typename add_reference<typename add_const<T, >::type>::type t))
+               : tuple_cons<T0, tuple_null_type>
+                  (t0, tuple_null_type())
+            {}
+         };
 
          // 0 element template
 define(`TUPLE_NULL_TYPE_PARAM', `tuple_null_type M4_COMMA_IF(eval(MOCKITOPP_MAX_VIRTUAL_FUNCTION_ARITY-1-$1))')dnl

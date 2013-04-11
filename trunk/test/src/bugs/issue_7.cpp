@@ -12,9 +12,9 @@ namespace issue_7_ns
     {
        virtual void func(iface1&) = 0;
     };
-}
 
-bool operator==(issue_7_ns::iface1&, issue_7_ns::iface1&) { return true; }
+    bool operator==(issue_7_ns::iface1&, issue_7_ns::iface1&) { return true; }
+}
 
 bool eq(issue_7_ns::iface1& lhs, issue_7_ns::iface1& rhs) { return lhs == rhs; }
 
