@@ -47,18 +47,6 @@ namespace mockitopp
                {}
          };
 
-         // 1 element template
-         template <typename T0>
-         struct tuple<T0 , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type>
-            : tuple_cons<T0, tuple<> >
-         {
-            tuple(typename add_reference<typename add_const<T0 >::type>::type t0)
-               : tuple_cons<T0, tuple<> >
-                  (t0, tuple<>
-                     ())
-               {}
-         };
-
          // 2 element template
          template <typename T0, typename T1>
          struct tuple<T0, T1 , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type>
@@ -156,6 +144,17 @@ namespace mockitopp
          };
 
 
+
+         // 1 element template
+         template <typename T0>
+         struct tuple<T0 , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type , tuple_null_type>
+            : tuple_cons<T0, tuple_null_type>
+         {
+            tuple(typename add_reference<typename add_const<T0 >::type>::type t0)
+               : tuple_cons<T0, tuple_null_type>
+                  (t0, tuple_null_type())
+            {}
+         };
 
          // 0 element template
          template <>
