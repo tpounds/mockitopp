@@ -7,9 +7,9 @@ if 'm4' in COMMAND_LINE_TARGETS:
    env.AppendUnique(M4FLAGS = [
       '-I' + os.path.abspath(sys.path[0]) + '/include',
       # maximum supported virtual functions, increase for classes with large vtables
-      '-DMOCKITOPP_MAX_VIRTUAL_FUNCTIONS=50',
+      '-DMOCKITOPP_MAX_VIRTUAL_FUNCTIONS=100',
       # maximum supported arity, increase for function signatures with more arguments
-      '-DMOCKITOPP_MAX_VIRTUAL_FUNCTION_ARITY=10',
+      '-DMOCKITOPP_MAX_VIRTUAL_FUNCTION_ARITY=20',
    ])
    Alias('m4', [
       env.M4('include/mockitopp/detail/stubbing/dynamic_object.hpp.m4'),
