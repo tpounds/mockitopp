@@ -4,67 +4,103 @@ Usually, test cases are required to cover a large permutation of user inputs. Th
 
 === Built-in ===
 {{{
-#include <gtest/gtest.h>
 #include <mockitopp/mockitopp.hpp>
 
-using mockitopp::matcher;
+using mockitopp::matcher::null;
+using mockitopp::matcher::any;
+using mockitopp::matcher::equal;
+using mockitopp::matcher::is_not;
+
+#include <cassert>
+#define ASSERT_TRUE(expr) assert( (expr) == true )
+#define ASSERT_FALSE(expr) assert( (expr) == false )
+#define ASSERT_THROW(expr, exception) do {                      \
+        try {                                                   \
+            expr;                                               \
+            assert(! #expr " did not throw " #exception);       \
+        } catch (exception& ex) {                               \
+        } catch (exception* ex) {                               \
+        } catch (...) {                                         \
+            assert(! #expr " did throw unknown exception");     \
+        }                                                       \
+    } while(0)
 
 struct interface
 {
-   virtual bool func1(int*) = 0;
-   virtual bool func2(const std::string&) = 0;
+    virtual bool func1(int*) = 0;
+    virtual bool func2(const std::string&) = 0;
+    virtual bool func3(int) = 0;
 };
 
-TEST(test, built_in)
+int main()
 {
-   mockitopp::mock_object<interface> mock;
+    mockitopp::mock_object<interface> mock;
 
-   mock(&interface::func1)
-      .when(null<int*>())
-      .thenReturn(true);
+    mock(&interface::func1)
+        .when(null<int*>())
+        .thenReturn(true);
 
-   mock(&interface::func1)
-      .when(any<int*>())
-      .thenReturn(false);
+    mock(&interface::func1)
+        .when(any<int*>())
+        .thenReturn(false);
 
-   mock(&interface::func2)
-      .when(not_(equal<std::string>(std::string("foo"))))
-      .thenReturn(true);
+    mock(&interface::func2)
+        .when(is_not(equal<const std::string&>("foo")))
+        .thenReturn(true);
 
-   interface& obj = mock.getInstance();
+    interface& obj = mock.getInstance();
 
-   int value = 31337;
-   ASSERT_TRUE(obj.func1(NULL));
-   ASSERT_FALSE(obj.func1(&value));
-   ASSERT_TRUE(obj.func2("hello world!"));
-   ASSERT_TRUE(obj.func2("bar"));
-   ASSERT_THROW(obj.func1(new int), mockitopp::detail::IncompleteImplementationException);
-   ASSERT_THROW(obj.func2("foo"), mockitopp::detail::IncompleteImplementationException);
+    int value = 31337;
+    ASSERT_TRUE(obj.func1(NULL));
+    ASSERT_FALSE(obj.func1(&value));
+    ASSERT_TRUE(obj.func2("hello world!"));
+    ASSERT_TRUE(obj.func2("bar"));
+    ASSERT_THROW(obj.func3(7), mockitopp::missing_implementation_exception);
+
+    return 0;
 }
 }}}
 
 === [http://www.boost.org/doc/libs/1_36_0/libs/regex/doc/html/index.html TR1 <regex>] ===
 {{{
-#include <regex> // or <boost/regex.hpp>
-#include <gtest/gtest.h>
+#include <boost/regex.hpp> // or <regex>
 #include <mockitopp/mockitopp.hpp>
-#include <mockitopp/matchers/optional/Regex.hpp>
+#include <mockitopp/matchers/regex.hpp>
 
 using mockitopp::matcher::regex;
 
+#include <cassert>
+#define ASSERT_TRUE(expr) assert( (expr) == true )
+#define ASSERT_FALSE(expr) assert( (expr) == false )
+#define ASSERT_THROW(expr, exception) do {                      \
+        try {                                                   \
+            expr;                                               \
+            assert(! #expr " did not throw " #exception);       \
+        } catch (exception& ex) {                               \
+        } catch (exception* ex) {                               \
+        } catch (...) {                                         \
+            assert(! #expr " did throw unknown exception");     \
+        }                                                       \
+    } while(0)
+
 struct interface
 {
-   virtual bool func(const char*) = 0;
+    virtual bool func(const char*) = 0;
 };
 
-TEST(test, regex)
+int main()
 {
-   mockitopp::mock_object<interface> mock;
-   mock(&interface::func).when(regex("[0-9]*")).thenReturn(true);
-   mock(&interface::func).when(regex("he.*ld")).thenReturn(true);
-   regex_interface& obj = mock.getInstance();
+    mockitopp::mock_object<interface> mock;
+    mock(&interface::func).when(regex("[0-9]*")).thenReturn(true);
+    mock(&interface::func).when(regex("he.*ld")).thenReturn(true);
+    interface& obj = mock.getInstance();
 
-   ASSERT_TRUE(obj.func("1234567890"));
-   ASSERT_TRUE(obj.func("hello world"));
-   ASSERT_THROW(obj.func("foo"), mockitopp::detail::IncompleteImplementationException);}
+    ASSERT_TRUE(obj.func("1234567890"));
+    ASSERT_TRUE(obj.func("hello world"));
+    ASSERT_THROW(obj.func("foo"), mockitopp::partial_implementation_exception);
+
+    return 0;
+}
 }}}
+
+GNU g++ versions &lt;= 4.8.1 do not have a fully functional regular expression library. Using the boost regular expression library may be preferred.
