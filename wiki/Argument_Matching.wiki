@@ -103,4 +103,4 @@ int main()
 }
 }}}
 
-GNU g++ versions &lt;= 4.8.1 do not have a fully functional regular expression library. Using the boost regular expression library may be preferred.
+GNU g++ versions <= 4.8.1 do not have a fully functional regular expression library. Using the boost regular expression library may be preferred.
