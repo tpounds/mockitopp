@@ -13,6 +13,8 @@ namespace mockitopp
             namespace __tr1 = ::boost;
          #elif defined(_GLIBCXX_TR1_REGEX) || defined(_REGEX_)
             namespace __tr1 = ::std::tr1;
+         #elif defined(_GLIBCXX_REGEX)
+            namespace __tr1 = ::std;
          #else
             #error compatible tr1 regex header not found!
          #endif
