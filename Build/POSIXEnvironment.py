@@ -8,9 +8,7 @@ class Environment(BaseEnvironment.Environment):
       self.ConfigureCompiler()
 
    def ConfigureCompiler(self):
-      cxx = self.WhereIs(self['CXX'])
-      cxx_bin = os.path.basename(cxx).lower()
-      cxx_dir = os.path.dirname(cxx)
+      cxx = os.path.basename(self['CXX'])
 
       if cxx_bin.startswith("g++"):
          self.AppendUnique(CXXFLAGS=['-Wall', '-g'])
