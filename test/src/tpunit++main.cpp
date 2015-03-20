@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011 Trevor Pounds
+ * Copyright (c) 2011-2015 Trevor Pounds <trevor.pounds@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,8 +21,7 @@
  */
 #include "tpunit++.hpp"
 
-int main()
-{
+int main() {
    /**
     * Run all of the registered tpunit++ tests. Returns 0 if
     * all tests are successful, otherwise returns the number
