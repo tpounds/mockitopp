@@ -11,4 +11,10 @@ MockitoPP uses ABI and template techniques to create mock delegate classes that 
 This framework really only supports pure virtual abstract base classes (i.e. interface). The mocking construction only works for virtual functions declared in the target class to mock. You cannot use it to stub calls to non-virtual functions. In some cases it may be possible to mock a class that is not a pure abstract base class (i.e. hybrid class containing both virtual and non-virtual functions), but you may encounter unexpected results if other objects are expecting the mock object to operate under normal circumstances (i.e. maintain state) or have internal wired dependencies that operate on the object's state.
 
 ## Manual ##
-Guides about how to use the framework can be found in the [Mockitopp Wiki](../../wiki)
+Guides about how to use the framework can be found in the [Mockitopp Wiki](../../wiki) :
+
+1. [Stubbing](../../wiki/Stubbing)
+1. [Behavior verification](../../wiki/BehaviorVerification)
+1. [Argument matching](../../wiki/ArgumentMatching)
+1. [CommonIssues](../../wiki/CommonIssues)
+1. [SupportedCompilers](../../wiki/SupportedCompilers)
