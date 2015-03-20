@@ -10,5 +10,5 @@ class Environment(BaseEnvironment.Environment):
    def ConfigureCompiler(self):
       cxx = os.path.basename(self['CXX'])
 
-      if cxx_bin.startswith("g++"):
+      if cxx.startswith("clang") or cxx.startswith("g++"):
          self.AppendUnique(CXXFLAGS=['-Wall', '-g'])
