@@ -10,7 +10,7 @@ Basic usage examples and other information can be found in the [wiki](../../wiki
 1. [Common Issues](../../wiki/CommonIssues)
 1. [Supported Compilers](../../wiki/SupportedCompilers)
 
-## How Does It Work? ##
+## How does it work? ##
 MockitoPP uses ABI and template techniques to create mock delegate classes that intercept calls intended for any abstract base class you care to model. The techniques used to construct the mock objects are similar to the techniques used by [Automatic Mock Object for C++ (amop)](http://code.google.com/p/amop/), [Hippo Mocks](http://www.assembla.com/wiki/show/hippomocks), and [Member Function Pointers and the Fastest Possible C++ Delegates](http://www.codeproject.com/KB/cpp/FastDelegate.aspx). By exploiting the compiler's ABI class layout we can dynamically construct a mock delegate class to provide minimal stubbed functionality used during unit testing.
 
 ## Limitations ##
