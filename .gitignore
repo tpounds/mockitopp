@@ -1,0 +1,4 @@
+*.pyc
+*.scon*
+*/build/*
+config.log
