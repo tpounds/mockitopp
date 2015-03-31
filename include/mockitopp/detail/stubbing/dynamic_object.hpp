@@ -130,6 +130,17 @@ namespace mockitopp
             return *reinterpret_cast<dynamic_vfunction<typename remove_member_function_pointer_cv<M>::type>*>(vtable_mocks[offset]);
          }
 
+         template <typename M>
+         void delete_function(M ptr2member)
+         {
+            int offset = vtable_offset_helper::get(ptr2member);
+            if (vtable_mocks[offset] != 0) {
+               delete reinterpret_cast<dynamic_vfunction_base*>(vtable_mocks[offset]);
+               vtable_actual_ptr->functions[offset] = horrible_cast<void*>(&dynamic_object::missing_vfunction);
+               vtable_mocks[offset] = 0;
+            }
+         }
+
          void missing_vfunction()
             { throw missing_implementation_exception(); }
       };

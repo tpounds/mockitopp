@@ -39,6 +39,10 @@ namespace mockitopp
       template <typename M>
       detail::dynamic_vfunction<typename detail::remove_member_function_pointer_cv<M>::type>& operator() (M ptr2member)
          { return expect(ptr2member); }
+
+      template <typename M>
+      void reset(M ptr2member)
+         { delete_function(ptr2member); }
    };
 } // namespace mockitopp
 
