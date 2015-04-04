@@ -40,6 +40,7 @@ TEST_SRC = [
    'src/test_mfp_cv.cpp',
    'src/test_multiple_inheritance.cpp',
    'src/test_overloaded_functions.cpp',
+   'src/test_resetting_stubs.cpp',
    'src/test_verify.cpp',
    'src/bugs/issue_7.cpp',
    'src/bugs/issue_8.cpp',

@@ -86,6 +86,12 @@ namespace mockitopp
             stubbing_progress->push_back(action_type(new throwable_action<R, T>(throwable)));
             return *this;
          }
+
+         dynamic_vfunction_progress& reset()
+         {
+            stubbing_progress->clear();
+            return *this;
+         }
       };
 
       template <>
@@ -106,6 +112,12 @@ namespace mockitopp
          dynamic_vfunction_progress& thenThrow(T throwable)
          {
             stubbing_progress->push_back(action_type(new throwable_action<void, T>(throwable)));
+            return *this;
+         }
+
+         dynamic_vfunction_progress& reset()
+         {
+            stubbing_progress->clear();
             return *this;
          }
       };
@@ -232,6 +244,9 @@ namespace mockitopp
                    { throw partial_implementation_exception(); }
                actions = &(fuzzy_match->val);
             }
+            if (actions->empty())
+               { throw partial_implementation_exception(); }
+
             action_type action = actions->front();
             if(actions->size() > 1)
                { actions->pop_front(); }
@@ -327,6 +342,9 @@ namespace mockitopp
                    { throw partial_implementation_exception(); }
                actions = &(fuzzy_match->val);
             }
+            if (actions->empty())
+               { throw partial_implementation_exception(); }
+
             action_type action = actions->front();
             if(actions->size() > 1)
                { actions->pop_front(); }
@@ -422,6 +440,9 @@ namespace mockitopp
                    { throw partial_implementation_exception(); }
                actions = &(fuzzy_match->val);
             }
+            if (actions->empty())
+               { throw partial_implementation_exception(); }
+
             action_type action = actions->front();
             if(actions->size() > 1)
                { actions->pop_front(); }
@@ -517,6 +538,9 @@ namespace mockitopp
                    { throw partial_implementation_exception(); }
                actions = &(fuzzy_match->val);
             }
+            if (actions->empty())
+               { throw partial_implementation_exception(); }
+
             action_type action = actions->front();
             if(actions->size() > 1)
                { actions->pop_front(); }
@@ -612,6 +636,9 @@ namespace mockitopp
                    { throw partial_implementation_exception(); }
                actions = &(fuzzy_match->val);
             }
+            if (actions->empty())
+               { throw partial_implementation_exception(); }
+
             action_type action = actions->front();
             if(actions->size() > 1)
                { actions->pop_front(); }
@@ -707,6 +734,9 @@ namespace mockitopp
                    { throw partial_implementation_exception(); }
                actions = &(fuzzy_match->val);
             }
+            if (actions->empty())
+               { throw partial_implementation_exception(); }
+
             action_type action = actions->front();
             if(actions->size() > 1)
                { actions->pop_front(); }
@@ -802,6 +832,9 @@ namespace mockitopp
                    { throw partial_implementation_exception(); }
                actions = &(fuzzy_match->val);
             }
+            if (actions->empty())
+               { throw partial_implementation_exception(); }
+
             action_type action = actions->front();
             if(actions->size() > 1)
                { actions->pop_front(); }
@@ -897,6 +930,9 @@ namespace mockitopp
                    { throw partial_implementation_exception(); }
                actions = &(fuzzy_match->val);
             }
+            if (actions->empty())
+               { throw partial_implementation_exception(); }
+
             action_type action = actions->front();
             if(actions->size() > 1)
                { actions->pop_front(); }
@@ -992,6 +1028,9 @@ namespace mockitopp
                    { throw partial_implementation_exception(); }
                actions = &(fuzzy_match->val);
             }
+            if (actions->empty())
+               { throw partial_implementation_exception(); }
+
             action_type action = actions->front();
             if(actions->size() > 1)
                { actions->pop_front(); }
@@ -1087,6 +1126,9 @@ namespace mockitopp
                    { throw partial_implementation_exception(); }
                actions = &(fuzzy_match->val);
             }
+            if (actions->empty())
+               { throw partial_implementation_exception(); }
+
             action_type action = actions->front();
             if(actions->size() > 1)
                { actions->pop_front(); }
@@ -1182,6 +1224,9 @@ namespace mockitopp
                    { throw partial_implementation_exception(); }
                actions = &(fuzzy_match->val);
             }
+            if (actions->empty())
+               { throw partial_implementation_exception(); }
+
             action_type action = actions->front();
             if(actions->size() > 1)
                { actions->pop_front(); }
