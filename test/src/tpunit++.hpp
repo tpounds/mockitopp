@@ -37,10 +37,10 @@ extern "C" int printf(const char*, ...);
  * TPUNITPP_VERSION_MINOR is an integer of the minor version.
  * TPUNITPP_VERSION_PATCH is an integer of the patch version.
  */
-#define TPUNITPP_VERSION 1001001
+#define TPUNITPP_VERSION 1001002
 #define TPUNITPP_VERSION_MAJOR 1
 #define TPUNITPP_VERSION_MINOR 1
-#define TPUNITPP_VERSION_PATCH 1
+#define TPUNITPP_VERSION_PATCH 2
 
 /**
  * ABORT(); generates a failure, immediately returning from the
@@ -112,8 +112,8 @@ extern "C" int printf(const char*, ...);
  * ASSERT|EXPECT_ANY_THROW(statement); generates a failure if the
  * given statement does not throw any exceptions.
  */
-#define ASSERT_THROW(statement, exception) try { statement; ABORT(); } catch(const exception& e) { PASS(); } catch(...) { ABORT(); }
-#define EXPECT_THROW(statement, exception) try { statement; FAIL(); } catch(const exception& e) { PASS(); } catch(...) { FAIL(); }
+#define ASSERT_THROW(statement, exception) try { statement; ABORT(); } catch(const exception&) { PASS(); } catch(...) { ABORT(); }
+#define EXPECT_THROW(statement, exception) try { statement; FAIL(); } catch(const exception&) { PASS(); } catch(...) { FAIL(); }
 #define ASSERT_NO_THROW(statement) try { statement; PASS(); } catch(...) { ABORT(); }
 #define EXPECT_NO_THROW(statement) try { statement; PASS(); } catch(...) { FAIL(); }
 #define ASSERT_ANY_THROW(statement) try { statement; ABORT(); } catch(...) { PASS(); }
@@ -269,46 +269,49 @@ namespace tpunit {
       public:
 
          /**
-          * The base constructor of all test fixtures used to register methods executed by the default runner.
+          * Base constructor to register methods with the test fixture. A test
+          * fixture can register up to 50 methods.
           *
-          * @param[in] m0...m29 A list of methods to register with the test fixture.
+          * @param[in] m0..m49 The methods to register with the test fixture.
           */
          TestFixture(method* m0,      method* m1  = 0, method* m2  = 0, method* m3  = 0, method* m4  = 0,
                      method* m5  = 0, method* m6  = 0, method* m7  = 0, method* m8  = 0, method* m9  = 0,
                      method* m10 = 0, method* m11 = 0, method* m12 = 0, method* m13 = 0, method* m14 = 0,
                      method* m15 = 0, method* m16 = 0, method* m17 = 0, method* m18 = 0, method* m19 = 0,
                      method* m20 = 0, method* m21 = 0, method* m22 = 0, method* m23 = 0, method* m24 = 0,
-                     method* m25 = 0, method* m26 = 0, method* m27 = 0, method* m28 = 0, method* m29 = 0) {
+                     method* m25 = 0, method* m26 = 0, method* m27 = 0, method* m28 = 0, method* m29 = 0,
+                     method* m30 = 0, method* m31 = 0, method* m32 = 0, method* m33 = 0, method* m34 = 0,
+                     method* m35 = 0, method* m36 = 0, method* m37 = 0, method* m38 = 0, method* m39 = 0,
+                     method* m40 = 0, method* m41 = 0, method* m42 = 0, method* m43 = 0, method* m44 = 0,
+                     method* m45 = 0, method* m46 = 0, method* m47 = 0, method* m48 = 0, method* m49 = 0) {
             fixture* f = &__fixtures();
             while(f->_next) {
                f = f->_next;
             }
             f = f->_next = new fixture;
 
-            #define SET_FIXTURE_METHOD(M) \
-               if(M) { \
-                  method** m = 0; \
-                  switch(M->_type) { \
-                     case method::AFTER_METHOD:        m = &f->_afters;         break; \
-                     case method::AFTER_CLASS_METHOD:  m = &f->_after_classes;  break; \
-                     case method::BEFORE_METHOD:       m = &f->_befores;        break; \
-                     case method::BEFORE_CLASS_METHOD: m = &f->_before_classes; break; \
-                     case method::TEST_METHOD:         m = &f->_tests;          break; \
-                  } \
-                  while(*m && (*m)->_next) { \
-                     m = &(*m)->_next; \
-                  } \
-                  (*m) ? (*m)->_next = M : *m = M; \
+            method* methods[50] = { m0,  m1,  m2,  m3,  m4,  m5,  m6,  m7,  m8,  m9,
+                                    m10, m11, m12, m13, m14, m15, m16, m17, m18, m19,
+                                    m20, m21, m22, m23, m24, m25, m26, m27, m28, m29,
+                                    m30, m31, m32, m33, m34, m35, m36, m37, m38, m39,
+                                    m40, m41, m42, m43, m44, m45, m46, m47, m48, m49 };
+
+            for(int i = 0; i < 50; i++) {
+               if(methods[i]) {
+                  method** m = 0;
+                  switch(methods[i]->_type) {
+                     case method::AFTER_METHOD:        m = &f->_afters;         break;
+                     case method::AFTER_CLASS_METHOD:  m = &f->_after_classes;  break;
+                     case method::BEFORE_METHOD:       m = &f->_befores;        break;
+                     case method::BEFORE_CLASS_METHOD: m = &f->_before_classes; break;
+                     case method::TEST_METHOD:         m = &f->_tests;          break;
+                  }
+                  while(*m && (*m)->_next) {
+                     m = &(*m)->_next;
+                  }
+                  (*m) ? (*m)->_next = methods[i] : *m = methods[i];
                }
-            SET_FIXTURE_METHOD(m0)  SET_FIXTURE_METHOD(m1)  SET_FIXTURE_METHOD(m2)  SET_FIXTURE_METHOD(m3)
-            SET_FIXTURE_METHOD(m4)  SET_FIXTURE_METHOD(m5)  SET_FIXTURE_METHOD(m6)  SET_FIXTURE_METHOD(m7)
-            SET_FIXTURE_METHOD(m8)  SET_FIXTURE_METHOD(m9)  SET_FIXTURE_METHOD(m10) SET_FIXTURE_METHOD(m11)
-            SET_FIXTURE_METHOD(m12) SET_FIXTURE_METHOD(m13) SET_FIXTURE_METHOD(m14) SET_FIXTURE_METHOD(m15)
-            SET_FIXTURE_METHOD(m16) SET_FIXTURE_METHOD(m17) SET_FIXTURE_METHOD(m18) SET_FIXTURE_METHOD(m19)
-            SET_FIXTURE_METHOD(m20) SET_FIXTURE_METHOD(m21) SET_FIXTURE_METHOD(m22) SET_FIXTURE_METHOD(m23)
-            SET_FIXTURE_METHOD(m24) SET_FIXTURE_METHOD(m25) SET_FIXTURE_METHOD(m26) SET_FIXTURE_METHOD(m27)
-            SET_FIXTURE_METHOD(m28) SET_FIXTURE_METHOD(m29)
-            #undef SET_FIXTURE_METHOD
+            }
          }
 
          /**
@@ -319,7 +322,7 @@ namespace tpunit {
           */
          template <typename C>
          method* After(void (C::*_method)(), const char* _name) {
-            return new method(this, reinterpret_cast<void (TestFixture::*)()>(_method), _name, method::AFTER_METHOD);
+            return new method(this, static_cast<void (TestFixture::*)()>(_method), _name, method::AFTER_METHOD);
          }
 
          /**
@@ -331,7 +334,7 @@ namespace tpunit {
           */
          template <typename C>
          method* AfterClass(void (C::*_method)(), const char* _name) {
-            return new method(this, reinterpret_cast<void (TestFixture::*)()>(_method), _name, method::AFTER_CLASS_METHOD);
+            return new method(this, static_cast<void (TestFixture::*)()>(_method), _name, method::AFTER_CLASS_METHOD);
          }
 
          /**
@@ -342,7 +345,7 @@ namespace tpunit {
           */
          template <typename C>
          method* Before(void (C::*_method)(), const char* _name) {
-            return new method(this, reinterpret_cast<void (TestFixture::*)()>(_method), _name, method::BEFORE_METHOD);
+            return new method(this, static_cast<void (TestFixture::*)()>(_method), _name, method::BEFORE_METHOD);
          }
 
          /**
@@ -354,7 +357,7 @@ namespace tpunit {
           */
          template <typename C>
          method* BeforeClass(void (C::*_method)(), const char* _name) {
-            return new method(this, reinterpret_cast<void (TestFixture::*)()>(_method), _name, method::BEFORE_CLASS_METHOD);
+            return new method(this, static_cast<void (TestFixture::*)()>(_method), _name, method::BEFORE_CLASS_METHOD);
          }
 
          /**
@@ -365,7 +368,7 @@ namespace tpunit {
           */
          template <typename C>
          method* Test(void (C::*_method)(), const char* _name) {
-            return new method(this, reinterpret_cast<void (TestFixture::*)()>(_method), _name, method::TEST_METHOD);
+            return new method(this, static_cast<void (TestFixture::*)()>(_method), _name, method::TEST_METHOD);
          }
 
       protected:
@@ -528,6 +531,10 @@ namespace tpunit {
                __do_methods(f->_afters);
             }
          }
+
+         #undef __TPUNITPP_TRY
+         #undef __TPUNITPP_CATCH
+         #undef __TPUNITPP_CAUSE
 
          static stats& __stats() {
             static stats _stats;
