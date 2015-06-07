@@ -27,5 +27,5 @@ int main() {
     * all tests are successful, otherwise returns the number
     * of failing assertions.
     */
-   return tpunit::Tests::Run();
+   return tpunit::Tests::run();
 }

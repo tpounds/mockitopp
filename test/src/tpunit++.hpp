@@ -37,10 +37,10 @@ extern "C" int printf(const char*, ...);
  * TPUNITPP_VERSION_MINOR is an integer of the minor version.
  * TPUNITPP_VERSION_PATCH is an integer of the patch version.
  */
-#define TPUNITPP_VERSION 1001002
+#define TPUNITPP_VERSION 1001004
 #define TPUNITPP_VERSION_MAJOR 1
 #define TPUNITPP_VERSION_MINOR 1
-#define TPUNITPP_VERSION_PATCH 2
+#define TPUNITPP_VERSION_PATCH 4
 
 /**
  * ABORT(); generates a failure, immediately returning from the
@@ -52,10 +52,10 @@ extern "C" int printf(const char*, ...);
  * TRACE(message); adds a trace to the test output with a user
  * specified string message.
  */
-#define ABORT() __assert(__FILE__, __LINE__); return;
-#define FAIL()  __assert(__FILE__, __LINE__);
+#define ABORT() tpunit_detail_assert(__FILE__, __LINE__); return;
+#define FAIL()  tpunit_detail_assert(__FILE__, __LINE__);
 #define PASS()  /* do nothing */
-#define TRACE(message) __trace(__FILE__, __LINE__, message);
+#define TRACE(message) tpunit_detail_trace(__FILE__, __LINE__, message);
 
 /**
  * The set of core macros for basic predicate testing of boolean
@@ -93,8 +93,8 @@ extern "C" int printf(const char*, ...);
  * ASSERT|EXPECT_FLOAT_NEAR(lhs, rhs, abs_error); generates a failure if
  * the given floating-point values exceed the absolute error.
  */
-#define ASSERT_FLOAT_EQUAL(lhs, rhs) if(__fp_equal(lhs, rhs, 4)) { PASS(); } else { ABORT(); }
-#define EXPECT_FLOAT_EQUAL(lhs, rhs) if(__fp_equal(lhs, rhs, 4)) { PASS(); } else { FAIL(); }
+#define ASSERT_FLOAT_EQUAL(lhs, rhs) if(tpunit_detail_fp_equal(lhs, rhs, 4)) { PASS(); } else { ABORT(); }
+#define EXPECT_FLOAT_EQUAL(lhs, rhs) if(tpunit_detail_fp_equal(lhs, rhs, 4)) { PASS(); } else { FAIL(); }
 #define ASSERT_FLOAT_NEAR(lhs, rhs, abs_error) if((((lhs) > (rhs)) ? (lhs) - (rhs) : (rhs) - (lhs)) <= (abs_error)) { PASS(); } else { ABORT(); }
 #define EXPECT_FLOAT_NEAR(lhs, rhs, abs_error) if((((lhs) > (rhs)) ? (lhs) - (rhs) : (rhs) - (lhs)) <= (abs_error)) { PASS(); } else { FAIL(); }
 
@@ -186,7 +186,7 @@ namespace tpunit {
       private:
 
          /**
-          * An internal class representing a TestFixture class.
+          * Internal class encapsulating a registered test method.
           */
          struct method {
             method(TestFixture* obj, void (TestFixture::*addr)(), const char* name, unsigned char type)
@@ -207,7 +207,7 @@ namespace tpunit {
 
             TestFixture* _this;
             void (TestFixture::*_addr)();
-            char _name[256];
+            char _name[1024];
 
             enum {
                AFTER_METHOD,  AFTER_CLASS_METHOD,
@@ -220,35 +220,7 @@ namespace tpunit {
          };
 
          /**
-          * An internal class representing a TestFixture class.
-          */
-         struct fixture {
-            fixture()
-               : _afters(0),  _after_classes(0) 
-               , _befores(0), _before_classes(0) 
-               , _tests(0),   _next(0)
-               {}
-
-            ~fixture() {
-               delete _afters;
-               delete _after_classes;
-               delete _befores;
-               delete _before_classes;
-               delete _tests;
-               delete _next;
-            }
-
-            method* _afters;
-            method* _after_classes;
-            method* _befores;
-            method* _before_classes;
-            method* _tests;
-
-            fixture* _next;
-         };
-
-         /**
-          * A struct holding test statistics. 
+          * Internal class encapsulating test statistics.
           */
          struct stats {
             stats()
@@ -284,11 +256,15 @@ namespace tpunit {
                      method* m35 = 0, method* m36 = 0, method* m37 = 0, method* m38 = 0, method* m39 = 0,
                      method* m40 = 0, method* m41 = 0, method* m42 = 0, method* m43 = 0, method* m44 = 0,
                      method* m45 = 0, method* m46 = 0, method* m47 = 0, method* m48 = 0, method* m49 = 0) {
-            fixture* f = &__fixtures();
-            while(f->_next) {
-               f = f->_next;
+            TestFixture** f = tpunit_detail_fixtures();
+            if (*f) {
+               while((*f)->_next) {
+                  f = &((*f)->_next);
+               }
+               (*f)->_next = this;
+            } else {
+               *f = this;
             }
-            f = f->_next = new fixture;
 
             method* methods[50] = { m0,  m1,  m2,  m3,  m4,  m5,  m6,  m7,  m8,  m9,
                                     m10, m11, m12, m13, m14, m15, m16, m17, m18, m19,
@@ -300,11 +276,11 @@ namespace tpunit {
                if(methods[i]) {
                   method** m = 0;
                   switch(methods[i]->_type) {
-                     case method::AFTER_METHOD:        m = &f->_afters;         break;
-                     case method::AFTER_CLASS_METHOD:  m = &f->_after_classes;  break;
-                     case method::BEFORE_METHOD:       m = &f->_befores;        break;
-                     case method::BEFORE_CLASS_METHOD: m = &f->_before_classes; break;
-                     case method::TEST_METHOD:         m = &f->_tests;          break;
+                     case method::AFTER_METHOD:        m = &_afters;         break;
+                     case method::AFTER_CLASS_METHOD:  m = &_after_classes;  break;
+                     case method::BEFORE_METHOD:       m = &_befores;        break;
+                     case method::BEFORE_CLASS_METHOD: m = &_before_classes; break;
+                     case method::TEST_METHOD:         m = &_tests;          break;
                   }
                   while(*m && (*m)->_next) {
                      m = &(*m)->_next;
@@ -312,6 +288,14 @@ namespace tpunit {
                   (*m) ? (*m)->_next = methods[i] : *m = methods[i];
                }
             }
+         }
+
+         ~TestFixture() {
+            delete _afters;
+            delete _after_classes;
+            delete _befores;
+            delete _before_classes;
+            delete _tests;
          }
 
          /**
@@ -371,23 +355,23 @@ namespace tpunit {
             return new method(this, static_cast<void (TestFixture::*)()>(_method), _name, method::TEST_METHOD);
          }
 
-      protected:
-
-         static int __do_run() {
-            fixture* f = __fixtures()._next;
+         static int tpunit_detail_do_run() {
+            TestFixture* f = *tpunit_detail_fixtures();
              while(f) {
                 printf("[--------------]\n");
-                __do_methods(f->_before_classes);
-                __do_tests(f);
-                __do_methods(f->_after_classes);
+                tpunit_detail_do_methods(f->_before_classes);
+                tpunit_detail_do_tests(f);
+                tpunit_detail_do_methods(f->_after_classes);
                 printf("[--------------]\n\n");
                 f = f->_next;
              }
              printf("[==============]\n");
-             printf("[ TEST RESULTS ] Passed: %i, Failed: %i\n", __stats()._passes, __stats()._failures);
+             printf("[ TEST RESULTS ] Passed: %i, Failed: %i\n", tpunit_detail_stats()._passes, tpunit_detail_stats()._failures);
              printf("[==============]\n");
-             return __stats()._failures;
+             return tpunit_detail_stats()._failures;
          }
+
+      protected:
 
          /**
           * Determine if two binary32 single precision IEEE 754 floating-point
@@ -395,7 +379,7 @@ namespace tpunit {
           *
           * http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm 
           */
-         static bool __fp_equal(float lhs, float rhs, unsigned char ulps) {
+         static bool tpunit_detail_fp_equal(float lhs, float rhs, unsigned char ulps) {
             union {
                float f;
                char  c[4];
@@ -428,7 +412,7 @@ namespace tpunit {
           *
           * http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm 
           */
-         static bool __fp_equal(double lhs, double rhs, unsigned char ulps) {
+         static bool tpunit_detail_fp_equal(double lhs, double rhs, unsigned char ulps) {
             union {
                double d;
                char   c[8];
@@ -466,106 +450,95 @@ namespace tpunit {
                    ((lhs_u.c[lsb] > rhs_u.c[lsb]) ? lhs_u.c[lsb] - rhs_u.c[lsb] : rhs_u.c[lsb] - lhs_u.c[lsb]) <= ulps;
          }
 
-         static void __assert(const char* _file, int _line) {
-            printf("[              ]    assertion #%i at %s:%i\n", ++__stats()._assertions, _file, _line);
+         static void tpunit_detail_assert(const char* _file, int _line) {
+            printf("[              ]    assertion #%i at %s:%i\n", ++tpunit_detail_stats()._assertions, _file, _line);
          }
 
-         static void __exception(const char* _message) {
-            printf("[              ]    exception #%i cause: %s\n", ++__stats()._exceptions, _message);
+         static void tpunit_detail_exception(const char* _message) {
+            printf("[              ]    exception #%i cause: %s\n", ++tpunit_detail_stats()._exceptions, _message);
          }
 
-         static void __trace(const char* _file, int _line, const char* _message) {
-            printf("[              ]    trace #%i at %s:%i: %s\n", ++__stats()._traces, _file, _line, _message);
+         static void tpunit_detail_trace(const char* _file, int _line, const char* _message) {
+            printf("[              ]    trace #%i at %s:%i: %s\n", ++tpunit_detail_stats()._traces, _file, _line, _message);
          }
 
       private:
 
-         #ifdef TPUNITPP_HAS_EXCEPTIONS
-            #define __TPUNITPP_TRY      try
-            #define __TPUNITPP_CATCH(E) catch(E)
-            #define __TPUNITPP_CAUSE(W) __exception(W)
-         #else
-            #define __TPUNITPP_TRY      if(true)
-            #define __TPUNITPP_CATCH(E) if(false)
-            #define __TPUNITPP_CAUSE(W)
-         #endif
+         static void tpunit_detail_do_method(method* m) {
+            #ifdef TPUNITPP_HAS_EXCEPTIONS
+            try {
+            #endif
+               (*m->_this.*m->_addr)();
+            #ifdef TPUNITPP_HAS_EXCEPTIONS
+            } catch(const std::exception& e) {
+               tpunit_detail_exception(e.what());
+            } catch(...) {
+               tpunit_detail_exception("caught unknown exception type");
+            }
+            #endif
+         }
 
-         static void __do_methods(method* m) {
+         static void tpunit_detail_do_methods(method* m) {
             while(m) {
-               __TPUNITPP_TRY {
-                  (*m->_this.*m->_addr)();
-               } __TPUNITPP_CATCH(const std::exception& e) {
-                  __TPUNITPP_CAUSE(e.what());
-               } __TPUNITPP_CATCH(...) {
-                  __TPUNITPP_CAUSE("caught unknown exception type");
-               }
+               tpunit_detail_do_method(m);
                m = m->_next;
             }
          }
 
-         static void __do_tests(fixture* f) {
+         static void tpunit_detail_do_tests(TestFixture* f) {
             method* t = f->_tests;
             while(t) {
-               __do_methods(f->_befores);
+               tpunit_detail_do_methods(f->_befores);
 
-               int _prev_assertions = __stats()._assertions;
-               int _prev_exceptions = __stats()._exceptions;
+               int _prev_assertions = tpunit_detail_stats()._assertions;
+               int _prev_exceptions = tpunit_detail_stats()._exceptions;
                printf("[ RUN          ] %s\n", t->_name);
-               __TPUNITPP_TRY {
-                  (*t->_this.*t->_addr)();
-               } __TPUNITPP_CATCH(const std::exception& e) {
-                  __TPUNITPP_CAUSE(e.what());
-               } __TPUNITPP_CATCH(...) {
-                  __TPUNITPP_CAUSE("caught unknown exception type");
-               }
-               if(_prev_assertions == __stats()._assertions &&
-                  _prev_exceptions == __stats()._exceptions) {
+               tpunit_detail_do_method(t);
+               if(_prev_assertions == tpunit_detail_stats()._assertions &&
+                  _prev_exceptions == tpunit_detail_stats()._exceptions) {
                   printf("[       PASSED ] %s\n", t->_name);
-                  __stats()._passes++;
+                  tpunit_detail_stats()._passes++;
                } else {
                   printf("[       FAILED ] %s\n", t->_name);
-                  __stats()._failures++;
+                  tpunit_detail_stats()._failures++;
                }
                t = t->_next;
 
-               __do_methods(f->_afters);
+               tpunit_detail_do_methods(f->_afters);
             }
          }
 
-         #undef __TPUNITPP_TRY
-         #undef __TPUNITPP_CATCH
-         #undef __TPUNITPP_CAUSE
-
-         static stats& __stats() {
+         static stats& tpunit_detail_stats() {
             static stats _stats;
             return _stats;
          }
 
-         static fixture& __fixtures() {
-            static fixture _fixtures;
-            return _fixtures;
+         static TestFixture** tpunit_detail_fixtures() {
+            static TestFixture* _fixtures = 0;
+            return &_fixtures;
          }
+
+         TestFixture* _next;
+
+         method* _afters;
+         method* _after_classes;
+         method* _befores;
+         method* _before_classes;
+         method* _tests;
    };
 
    /**
-    * A class containing the primary entry point for running all registered
-    * tpunit++ test cases. Generally this class is wrapped by the user's
-    * main function.
+    * Convenience class containing the entry point to run all registered tests.
     */
-   class Tests : private TestFixture
-   {
-      public:
-
-         /**
-          * Run all of the registered test cases and return the number of failed assertions.
-          *
-          * @return The number of failing assertions. (e.g. zero if all tests pass, otherwise non-zero)
-          */
-         static int Run() { return TestFixture::__do_run(); }
-
-      private:
-
-         Tests() : TestFixture(0) { /* disable instance creation */ }
+   struct Tests {
+      /**
+       * Run all registered test cases and return the number of failed assertions.
+       *
+       * @return Number of failed assertions or zero if all tests pass.
+       */
+      static int run() {
+         return TestFixture::tpunit_detail_do_run();
+      }
    };
 } // namespace tpunit
 #endif //__TPUNITPP_HPP__
