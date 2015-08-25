@@ -11,4 +11,4 @@ class Environment(BaseEnvironment.Environment):
       cxx = os.path.basename(self['CXX'])
 
       if cxx.startswith("clang") or cxx.startswith("g++"):
-         self.AppendUnique(CXXFLAGS=['-Wall', '-Wpedantic', '-g'])
+         self.AppendUnique(CXXFLAGS=['-Wall', '-pedantic', '-g'])
