@@ -22,13 +22,13 @@ struct test_string_literal : tpunit::TestFixture
    void char_ptr()
    {
       mock_object<string_literal_test_interface> mock;
-      mock(&string_literal_test_interface::char_ptr).when(string_literal<char*>("FOO")).thenReturn(0);
-      mock(&string_literal_test_interface::char_ptr).when(string_literal<char*>("BAR")).thenReturn(1);
+      mock(&string_literal_test_interface::char_ptr).when(string_literal<char*>(const_cast<char*>("FOO"))).thenReturn(0);
+      mock(&string_literal_test_interface::char_ptr).when(string_literal<char*>(const_cast<char*>("BAR"))).thenReturn(1);
       string_literal_test_interface& obj = mock.getInstance();
 
-      ASSERT_EQUAL(0, obj.char_ptr("FOO"));
-      ASSERT_EQUAL(1, obj.char_ptr("BAR"));
-      ASSERT_THROW(obj.char_ptr("NO MATCH"), mockitopp::partial_implementation_exception);
+      ASSERT_EQUAL(0, obj.char_ptr(const_cast<char*>("FOO")));
+      ASSERT_EQUAL(1, obj.char_ptr(const_cast<char*>("BAR")));
+      ASSERT_THROW(obj.char_ptr(const_cast<char*>("NO MATCH")), mockitopp::partial_implementation_exception);
    }
 
    void const_char_ptr()
