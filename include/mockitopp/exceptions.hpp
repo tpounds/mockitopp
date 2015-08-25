@@ -10,9 +10,9 @@ namespace mockitopp
    MOCKITO_EXCEPTION(partial_implementation_exception)
    MOCKITO_EXCEPTION(missing_implementation_exception)
 
-   MOCKITO_EXCEPTION(less_invocations_expected);
-   MOCKITO_EXCEPTION(more_invocations_expected);
-   MOCKITO_EXCEPTION(zero_invocations_expected);
+   MOCKITO_EXCEPTION(less_invocations_expected)
+   MOCKITO_EXCEPTION(more_invocations_expected)
+   MOCKITO_EXCEPTION(zero_invocations_expected)
 
    #undef MOCKITO_EXCEPTION
 } // namespace mockitopp
