@@ -10,7 +10,7 @@ namespace mockitopp
       template <typename T>
       struct Matcher
       {
-         virtual ~Matcher() {};
+         virtual ~Matcher() {}
 
          virtual Matcher* clone() const = 0;
 
