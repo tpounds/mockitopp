@@ -2,5 +2,5 @@ language: cpp
 compiler:
    - clang
    - gcc
-install: sudo apt-get install -qq clang g++
+install: sudo apt-get install -qq clang g++ scons
 script: scons
