@@ -15,8 +15,13 @@ class Environment(BaseEnvironment.Environment):
 
    def ConfigureCompiler(self):
       cxx = self.WhereIs(self['CXX'])
-      cxx_bin = os.path.basename(cxx).lower()
+      cxx = os.path.normpath(cxx)
+      cxx_bin = os.path.basename(cxx)
       cxx_dir = os.path.dirname(cxx)
+
+      print "XXX: " + cxx
+      print "XXX: " + cxx_bin
+      print "XXX: " + cxx_dir
 
       if cxx_bin.startswith("cl"):
          common = cxx_dir + "\..\.."
