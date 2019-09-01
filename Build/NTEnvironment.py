@@ -9,9 +9,9 @@ class Environment(BaseEnvironment.Environment):
 
       self.ConfigureCompiler()
 
-      self['ENV']['INCLUDE'] = self['CPPPATH']
-      self['ENV']['LIB'] = self['LIBPATH']
-      self['ENV']['PATH'] = os.environ['PATH']
+      # self['ENV']['INCLUDE'] = self['CPPPATH']
+      # self['ENV']['LIB'] = self['LIBPATH']
+      # self['ENV']['PATH'] = os.environ['PATH']
 
    def ConfigureCompiler(self):
       cxx = self.WhereIs(self['CXX'])
@@ -24,11 +24,12 @@ class Environment(BaseEnvironment.Environment):
       print "XXX: " + cxx_dir
 
       if cxx_bin.startswith("cl"):
-         common = cxx_dir + "\..\.."
-         if os.path.exists(common + "\Common\IDE"):
-           os.environ['PATH'] = common + "\Common\IDE" + ";" + cxx_dir
-         elif os.path.exists(common + "\Common7\IDE"):
-           os.environ['PATH'] = common + "\Common7\IDE" + ";" + cxx_dir
+         # common = cxx_dir + "\..\.."
+         # if os.path.exists(common + "\Common\IDE"):
+         #   os.environ['PATH'] = common + "\Common\IDE"
+         # elif os.path.exists(common + "\Common7\IDE"):
+         #   os.environ['PATH'] = common + "\Common7\IDE"
+         # os.environ['PATH'] += ";" + cxx_dir
 
          # proc = Popen(cxx_bin, stderr=STDOUT, stdout=PIPE)
          # proc.wait()
@@ -53,8 +54,8 @@ class Environment(BaseEnvironment.Environment):
          self.AppendUnique(CXXFLAGS = ['/EHsc', '/GR', '/DBOOST_ALL_NO_LIB'])
          self['CXX'] = cxx_bin
 #         self['LINK'] = "link.exe"
-         self['CPPPATH'] = os.path.abspath(cxx_dir + "\..\include")
-         self['LIBPATH'] = os.path.abspath(cxx_dir + "\..\lib")
+         # self['CPPPATH'] = os.path.abspath(cxx_dir + "\..\include")
+         # self['LIBPATH'] = os.path.abspath(cxx_dir + "\..\lib")
 
          sdk_dir = ""
          if os.getenv('MicrosoftPlatformSDK', None) != None:
