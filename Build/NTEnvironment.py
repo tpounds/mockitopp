@@ -30,24 +30,24 @@ class Environment(BaseEnvironment.Environment):
          elif os.path.exists(common + "\Common7\IDE"):
            os.environ['PATH'] = common + "\Common7\IDE" + ";" + cxx_dir
 
-         proc = Popen(cxx_bin, stderr=STDOUT, stdout=PIPE)
-         proc.wait()
-         version = "".join(proc.stdout.readlines())
+         # proc = Popen(cxx_bin, stderr=STDOUT, stdout=PIPE)
+         # proc.wait()
+         # version = "".join(proc.stdout.readlines())
 
-         if re.search("Version 12\.00", version):
-            raise EnvironmentError("Microsoft Visual C++ (6.0) Unsupported!")
-         elif re.search("Version 13\.00", version):
-            print "Microsoft Visual C++ .NET 2002 (7.0) Detected"
-         elif re.search("Version 13\.10", version):
-            print "Microsoft Visual C++ .NET 2003 (7.1) Detected"
-         elif re.search("Version 14\.00", version):
-            print "Microsoft Visual C++ 2005 (8.0) Detected"
-         elif re.search("Version 15\.00", version):
-            print "Microsoft Visual C++ 2008 (9.0) Detected"
-         elif re.search("Version 16\.00", version):
-            print "Microsoft Visual C++ 2010 (10.0) Detected"
-         else:
-            raise EnvironmentError("Unknown Microsoft Visual C++ Detected!")
+         # if re.search("Version 12\.00", version):
+         #    raise EnvironmentError("Microsoft Visual C++ (6.0) Unsupported!")
+         # elif re.search("Version 13\.00", version):
+         #    print "Microsoft Visual C++ .NET 2002 (7.0) Detected"
+         # elif re.search("Version 13\.10", version):
+         #    print "Microsoft Visual C++ .NET 2003 (7.1) Detected"
+         # elif re.search("Version 14\.00", version):
+         #    print "Microsoft Visual C++ 2005 (8.0) Detected"
+         # elif re.search("Version 15\.00", version):
+         #    print "Microsoft Visual C++ 2008 (9.0) Detected"
+         # elif re.search("Version 16\.00", version):
+         #    print "Microsoft Visual C++ 2010 (10.0) Detected"
+         # else:
+         #    raise EnvironmentError("Unknown Microsoft Visual C++ Detected!")
 
          # XXX: BOOST_ALL_NO_LIB prevents MSVC from auto-linking a non-existent library
          self.AppendUnique(CXXFLAGS = ['/EHsc', '/GR', '/DBOOST_ALL_NO_LIB'])
