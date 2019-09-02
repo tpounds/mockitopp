@@ -3,6 +3,18 @@ import os
 import subprocess
 
 def Test(target, source, env):
+   print "YYY: " + str(source[0])
+   print "YYY: " + str(source[0].abspath)
+   print "YYY: " + os.path.normpath(str(source[0]))
+   print "YYY: " + os.path.abspath(str(source[0]))
+   print "YYY: " + os.path.abspath('.')
+
+   print "ZZZ: " + os.getcwd()
+   print "ZZZ: " + os.path.abspath(os.getcwd())
+   print "ZZZ: " + " ".join(os.listdir('.'))
+   print "ZZZ: " + " ".join(os.listdir('test'))
+   print "ZZZ: " + " ".join(os.listdir('test\build'))
+
    proc = subprocess.Popen(source[0].abspath)
    proc.wait()
    print "\n============================="
