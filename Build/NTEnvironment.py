@@ -9,47 +9,53 @@ class Environment(BaseEnvironment.Environment):
 
       self.ConfigureCompiler()
 
-      self['ENV']['INCLUDE'] = self['CPPPATH']
-      self['ENV']['LIB'] = self['LIBPATH']
-      self['ENV']['PATH'] = os.environ['PATH']
+      # self['ENV']['INCLUDE'] = self['CPPPATH']
+      # self['ENV']['LIB'] = self['LIBPATH']
+      # self['ENV']['PATH'] = os.environ['PATH']
 
    def ConfigureCompiler(self):
       cxx = self.WhereIs(self['CXX'])
-      cxx_bin = os.path.basename(cxx).lower()
+      cxx = os.path.normpath(cxx)
+      cxx_bin = os.path.basename(cxx)
       cxx_dir = os.path.dirname(cxx)
 
+      print "XXX: " + cxx
+      print "XXX: " + cxx_bin
+      print "XXX: " + cxx_dir
+
       if cxx_bin.startswith("cl"):
-         common = cxx_dir + "\..\.."
-         if os.path.exists(common + "\Common\IDE"):
-           os.environ['PATH'] = common + "\Common\IDE" + ";" + cxx_dir
-         elif os.path.exists(common + "\Common7\IDE"):
-           os.environ['PATH'] = common + "\Common7\IDE" + ";" + cxx_dir
+         # common = cxx_dir + "\..\.."
+         # if os.path.exists(common + "\Common\IDE"):
+         #   os.environ['PATH'] = common + "\Common\IDE"
+         # elif os.path.exists(common + "\Common7\IDE"):
+         #   os.environ['PATH'] = common + "\Common7\IDE"
+         # os.environ['PATH'] += ";" + cxx_dir
 
-         proc = Popen(cxx_bin, stderr=STDOUT, stdout=PIPE)
-         proc.wait()
-         version = "".join(proc.stdout.readlines())
+         # proc = Popen(cxx_bin, stderr=STDOUT, stdout=PIPE)
+         # proc.wait()
+         # version = "".join(proc.stdout.readlines())
 
-         if re.search("Version 12\.00", version):
-            raise EnvironmentError("Microsoft Visual C++ (6.0) Unsupported!")
-         elif re.search("Version 13\.00", version):
-            print "Microsoft Visual C++ .NET 2002 (7.0) Detected"
-         elif re.search("Version 13\.10", version):
-            print "Microsoft Visual C++ .NET 2003 (7.1) Detected"
-         elif re.search("Version 14\.00", version):
-            print "Microsoft Visual C++ 2005 (8.0) Detected"
-         elif re.search("Version 15\.00", version):
-            print "Microsoft Visual C++ 2008 (9.0) Detected"
-         elif re.search("Version 16\.00", version):
-            print "Microsoft Visual C++ 2010 (10.0) Detected"
-         else:
-            raise EnvironmentError("Unknown Microsoft Visual C++ Detected!")
+         # if re.search("Version 12\.00", version):
+         #    raise EnvironmentError("Microsoft Visual C++ (6.0) Unsupported!")
+         # elif re.search("Version 13\.00", version):
+         #    print "Microsoft Visual C++ .NET 2002 (7.0) Detected"
+         # elif re.search("Version 13\.10", version):
+         #    print "Microsoft Visual C++ .NET 2003 (7.1) Detected"
+         # elif re.search("Version 14\.00", version):
+         #    print "Microsoft Visual C++ 2005 (8.0) Detected"
+         # elif re.search("Version 15\.00", version):
+         #    print "Microsoft Visual C++ 2008 (9.0) Detected"
+         # elif re.search("Version 16\.00", version):
+         #    print "Microsoft Visual C++ 2010 (10.0) Detected"
+         # else:
+         #    raise EnvironmentError("Unknown Microsoft Visual C++ Detected!")
 
          # XXX: BOOST_ALL_NO_LIB prevents MSVC from auto-linking a non-existent library
          self.AppendUnique(CXXFLAGS = ['/EHsc', '/GR', '/DBOOST_ALL_NO_LIB'])
          self['CXX'] = cxx_bin
 #         self['LINK'] = "link.exe"
-         self['CPPPATH'] = os.path.abspath(cxx_dir + "\..\include")
-         self['LIBPATH'] = os.path.abspath(cxx_dir + "\..\lib")
+         # self['CPPPATH'] = os.path.abspath(cxx_dir + "\..\include")
+         # self['LIBPATH'] = os.path.abspath(cxx_dir + "\..\lib")
 
          sdk_dir = ""
          if os.getenv('MicrosoftPlatformSDK', None) != None:
